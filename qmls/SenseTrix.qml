@@ -1,6 +1,5 @@
 import QtQuick 6.5
 import QtQuick.Controls 6.5
-import UntitledProject2
 import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
 import QtQuick.Window
