@@ -45,6 +45,10 @@ import QtQuick.Window
                     if(menuState === true){
                         lsAnimationOff.running = true
                         menuState = false
+
+                        if(workspace1.visible === true){
+                            workspace1.anchors.leftMargin = 50
+                        }
                     }if(settingState === true){
                         settingPopUp.visible = false
                         settingState = false
@@ -89,6 +93,16 @@ import QtQuick.Window
                 },
                 Dictionary{
                     customName: "Setting 3"
+                }
+            ]
+
+            //function button in workspace1
+            property list<Dictionary> funcBtnModel:[
+                Dictionary{
+                    customName: "Add file"
+                },
+                Dictionary{
+                    customName: "Delete"
                 }
             ]
 
@@ -153,6 +167,8 @@ import QtQuick.Window
                                 customColor = "#DCDDDD"
                                 if(model.customWorkspace === workspace1){
                                     workspace1.visible = true
+                                    workspace1.anchors.leftMargin = 50 +
+                                            leftSidebar.width
                                 }
                             }
                         }
@@ -190,9 +206,17 @@ import QtQuick.Window
                         if(menuState === false){
                             lsAnimationOn.running = true
                             menuState = true
+
+                            if(workspace1.visible === true){
+                                workspace1.anchors.leftMargin = 50+leftSidebar.width
+                            }
                         }else{
                             lsAnimationOff.running = true
                             menuState = false
+
+                            if(workspace1.visible === true){
+                                workspace1.anchors.leftMargin = 50
+                            }
                         }
                     }
                 }
@@ -307,18 +331,20 @@ import QtQuick.Window
             //workspace
             property list<Rectangle> workspace:[workspace1, workspace2, workspace3]
             Rectangle {
-                 id: workspace1
-
-                width: root.width-100
+                id: workspace1
 
                 anchors.top: parent.top
-                anchors.topMargin: menu.anchors.topMargin+menu.height+20
+                anchors.topMargin: ((menu.anchors.topMargin*2)+menu.height)+50
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 50
+                anchors.left: parent.left
+                anchors.leftMargin: 50
+                anchors.right: parent.right
+                anchors.rightMargin: 50
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 color: "#ffffff"
-                radius: 10
+                radius: 5
                 border.width: 0
                 border.color: "#332C2B"
 
@@ -330,6 +356,29 @@ import QtQuick.Window
                     verticalOffset: 0
                     radius: 4.0
                     color: "#80000000"
+                }
+
+                //function button
+                Grid {
+                    id: grid1
+
+                    x: 0
+                    y: 0-(menu.height+(menu.anchors.topMargin*2))
+
+                    width: 258
+                    height: 38
+
+                    columns: 3
+
+                    // Repeater{
+                    //     model: root.funcBtnModel
+                    //     MyText{
+                    //         anchors.fill: parent
+
+                    //         customText: model.customName
+                    //         customColor: "#000000"
+                    //     }
+                    // }
                 }
             }
         }
