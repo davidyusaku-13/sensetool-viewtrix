@@ -6,6 +6,7 @@ QtObject {
 
     property int customWidth
     property int customHeight
+    property string customImage
     property string customName: ""
     property var customWorkspace: workspace1
 }
