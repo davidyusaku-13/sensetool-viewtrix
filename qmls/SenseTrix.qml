@@ -66,19 +66,17 @@ import QtQuick.Window
 
 
             //dictionary for project in left sidebar
-            property list<Dictionary> menuModel:[
+            property list<Dictionary> menuList:[
                 Dictionary{
-                    customName: "Project 1"
+                    customImage: "images/import.png"
                     customWorkspace: workspace1
-                },
-                Dictionary{
-                    customName: "Project 2"
-                    customWorkspace: workspace2
-                },
-                Dictionary{
-                    customName: "Project 3"
-                    customWorkspace: workspace3
                 }
+                // Dictionary{
+                //     customWorkspace: workspace2
+                // },
+                // Dictionary{
+                //     customWorkspace: workspace3
+                // }
             ]
 
             //dictionary for setting
@@ -101,7 +99,7 @@ import QtQuick.Window
                 x:-width
                 y: root.y
 
-                width: 150
+                width: menu.width+menu.anchors.leftMargin*2
                 height: root.height
 
                 visible: true
@@ -126,39 +124,36 @@ import QtQuick.Window
                     duration: 150
                 }
 
-                //project list
+                //list menu
                 Grid {
                     id: grid
 
-                    x: 20
-                    y: 105
+                    x: menu.anchors.leftMargin
+                    y: menu.height+menu.anchors.topMargin*2
 
                     width: leftSidebar.width-menu.anchors.leftMargin*2
                     height: leftSidebar.height - (menu.height +
-                                                  menu.anchors.topMargin*3)
+                                                  menu.anchors.topMargin*2)
                     spacing: 10
 
-                    rows: 5
+                    rows: 1
                     columns: 1
-
                     Repeater{
-                        id: repeaterMenu
-                        model: root.menuModel
-                        MyText{
-                            width: grid.width
-                            height: width/3
-
-                            customText: model.customName
-                            customSize: 13
+                        id: repeater
+                        model: root.menuList
+                        MyButton{
+                            customIconWidth: 25
+                            customIconHeight: 25
+                            customImage: model.customImage
+                            customColor: "#ffffff"
+                            customHoveredColor: "#DCDDDD"
+                            customRadius: 5
 
                             onClicked: {
-                                model.customWorkspace.visible = true
-                                lsAnimationOff.running = true
-
-                                menu.customColor = "#f4d7fb"
-                                menu.customHoveredColor = "#E3BBED"
-
-                                menuState = false
+                                customColor = "#DCDDDD"
+                                if(model.customWorkspace === workspace1){
+                                    workspace1.visible = true
+                                }
                             }
                         }
                     }
@@ -186,7 +181,7 @@ import QtQuick.Window
 
                 customImage: "images/menu-icon2.png"
                 customColor: "#ffffff"
-                customHoveredColor: "#E1E1E1"
+                customHoveredColor: "#DCDDDD"
                 customRadius: 5
 
                 MouseArea{
@@ -203,9 +198,9 @@ import QtQuick.Window
                 }
             }
 
-            //grid for left icon
+            //grid for right icon
             Grid {
-                id: leftIcontGrid
+                id: rightIconGrid
 
                 x: 1480
 
@@ -226,7 +221,8 @@ import QtQuick.Window
 
                     customImage: "images/setting.png"
                     customColor: "#ffffff"
-                    customHoveredColor: "#e1e1e1"
+                    customHoveredColor: "#DCDDDC"
+                    customRadius: 5
 
                     MouseArea{
                         anchors.fill:parent
@@ -248,7 +244,8 @@ import QtQuick.Window
 
                     customImage: "images/notification.png"
                     customColor: "#ffffff"
-                    customHoveredColor: "#e1e1e1"
+                    customHoveredColor: "#DCDDDD"
+                    customRadius: 5
 
                     MouseArea{
                         anchors.fill:parent
@@ -259,40 +256,11 @@ import QtQuick.Window
                 }
             }
 
-            //workspace
-            property list<Rectangle> workspace:[workspace1, workspace2, workspace3]
-            Rectangle {
-                id: workspace1
-
-                width: root.width-100
-
-                anchors.top: parent.top
-                anchors.topMargin: menu.anchors.topMargin+menu.height+20
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 50
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                color: "#ffffff"
-                radius: 10
-                border.width: 0
-
-                visible: false
-
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 0
-                    radius: 4.0
-                    color: "#80000000"
-                }
-
-            }
-
             //setting pop up
             Rectangle{
                 id: settingPopUp
 
-                width: leftSidebar.width
+                width: 150
                 height: 30*3
 
                 radius: 5*3
@@ -300,7 +268,7 @@ import QtQuick.Window
                 anchors.right: parent.right
                 anchors.top: parent.top
                 anchors.rightMargin: menu.anchors.leftMargin
-                anchors.topMargin: setting.height+leftIcontGrid.anchors.topMargin+10
+                anchors.topMargin: setting.height+rightIconGrid.anchors.topMargin+10
 
                 visible: false
 
@@ -333,6 +301,35 @@ import QtQuick.Window
                             customFont: "Montserrat"
                         }
                     }
+                }
+            }
+
+            //workspace
+            property list<Rectangle> workspace:[workspace1, workspace2, workspace3]
+            Rectangle {
+                 id: workspace1
+
+                width: root.width-100
+
+                anchors.top: parent.top
+                anchors.topMargin: menu.anchors.topMargin+menu.height+20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                color: "#ffffff"
+                radius: 10
+                border.width: 0
+                border.color: "#332C2B"
+
+                visible: false
+
+                layer.enabled: true
+                layer.effect: DropShadow{
+                    horizontalOffset: 0
+                    verticalOffset: 0
+                    radius: 4.0
+                    color: "#80000000"
                 }
             }
         }
