@@ -99,10 +99,12 @@ import QtQuick.Window
             //function button in workspace1
             property list<Dictionary> funcBtnModel:[
                 Dictionary{
-                    customName: "Add file"
+                    customName: "Add"
+                    customImage: "images/plus"
                 },
                 Dictionary{
                     customName: "Delete"
+                    customImage: "images/trash"
                 }
             ]
 
@@ -307,7 +309,7 @@ import QtQuick.Window
                 }
 
                 Grid{
-                    id: grid3
+                    id: settingGrid
                     anchors.fill: parent
 
                     rows: 10
@@ -328,13 +330,13 @@ import QtQuick.Window
                 }
             }
 
-            //workspace
-            property list<Rectangle> workspace:[workspace1, workspace2, workspace3]
+            //workspace1
+            //property list<Rectangle> workspace:[workspace1, workspace2, workspace3]
             Rectangle {
                 id: workspace1
 
                 anchors.top: parent.top
-                anchors.topMargin: ((menu.anchors.topMargin*2)+menu.height)+50
+                anchors.topMargin: ((menu.anchors.topMargin*2)+menu.height)
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 50
                 anchors.left: parent.left
@@ -350,12 +352,26 @@ import QtQuick.Window
 
                 visible: false
 
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 0
-                    radius: 4.0
-                    color: "#80000000"
+                Rectangle{
+                    anchors.top: parent.top
+                    anchors.topMargin: 35
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    color: "#ffffff"
+                    radius: 5
+                    border.width: 0
+                    border.color: "#332C2B"
+
+                    layer.enabled: true
+                    layer.effect: DropShadow{
+                        horizontalOffset: 0
+                        verticalOffset: 0
+                        radius: 4.0
+                        color: "#80000000"
+                    }
                 }
 
                 //function button
@@ -363,22 +379,26 @@ import QtQuick.Window
                     id: grid1
 
                     x: 0
-                    y: 0-(menu.height+(menu.anchors.topMargin*2))
+                    y: parent.y-(menu.height+(menu.anchors.topMargin*2))
 
-                    width: 258
+                    width: 300
                     height: 38
 
+                    spacing: 3
                     columns: 3
 
-                    // Repeater{
-                    //     model: root.funcBtnModel
-                    //     MyText{
-                    //         anchors.fill: parent
+                    Repeater{
+                        model: root.funcBtnModel
+                        MyButton{
+                            width: 30
+                            height: 30
 
-                    //         customText: model.customName
-                    //         customColor: "#000000"
-                    //     }
-                    // }
+                            customImage: model.customImage
+                            customColor: "#ffffff"
+                            customHoveredColor: "#DCDDDD"
+                            customRadius: 5
+                        }
+                    }
                 }
             }
         }
