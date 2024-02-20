@@ -96,18 +96,6 @@ import QtQuick.Window
                 }
             ]
 
-            //function button in workspace1
-            property list<Dictionary> funcBtnModel:[
-                Dictionary{
-                    customName: "Add"
-                    customImage: "images/plus"
-                },
-                Dictionary{
-                    customName: "Delete"
-                    customImage: "images/trash"
-                }
-            ]
-
             //left sidebar
             Rectangle {
                 id: leftSidebar
@@ -329,6 +317,19 @@ import QtQuick.Window
                     }
                 }
             }
+            //function button in workspace1
+            property list<Dictionary> funcBtnModel:[
+                Dictionary{
+                    customName: "Add"
+                    customImage: "images/plus"
+                    customWidth: 50
+                },
+                Dictionary{
+                    customName: "Delete"
+                    customImage: "images/trash"
+                    customWidth: 70
+                }
+            ]
 
             //workspace1
             //property list<Rectangle> workspace:[workspace1, workspace2, workspace3]
@@ -354,7 +355,7 @@ import QtQuick.Window
 
                 Rectangle{
                     anchors.top: parent.top
-                    anchors.topMargin: 35
+                    anchors.topMargin: 40
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -384,19 +385,34 @@ import QtQuick.Window
                     width: 300
                     height: 38
 
-                    spacing: 3
+                    spacing: 4
                     columns: 3
 
                     Repeater{
                         model: root.funcBtnModel
-                        MyButton{
-                            width: 30
+                        // MyButton{
+                        //     width: 28
+                        //     height: 28
+
+                        //     customImage: model.customImage
+                        //     customColor: "#ffffff"
+                        //     customHoveredColor: "#DCDDDD"
+                        //     customRadius: 5
+                        // }
+                        MyText{
+                            width: model.customWidth
                             height: 30
 
-                            customImage: model.customImage
-                            customColor: "#ffffff"
-                            customHoveredColor: "#DCDDDD"
                             customRadius: 5
+                            customText: model.customName
+                            customHAlignment: "Center"
+                            customSize: 15
+                            customColor: "#000000"
+                            customHoveredColor: "#000000"
+                            customTextColor: "#ffffff"
+                            onClicked: {
+
+                            }
                         }
                     }
                 }

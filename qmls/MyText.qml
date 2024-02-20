@@ -6,22 +6,27 @@ Button {
     x: 0
     y: 0
 
-    width: 150
-    height: 50
-
     property string customText: "menu 1"
     property string customFont: "Montserrat Medium"
     property int customSize: 20
     property string customHAlignment: "Left"
+    property string customTextColor: "#000000"
 
     property string customColor: "#ffffff"
     property string customHoveredColor: "#e1e1e1"
 
     property int customRadius: 10
 
+    property int customWidth: 100
+    property int customHeight: 40
+
+    width: customWidth
+    height: customHeight
+
     Text {
         id: myText
 
+        color: customTextColor
         text: customText
         font.pixelSize: customSize
         font.family: customFont
