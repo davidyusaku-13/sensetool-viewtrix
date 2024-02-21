@@ -328,11 +328,15 @@ import QtQuick.Window
                     customName: "Delete"
                     customImage: "images/trash"
                     customWidth: 70
+                },
+                Dictionary{
+                    customName: "Edit"
+                    customImage: "images/trash"
+                    customWidth: 50
                 }
             ]
 
             //workspace1
-            //property list<Rectangle> workspace:[workspace1, workspace2, workspace3]
             Rectangle {
                 id: workspace1
 
@@ -385,7 +389,7 @@ import QtQuick.Window
                     width: 300
                     height: 38
 
-                    spacing: 4
+                    spacing: 5
                     columns: 3
 
                     Repeater{
@@ -401,17 +405,20 @@ import QtQuick.Window
                         // }
                         MyText{
                             width: model.customWidth
-                            height: 30
+                            height: 28
 
                             customRadius: 5
                             customText: model.customName
                             customHAlignment: "Center"
                             customSize: 15
-                            customColor: "#000000"
+                            customColor: down ? "#332C2B" : customHoveredColor
                             customHoveredColor: "#000000"
                             customTextColor: "#ffffff"
-                            onClicked: {
 
+                            HoverHandler {
+                                id: cursorHovered
+                                acceptedDevices: PointerDevice.Mouse
+                                cursorShape: Qt.PointingHandCursor
                             }
                         }
                     }

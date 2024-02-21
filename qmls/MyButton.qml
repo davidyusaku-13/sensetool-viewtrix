@@ -34,17 +34,6 @@ Button {
         fillMode: Image.PreserveAspectFit
     }
 
-    DropShadow {
-        anchors.fill: menuIcon
-        horizontalOffset: 0
-        verticalOffset: 0
-        radius: 4
-        color: "#000000"
-        source: butterfly
-        spread: 0
-        samples: 9
-    }
-
     background: Rectangle{
         width: parent.width
         height: parent.height
