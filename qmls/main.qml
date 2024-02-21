@@ -22,50 +22,40 @@ ApplicationWindow {
     //     anchors.fill: parent
     // }
 
-    Rectangle {
+
+    Rectangle{
+        id: rect
         anchors.fill: parent
-
-        DelegateModel {
-            id: visualModel
-            model: ListModel {
-                ListElement { setitem: "GUI_ENABLE" }
-                ListElement { setitem: "OS_EVENT_QUEUE" }
-                ListElement { setitem: "OS_MSG_LEN_QUEUE" }
-                ListElement { setitem: "OS_UART_LEN_QUEUE" }
-                ListElement { setitem: "EVT_FIFO_DEEP_MAX" }
-                ListElement { setitem: "EVT_FIFO_LEN_MAX" }
-                ListElement { setitem: "CMD_FIFO_DEEP_MAX" }
-                ListElement { setitem: "CMD_FIFO_LEN_MAX" }
-            }
-
-            groups: [
-                DelegateModelGroup { name: "selected" }
-            ]
-
-            delegate: Rectangle {
-                id: item
-                height: 25
-                width: 200
-                Text {
-                    text: {
-                        var text = "Item: " + setitem
-                        if (item.DelegateModel.inSelected){
-                            text += " (" + item.DelegateModel.itemsIndex + ")"
-                            print(setitem)
-                        }
-                        return text;
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: item.DelegateModel.inSelected = !item.DelegateModel.inSelected
-                }
-            }
-        }
-
-        ListView {
+        color: "#fff"
+        
+        Coba{
             anchors.fill: parent
-            model: visualModel
+        }
+        
+        // ListView{
+        //     anchors.fill: parent
+        //     anchors.top: parent.bottom
+        //     anchors.topMargin: btnAdd.height + 20
+
+        //     model: root.manager.prjSetModel
+        //     delegate: Text{
+        //         height: 20
+        //         verticalAlignment: Text.AlignVCenter
+        //         text: setitem + " " + val + " " +  desc
+        //     }
+        // }
+
+        Button{
+            id: btnAdd
+            text: "Add"
+            anchors.top: parent.top
+            anchors.topMargin: 10
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+
+            onClicked: {
+                root.manager.add("OS_EVENT_QUE", "8", "Queue deep value")
+            }
         }
     }
 }

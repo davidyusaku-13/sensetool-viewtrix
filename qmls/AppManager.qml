@@ -8,7 +8,7 @@ QtObject {
     required property PrjSetModel prjSetModel
     required property var logic
 
-    function add(item, val, desc){
-      prjSetModel.addItem(item, val, desc)
+    function add(setitem, val, desc){
+      prjSetModel.addItem(setitem, val, desc)
     }
 }

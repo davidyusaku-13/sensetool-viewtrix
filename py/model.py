@@ -1,8 +1,13 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Signal, Property, Slot, QModelIndex, QObject
 from PySide6.QtQml import QmlElement
+from logger import AppLogger
 
 QML_IMPORT_NAME = "PrjSetModel"
 QML_IMPORT_MAJOR_VERSION = 1
+
+logger = AppLogger.get_instance()
+format = "[%(asctime)s] ___ %(levelname)s ___ %(message)s"
+level = logger.level("INFO")
 
 
 @QmlElement
@@ -58,6 +63,7 @@ class PrjSetModel(QAbstractListModel):
 
     @Slot(str, str, str)
     def addItem(self, setitem, val, desc):
+        logger.log(f"Added item: {setitem} - {val} - {desc}", level)
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
         item = PrjSetModelItem(setitem, val, desc, self)
         self._items.append(item)
