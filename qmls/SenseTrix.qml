@@ -185,7 +185,7 @@ import QtQuick.Window
                 anchors.leftMargin: 10
                 anchors.topMargin: 10
 
-                customImage: "images/menu-icon2.png"
+                customImage: "images/menu-icon2"
                 customColor: "#ffffff"
                 customHoveredColor: "#DCDDDD"
                 customRadius: 5
@@ -368,7 +368,7 @@ import QtQuick.Window
                     color: "#ffffff"
                     radius: 5
                     border.width: 0
-                    border.color: "#332C2B"
+                    border.color: "#A1A1A1"
 
                     layer.enabled: true
                     layer.effect: DropShadow{
@@ -376,6 +376,10 @@ import QtQuick.Window
                         verticalOffset: 0
                         radius: 4.0
                         color: "#80000000"
+                    }
+
+                    Grid{
+                        anchors.fill: parent
                     }
                 }
 
