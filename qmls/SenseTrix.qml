@@ -11,22 +11,29 @@ import QtQuick.Window
 //     property bool menuState: false
 //     property bool settingState: false
 
-    // Rectangle {
-    //     id: root
+//     Rectangle {
+//         id: root
 
-    //     anchors.fill: parent
-    //     color: "#ffffff"
+//         anchors.fill: parent
+//         color: "#ffffff"
 
         Rectangle{
+            id: root
+
             width: 1920
             height: 1080
 
             property bool menuState: false
             property bool settingState: false
-            id: root
 
             anchors.fill: parent
             color: "#ffffff"
+
+            Drawer{
+                id: drawer
+                width: 0.66 * root.width
+                height: root.height
+            }
 
             //mouse area for close every window
             MouseArea {
@@ -369,13 +376,13 @@ import QtQuick.Window
                     customName: "file 3 - wjndwjnbdijq"
                 },
                 Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
+                    customName: "file 3 - gdfgdfg"
                 },
                 Dictionary{
                     customName: "file 3 - wjndwjnbdijq"
                 },
                 Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
+                    customName: "file 3 - wjndwjngfdg"
                 }
             ]
 
@@ -422,7 +429,10 @@ import QtQuick.Window
                     }
 
                     ScrollView{
+                        id: scrollItem
                         anchors.fill: parent
+                        hoverEnabled: true
+                        enabled: itemModel.length>11 ? true : false
                         Grid{
                             anchors.fill: parent
                             rows: itemModel.length
@@ -432,6 +442,7 @@ import QtQuick.Window
                                 MyItem{
                                     customItemName: model.customName
                                     customWidth: workspace1.width
+                                    customHeight: 50
                                 }
                             }
                         }
@@ -484,5 +495,5 @@ import QtQuick.Window
                 }
             }
         }
-    // }
+//     }
 // }
