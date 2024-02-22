@@ -370,6 +370,12 @@ import QtQuick.Window
                 },
                 Dictionary{
                     customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
                 }
             ]
 
@@ -392,7 +398,7 @@ import QtQuick.Window
                 border.width: 0
                 border.color: "#332C2B"
 
-                visible: true
+                visible: false
 
                 Rectangle{
                     anchors.top: parent.top
@@ -415,15 +421,18 @@ import QtQuick.Window
                         color: "#80000000"
                     }
 
-                    Grid{
+                    ScrollView{
                         anchors.fill: parent
-                        rows: itemModel.length
+                        Grid{
+                            anchors.fill: parent
+                            rows: itemModel.length
 
-                        Repeater{
-                            model: root.itemModel
-                            MyItem{
-                                customItemName: model.customName
-                                customWidth: parent.width
+                            Repeater{
+                                model: root.itemModel
+                                MyItem{
+                                    customItemName: model.customName
+                                    customWidth: workspace1.width
+                                }
                             }
                         }
                     }
