@@ -5,16 +5,18 @@ import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
-    width: 1000
-    height: 50
 
     property string customItemColor: "#ffffff"
     property string customItemName: "dbchjcdhbsfhcsdfu"
-    property int customNameSize: 15
+    property int customItemSize: 15
+    property int customWidth: 2000
+    property int customHeight: 50
+
+    width: customWidth
+    height: customHeight
 
     //check box
     Button{
-
         id: checkBox
         x: 8
 
@@ -28,15 +30,50 @@ Item {
         background: Rectangle{
             anchors.fill: parent
             color: "#ffffff"
+            radius: 5
+            border.color: "#b3b3b3"
+            border.width: 1
+
+            // layer.enabled: true
+            // layer.effect: InnerShadow{
+            //     horizontalOffset: 0
+            //     verticalOffset: 0
+            //     radius: 6
+            //     samples: 6
+            //     color: "#b0000000"
+            // }
         }
 
-        //check list icon
-        Image{
+        //check list rectangle
+        Rectangle{
             id: checklistIcon
             width: parent.width
             height: width
-            source: "images/checklist"
+            color: "#000000"
+            radius: parent.background.radius
             visible: false
+        }
+
+        //check list icon
+        // Image{
+        //     id: checklistIcon
+        //     width: parent.width
+        //     height: width
+        //     source: "images/checklist"
+        //     visible: true
+        // }
+
+        onClicked: {
+            // if(checklistIcon.visible === false){
+            //     checklistIcon.visible = true
+            // }else{
+            //     checklistIcon.visible = false
+            // }
+            if(checklistIcon.visible === false){
+                checklistIcon.visible = true
+            }else{
+                checklistIcon.visible = false
+            }
         }
 
         HoverHandler {
@@ -44,28 +81,20 @@ Item {
             acceptedDevices: PointerDevice.Mouse
             cursorShape: Qt.PointingHandCursor
         }
-
-        onClicked: {
-            if(checklistIcon.visible === false){
-                checklistIcon.visible = true
-            }else{
-                checklistIcon.visible = false
-            }
-        }
     }
 
     //check box shadow
-    InnerShadow {
-        anchors.fill: root
-        cached: true
-        horizontalOffset: 0
-        verticalOffset: 0
-        radius: 6
-        samples: 48
-        color: "#b0000000"
-        smooth: true
-        source: root
-    }
+    // InnerShadow {
+    //     anchors.fill: checkBox
+    //     cached: true
+    //     horizontalOffset: 1
+    //     verticalOffset: 1
+    //     radius: 6
+    //     samples: 48
+    //     color: "#b0000000"
+    //     smooth: true
+    //     source: checkBox
+    // }
 
     //item box
     Rectangle{
@@ -86,7 +115,7 @@ Item {
 
         MyText {
             anchors.fill: parent
-            customSize: customNameSize
+            customSize: customItemSize
             customText: customItemName
             customFont: "Montserrat"
             customRadius: 0

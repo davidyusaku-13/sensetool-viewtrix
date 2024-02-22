@@ -336,6 +336,43 @@ import QtQuick.Window
                 }
             ]
 
+            //workspace1 item list
+            property list<Dictionary> itemModel:[
+                Dictionary{
+                    customName: "file 1 - djwqjdhjqwhid"
+                },
+                Dictionary{
+                    customName: "file 2 - xwnaqdqwqwdqwd"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                }
+            ]
+
             //workspace1
             Rectangle {
                 id: workspace1
@@ -355,7 +392,7 @@ import QtQuick.Window
                 border.width: 0
                 border.color: "#332C2B"
 
-                visible: false
+                visible: true
 
                 Rectangle{
                     anchors.top: parent.top
@@ -380,6 +417,15 @@ import QtQuick.Window
 
                     Grid{
                         anchors.fill: parent
+                        rows: itemModel.length
+
+                        Repeater{
+                            model: root.itemModel
+                            MyItem{
+                                customItemName: model.customName
+                                customWidth: parent.width
+                            }
+                        }
                     }
                 }
 
