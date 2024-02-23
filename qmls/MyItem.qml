@@ -2,14 +2,13 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 
-
 Item {
     id: root
 
     property string customItemColor: "#ffffff"
     property string customItemName: "dbchjcdhbsfhcsdfu"
     property int customItemSize: 15
-    property int customWidth: 2000
+    property int customWidth: 1000
     property int customHeight: 50
 
     property bool selectState: false
@@ -20,14 +19,13 @@ Item {
     //check box
     Button{
         id: checkBox
-        x: 8
 
-        width: 20
-        height: 20
+        width: parent.height-30
+        height: parent.height-30
 
-        anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: 15
+        anchors.verticalCenter: parent.verticalCenter
 
         background: Rectangle{
             anchors.fill: parent
