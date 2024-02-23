@@ -28,34 +28,53 @@ ApplicationWindow {
         anchors.fill: parent
         color: "#fff"
         
-        Coba{
-            anchors.fill: parent
+        DelegateModel {
+            id: visualModel
+            model: root.manager.prjSetModel
+
+            groups: [
+                DelegateModelGroup { name: "selected" }
+            ]
+
+            delegate: Rectangle {
+                id: item
+                height: 25
+                width: parent.width
+                color: "#ff0"
+                Text {
+                    text: {
+                        var text = "Item: " + setitem + " | " + val + " | " + desc
+                        if (item.DelegateModel.inSelected){
+                            text += " (" + item.DelegateModel.itemsIndex + ")"
+                        }
+                        return text;
+                    }
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        item.DelegateModel.inSelected = !item.DelegateModel.inSelected
+                    }
+                }
+            }
         }
-        
-        // ListView{
-        //     anchors.fill: parent
-        //     anchors.top: parent.bottom
-        //     anchors.topMargin: btnAdd.height + 20
 
-        //     model: root.manager.prjSetModel
-        //     delegate: Text{
-        //         height: 20
-        //         verticalAlignment: Text.AlignVCenter
-        //         text: setitem + " " + val + " " +  desc
-        //     }
-        // }
+        ListView {
+            anchors.fill: parent
+            model: visualModel
+        }
 
-        // Button{
-        //     id: btnAdd
-        //     text: "Add"
-        //     anchors.top: parent.top
-        //     anchors.topMargin: 10
-        //     anchors.left: parent.left
-        //     anchors.leftMargin: 10
+        Button{
+            id: btnAdd
+            text: "Add"
+            anchors.top: parent.top
+            anchors.topMargin: 10
+            anchors.left: parent.left
+            anchors.leftMargin: 10
 
-        //     onClicked: {
-        //         root.manager.add("OS_EVENT_QUE", "8", "Queue deep value")
-        //     }
-        // }
+            onClicked: {
+                root.manager.add("OS_EVENT_QUE", "8", "Queue deep value")
+            }
+        }
     }
 }
