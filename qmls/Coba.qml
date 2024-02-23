@@ -26,11 +26,11 @@ Rectangle {
             delegate: Rectangle {
                 id: item
                 height: 25
-                width: 200
+                width: parent.width
                 color: "#ff0"
                 Text {
                     text: {
-                        var text = "Item: " + setitem
+                        var text = "Item: " + setitem + " | " + val + " | " + desc
                         if (item.DelegateModel.inSelected){
                             text += " (" + item.DelegateModel.itemsIndex + ")"
                         }

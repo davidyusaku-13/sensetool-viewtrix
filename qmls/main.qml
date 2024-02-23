@@ -45,17 +45,17 @@ ApplicationWindow {
         //     }
         // }
 
-        Button{
-            id: btnAdd
-            text: "Add"
-            anchors.top: parent.top
-            anchors.topMargin: 10
-            anchors.left: parent.left
-            anchors.leftMargin: 10
+        // Button{
+        //     id: btnAdd
+        //     text: "Add"
+        //     anchors.top: parent.top
+        //     anchors.topMargin: 10
+        //     anchors.left: parent.left
+        //     anchors.leftMargin: 10
 
-            onClicked: {
-                root.manager.add("OS_EVENT_QUE", "8", "Queue deep value")
-            }
-        }
+        //     onClicked: {
+        //         root.manager.add("OS_EVENT_QUE", "8", "Queue deep value")
+        //     }
+        // }
     }
 }
