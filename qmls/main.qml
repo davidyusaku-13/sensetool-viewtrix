@@ -22,14 +22,21 @@ ApplicationWindow {
         anchors.fill: parent
     }
 
-    // Rectangle{
-    //     id: rect
+    // Rectangle {
     //     anchors.fill: parent
-    //     color: "#fff"
-        
+
     //     DelegateModel {
     //         id: visualModel
-    //         model: root.manager.prjSetModel
+    //         model: ListModel {
+    //             ListElement { setitem: "GUI_ENABLE" }
+    //             ListElement { setitem: "OS_EVENT_QUEUE" }
+    //             ListElement { setitem: "OS_MSG_LEN_QUEUE" }
+    //             ListElement { setitem: "OS_UART_LEN_QUEUE" }
+    //             ListElement { setitem: "EVT_FIFO_DEEP_MAX" }
+    //             ListElement { setitem: "EVT_FIFO_LEN_MAX" }
+    //             ListElement { setitem: "CMD_FIFO_DEEP_MAX" }
+    //             ListElement { setitem: "CMD_FIFO_LEN_MAX" }
+    //         }
 
     //         groups: [
     //             DelegateModelGroup { name: "selected" }
@@ -38,22 +45,20 @@ ApplicationWindow {
     //         delegate: Rectangle {
     //             id: item
     //             height: 25
-    //             width: parent.width
-    //             color: "#ff0"
+    //             width: 200
     //             Text {
     //                 text: {
-    //                     var text = "Item: " + setitem + " | " + val + " | " + desc
+    //                     var text = "Item: " + setitem
     //                     if (item.DelegateModel.inSelected){
     //                         text += " (" + item.DelegateModel.itemsIndex + ")"
+    //                         print(setitem)
     //                     }
     //                     return text;
     //                 }
     //             }
     //             MouseArea {
     //                 anchors.fill: parent
-    //                 onClicked: {
-    //                     item.DelegateModel.inSelected = !item.DelegateModel.inSelected
-    //                 }
+    //                 onClicked: item.DelegateModel.inSelected = !item.DelegateModel.inSelected
     //             }
     //         }
     //     }
@@ -61,19 +66,6 @@ ApplicationWindow {
     //     ListView {
     //         anchors.fill: parent
     //         model: visualModel
-    //     }
-
-    //     Button{
-    //         id: btnAdd
-    //         text: "Add"
-    //         anchors.top: parent.top
-    //         anchors.topMargin: 10
-    //         anchors.left: parent.left
-    //         anchors.leftMargin: 10
-
-    //         onClicked: {
-    //             root.manager.add("OS_EVENT_QUE", "8", "Queue deep value")
-    //         }
     //     }
     // }
 }
