@@ -22,7 +22,6 @@ ApplicationWindow {
     //     anchors.fill: parent
     // }
 
-
     Rectangle{
         id: rect
         anchors.fill: parent
