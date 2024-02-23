@@ -25,6 +25,7 @@ import QtQuick.Window
 
             property bool menuState: false
             property bool settingState: false
+            property bool deselectState: false
 
             anchors.fill: parent
             color: "#ffffff"
@@ -277,7 +278,6 @@ import QtQuick.Window
                 }
             }
 
-            //setting pop up
             //function button in workspace1
             property list<Dictionary> funcBtnModel:[
                 Dictionary{
@@ -303,46 +303,6 @@ import QtQuick.Window
                 Dictionary{
                     customName: "Deselect All"
                     customWidth: 110
-                }
-            ]
-
-            //workspace1 item list
-            property list<Dictionary> itemModel:[
-                Dictionary{
-                    customName: "file 1 - djwqjdhjqwhid"
-                },
-                Dictionary{
-                    customName: "file 2 - xwnaqdqwqwdqwd"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 4 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 5 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 6 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 7 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 8 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 9 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 10 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 11 - gdfgdfg"
-                },
-                Dictionary{
-                    customName: "file 12 - wjndwjnbdijq"
                 }
             ]
 
@@ -393,17 +353,44 @@ import QtQuick.Window
                         id: scrollItem
                         anchors.fill: parent
                         hoverEnabled: true
-                        enabled: itemModel.length*50>workspaceItem.height ? true : false
+                        //enabled: itemModel.length*50>workspaceItem.height ? true : false
+                        enabled: true
+
                         Grid{
                             anchors.fill: parent
                             rows: itemModel.length
 
-                            Repeater{
-                                model: root.itemModel
-                                MyItem{
-                                    customItemName: model.customName
-                                    customWidth: workspace1.width
-                                    customHeight: 50
+                            // Repeater{
+                            //     model: root.itemModel
+                            //     MyItem{
+                            //         required property bool deselectState
+                            //         customItemName: model.customName
+                            //         customWidth: workspace1.width
+                            //         customHeight: 50
+                            //         deselectState: selectState === true ? true : false
+                            //     }
+                            // }
+                            ListView{
+                                anchors.fill: parent
+                                model: ListModel{
+                                    ListElement{text: "file 1 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 2 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 3 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 4 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 5 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 6 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 7 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 8 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 9 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 10 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 11 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 12 - csnjacbnjknbjcbn"}
+                                }
+
+                                delegate: MyItem{
+                                    customItemName: model.text
+                                    customWidth: workspaceItem.width
+                                    customItemSize: 15
                                 }
                             }
                         }
@@ -447,7 +434,7 @@ import QtQuick.Window
                             customTextColor: "#ffffff"
 
                             HoverHandler {
-                                id: cursorHovered
+                                id: cursorHovered1
                                 acceptedDevices: PointerDevice.Mouse
                                 cursorShape: Qt.PointingHandCursor
                             }
@@ -473,6 +460,7 @@ import QtQuick.Window
                         id: repeater1
                         model: selectBtnModel
                         MyText{
+                            // required property bool deselectState
                             width: model.customWidth
                             height: 28
 
@@ -483,10 +471,18 @@ import QtQuick.Window
                             customColor: down ? "#332C2B" : customHoveredColor
                             customHoveredColor: "#000000"
                             customTextColor: "#ffffff"
+
+                            HoverHandler {
+                                id: cursorHovered2
+                                acceptedDevices: PointerDevice.Mouse
+                                cursorShape: Qt.PointingHandCursor
+                            }
                         }
                     }
                 }
             }
+
+            //setting pop up
             Rectangle{
                 id: settingPopUp
 
