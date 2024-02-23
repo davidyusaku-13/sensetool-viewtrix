@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="91.44mm" height="91.44mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 9144 9144"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .str0 {stroke:black;stroke-width:1270;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:22.9256}
+    .fil0 {fill:black}
+   ]]>
+  </style>
+    <clipPath id="id0">
+     <path d="M-4723.09 -4185.72l18160.97 0 0 18160.96 -18160.97 0 0 -18160.96z"/>
+    </clipPath>
+ </defs>
+ <g id="Layer_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_1818412616240">
+   <g style="clip-path:url(#id0)">
+    <image x="-4723.09" y="-4185.72" width="18160.97" height="18160.96" xlink:href="menu_Images\menu_ImgID1.png"/>
+   </g>
+  </g>
+  <g id="_1818412615808">
+   <path class="fil0 str0" d="M-299.27 3201.43c1636.61,0 2963.34,-1326.73 2963.34,-2963.33 0,-1636.6 -1326.73,-2963.33 -2963.34,-2963.33 -1636.6,0 -2963.33,1326.73 -2963.33,2963.33 0,1636.6 1326.73,2963.33 2963.33,2963.33z"/>
+   <path class="fil0 str0" d="M9014.06 3201.43c1636.6,0 2963.33,-1326.73 2963.33,-2963.33 0,-1636.6 -1326.73,-2963.33 -2963.33,-2963.33 -1636.61,0 -2963.34,1326.73 -2963.34,2963.33 0,1636.6 1326.73,2963.33 2963.34,2963.33z"/>
+   <path class="fil0 str0" d="M-299.27 12514.75c1636.61,0 2963.34,-1326.73 2963.34,-2963.33 0,-1636.61 -1326.73,-2963.34 -2963.34,-2963.34 -1636.6,0 -2963.33,1326.73 -2963.33,2963.34 0,1636.6 1326.73,2963.33 2963.33,2963.33z"/>
+   <path class="fil0 str0" d="M9014.06 12514.75c1636.6,0 2963.33,-1326.73 2963.33,-2963.33 0,-1636.61 -1326.73,-2963.34 -2963.33,-2963.34 -1636.61,0 -2963.34,1326.73 -2963.34,2963.34 0,1636.6 1326.73,2963.33 2963.34,2963.33z"/>
+  </g>
+ </g>
+</svg>
