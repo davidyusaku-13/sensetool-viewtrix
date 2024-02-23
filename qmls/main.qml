@@ -75,4 +75,5 @@ ApplicationWindow {
     //             root.manager.add("OS_EVENT_QUE", "8", "Queue deep value")
     //         }
     //     }
+    // }
 }
