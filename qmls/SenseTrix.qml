@@ -278,6 +278,215 @@ import QtQuick.Window
             }
 
             //setting pop up
+            //function button in workspace1
+            property list<Dictionary> funcBtnModel:[
+                Dictionary{
+                    customName: "Add"
+                    customWidth: 50
+                },
+                Dictionary{
+                    customName: "Delete"
+                    customWidth: 70
+                },
+                Dictionary{
+                    customName: "Edit"
+                    customWidth: 50
+                }
+            ]
+
+            //select button in workspace1
+            property list<Dictionary> selectBtnModel:[
+                Dictionary{
+                    customName: "Select All"
+                    customWidth: 90
+                },
+                Dictionary{
+                    customName: "Deselect All"
+                    customWidth: 110
+                }
+            ]
+
+            //workspace1 item list
+            property list<Dictionary> itemModel:[
+                Dictionary{
+                    customName: "file 1 - djwqjdhjqwhid"
+                },
+                Dictionary{
+                    customName: "file 2 - xwnaqdqwqwdqwd"
+                },
+                Dictionary{
+                    customName: "file 3 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 4 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 5 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 6 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 7 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 8 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 9 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 10 - wjndwjnbdijq"
+                },
+                Dictionary{
+                    customName: "file 11 - gdfgdfg"
+                },
+                Dictionary{
+                    customName: "file 12 - wjndwjnbdijq"
+                }
+            ]
+
+            //workspace1
+            Rectangle {
+                id: workspace1
+
+                anchors.top: parent.top
+                anchors.topMargin: ((menu.anchors.topMargin*2)+menu.height)
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 50
+                anchors.left: parent.left
+                anchors.leftMargin: 50
+                anchors.right: parent.right
+                anchors.rightMargin: 50
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                color: "#ffffff"
+                radius: 5
+                border.width: 0
+                border.color: "#332C2B"
+
+                visible: false
+
+                Rectangle{
+                    id: workspaceItem
+                    anchors.top: parent.top
+                    anchors.topMargin: 40
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    color: "#ffffff"
+                    radius: 5
+                    border.width: 0
+                    border.color: "#A1A1A1"
+
+                    layer.enabled: true
+                    layer.effect: DropShadow{
+                        horizontalOffset: 0
+                        verticalOffset: 0
+                        radius: 4.0
+                        color: "#80000000"
+                    }
+
+                    ScrollView{
+                        id: scrollItem
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        enabled: itemModel.length*50>workspaceItem.height ? true : false
+                        Grid{
+                            anchors.fill: parent
+                            rows: itemModel.length
+
+                            Repeater{
+                                model: root.itemModel
+                                MyItem{
+                                    customItemName: model.customName
+                                    customWidth: workspace1.width
+                                    customHeight: 50
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //function button
+                Grid {
+                    id: grid1
+
+                    x: 0
+                    y: parent.y-(menu.height+(menu.anchors.topMargin*2))
+
+                    width: 300
+                    height: 38
+
+                    spacing: 5
+                    columns: funcBtnModel.length
+
+                    Repeater{
+                        model: root.funcBtnModel
+                        // MyButton{
+                        //     width: 28
+                        //     height: 28
+
+                        //     customImage: model.customImage
+                        //     customColor: "#ffffff"
+                        //     customHoveredColor: "#DCDDDD"
+                        //     customRadius: 5
+                        // }
+                        MyText{
+                            width: model.customWidth
+                            height: 28
+
+                            customRadius: 5
+                            customText: model.customName
+                            customHAlignment: "Center"
+                            customSize: 15
+                            customColor: down ? "#332C2B" : customHoveredColor
+                            customHoveredColor: "#000000"
+                            customTextColor: "#ffffff"
+
+                            HoverHandler {
+                                id: cursorHovered
+                                acceptedDevices: PointerDevice.Mouse
+                                cursorShape: Qt.PointingHandCursor
+                            }
+                        }
+                    }
+                }
+
+                //select button
+                Grid {
+                    id: grid2
+
+                    x: workspace1.width-grid1.width
+                    y: parent.y-(menu.height+(menu.anchors.topMargin*2))
+
+                    width: 300
+                    height: 38
+                    layoutDirection: Qt.RightToLeft
+
+                    spacing: 5
+                    columns: selectBtnModel.length
+
+                    Repeater{
+                        id: repeater1
+                        model: selectBtnModel
+                        MyText{
+                            width: model.customWidth
+                            height: 28
+
+                            customRadius: 5
+                            customText: model.customName
+                            customHAlignment: "Center"
+                            customSize: 15
+                            customColor: down ? "#332C2B" : customHoveredColor
+                            customHoveredColor: "#000000"
+                            customTextColor: "#ffffff"
+                        }
+                    }
+                }
+            }
             Rectangle{
                 id: settingPopUp
 
@@ -320,176 +529,6 @@ import QtQuick.Window
                             customSize: 15
                             customRadius: 5
                             customFont: "Montserrat"
-                        }
-                    }
-                }
-            }
-            //function button in workspace1
-            property list<Dictionary> funcBtnModel:[
-                Dictionary{
-                    customName: "Add"
-                    customImage: "images/plus"
-                    customWidth: 50
-                },
-                Dictionary{
-                    customName: "Delete"
-                    customImage: "images/trash"
-                    customWidth: 70
-                },
-                Dictionary{
-                    customName: "Edit"
-                    customImage: "images/trash"
-                    customWidth: 50
-                }
-            ]
-
-            //workspace1 item list
-            property list<Dictionary> itemModel:[
-                Dictionary{
-                    customName: "file 1 - djwqjdhjqwhid"
-                },
-                Dictionary{
-                    customName: "file 2 - xwnaqdqwqwdqwd"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - gdfgdfg"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjnbdijq"
-                },
-                Dictionary{
-                    customName: "file 3 - wjndwjngfdg"
-                }
-            ]
-
-            //workspace1
-            Rectangle {
-                id: workspace1
-
-                anchors.top: parent.top
-                anchors.topMargin: ((menu.anchors.topMargin*2)+menu.height)
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 50
-                anchors.left: parent.left
-                anchors.leftMargin: 50
-                anchors.right: parent.right
-                anchors.rightMargin: 50
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                color: "#ffffff"
-                radius: 5
-                border.width: 0
-                border.color: "#332C2B"
-
-                visible: false
-
-                Rectangle{
-                    anchors.top: parent.top
-                    anchors.topMargin: 40
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    color: "#ffffff"
-                    radius: 5
-                    border.width: 0
-                    border.color: "#A1A1A1"
-
-                    layer.enabled: true
-                    layer.effect: DropShadow{
-                        horizontalOffset: 0
-                        verticalOffset: 0
-                        radius: 4.0
-                        color: "#80000000"
-                    }
-
-                    ScrollView{
-                        id: scrollItem
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        enabled: itemModel.length>11 ? true : false
-                        Grid{
-                            anchors.fill: parent
-                            rows: itemModel.length
-
-                            Repeater{
-                                model: root.itemModel
-                                MyItem{
-                                    customItemName: model.customName
-                                    customWidth: workspace1.width
-                                    customHeight: 50
-                                }
-                            }
-                        }
-                    }
-                }
-
-                //function button
-                Grid {
-                    id: grid1
-
-                    x: 0
-                    y: parent.y-(menu.height+(menu.anchors.topMargin*2))
-
-                    width: 300
-                    height: 38
-
-                    spacing: 5
-                    columns: 3
-
-                    Repeater{
-                        model: root.funcBtnModel
-                        // MyButton{
-                        //     width: 28
-                        //     height: 28
-
-                        //     customImage: model.customImage
-                        //     customColor: "#ffffff"
-                        //     customHoveredColor: "#DCDDDD"
-                        //     customRadius: 5
-                        // }
-                        MyText{
-                            width: model.customWidth
-                            height: 28
-
-                            customRadius: 5
-                            customText: model.customName
-                            customHAlignment: "Center"
-                            customSize: 15
-                            customColor: down ? "#332C2B" : customHoveredColor
-                            customHoveredColor: "#000000"
-                            customTextColor: "#ffffff"
-
-                            HoverHandler {
-                                id: cursorHovered
-                                acceptedDevices: PointerDevice.Mouse
-                                cursorShape: Qt.PointingHandCursor
-                            }
                         }
                     }
                 }

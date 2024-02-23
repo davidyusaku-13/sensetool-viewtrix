@@ -12,6 +12,8 @@ Item {
     property int customWidth: 2000
     property int customHeight: 50
 
+    property bool selectState: false
+
     width: customWidth
     height: customHeight
 
@@ -71,8 +73,10 @@ Item {
             // }
             if(checklistIcon.visible === false){
                 checklistIcon.visible = true
+                selectState = true
             }else{
                 checklistIcon.visible = false
+                selectState = false
             }
         }
 
