@@ -25,7 +25,7 @@ import QtQuick.Window
 
             property bool menuState: false
             property bool settingState: false
-            property bool deselectState: false
+            property bool selectState: false
 
             anchors.fill: parent
             color: "#ffffff"
@@ -278,34 +278,6 @@ import QtQuick.Window
                 }
             }
 
-            //function button in workspace1
-            property list<Dictionary> funcBtnModel:[
-                Dictionary{
-                    customName: "Add"
-                    customWidth: 50
-                },
-                Dictionary{
-                    customName: "Delete"
-                    customWidth: 70
-                },
-                Dictionary{
-                    customName: "Edit"
-                    customWidth: 50
-                }
-            ]
-
-            //select button in workspace1
-            property list<Dictionary> selectBtnModel:[
-                Dictionary{
-                    customName: "Select All"
-                    customWidth: 90
-                },
-                Dictionary{
-                    customName: "Deselect All"
-                    customWidth: 110
-                }
-            ]
-
             //workspace1
             Rectangle {
                 id: workspace1
@@ -378,9 +350,11 @@ import QtQuick.Window
                                 }
 
                                 delegate: MyItem{
+                                    required property var deselectButton
                                     customItemName: model.text + index + selectState
                                     customWidth: workspaceItem.width
                                     customItemSize: 15
+
 
                                 }
                             }
@@ -388,89 +362,94 @@ import QtQuick.Window
                     }
                 }
 
-                //function button
-                Grid {
-                    id: grid1
+                //function button icon
+                // MyButton{
+                //     width: 28
+                //     height: 28
+
+                //     customImage: model.customImage
+                //     customColor: "#ffffff"
+                //     customHoveredColor: "#DCDDDD"
+                //     customRadius: 5
+                // }
+
+                //function button text
+                //add
+                MyText{
+                    id: addButton
 
                     x: 0
-                    y: parent.y-(menu.height+(menu.anchors.topMargin*2))
+                    y: 0
 
-                    width: 300
-                    height: 38
+                    width: 50
+                    height: 28
 
-                    spacing: 5
-                    columns: funcBtnModel.length
+                    customRadius: 5
+                    customText: "Add"
+                    customHAlignment: "Center"
+                    customSize: 15
+                    customColor: down ? "#332C2B" : customHoveredColor
+                    customHoveredColor: "#000000"
+                    customTextColor: "#ffffff"
 
-                    Repeater{
-                        model: root.funcBtnModel
-                        // MyButton{
-                        //     width: 28
-                        //     height: 28
+                    HoverHandler {
+                        id: cursorHovered
+                        acceptedDevices: PointerDevice.Mouse
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                }
 
-                        //     customImage: model.customImage
-                        //     customColor: "#ffffff"
-                        //     customHoveredColor: "#DCDDDD"
-                        //     customRadius: 5
-                        // }
-                        MyText{
-                            width: model.customWidth
-                            height: 28
+                //delete
+                MyText{
+                    id: deleteButton
 
-                            customRadius: 5
-                            customText: model.customName
-                            customHAlignment: "Center"
-                            customSize: 15
-                            customColor: down ? "#332C2B" : customHoveredColor
-                            customHoveredColor: "#000000"
-                            customTextColor: "#ffffff"
+                    x: addButton.width+5
+                    y: 0
 
-                            HoverHandler {
-                                id: cursorHovered1
-                                acceptedDevices: PointerDevice.Mouse
-                                cursorShape: Qt.PointingHandCursor
-                            }
-                        }
+                    width: 70
+                    height: 28
+
+                    customRadius: 5
+                    customText: "Delete"
+                    customHAlignment: "Center"
+                    customSize: 15
+                    customColor: down ? "#332C2B" : customHoveredColor
+                    customHoveredColor: "#000000"
+                    customTextColor: "#ffffff"
+
+                    HoverHandler {
+                        id: cursorHovered1
+                        acceptedDevices: PointerDevice.Mouse
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                }
+
+                //edit
+                MyText{
+                    id: editButton
+
+                    x: (addButton.width+5)+(deleteButton.width+5)
+                    y: 0
+
+                    width: 50
+                    height: 28
+
+                    customRadius: 5
+                    customText: "Edit"
+                    customHAlignment: "Center"
+                    customSize: 15
+                    customColor: down ? "#332C2B" : customHoveredColor
+                    customHoveredColor: "#000000"
+                    customTextColor: "#ffffff"
+
+                    HoverHandler {
+                        id: cursorHovered2
+                        acceptedDevices: PointerDevice.Mouse
+                        cursorShape: Qt.PointingHandCursor
                     }
                 }
 
                 //select button
-                // Grid {
-                //     id: grid2
-
-                //     x: workspace1.width-grid1.width
-                //     y: parent.y-(menu.height+(menu.anchors.topMargin*2))
-
-                //     width: 300
-                //     height: 38
-                //     layoutDirection: Qt.RightToLeft
-
-                //     spacing: 5
-                //     columns: selectBtnModel.length
-
-                //     Repeater{
-                //         id: repeater1
-                //         model: selectBtnModel
-                //         MyText{
-                //             // required property bool deselectState
-                //             width: model.customWidth
-                //             height: 28
-
-                //             customRadius: 5
-                //             customText: model.customName
-                //             customHAlignment: "Center"
-                //             customSize: 15
-                //             customColor: down ? "#332C2B" : customHoveredColor
-                //             customHoveredColor: "#000000"
-                //             customTextColor: "#ffffff"
-
-                //             HoverHandler {
-                //                 id: cursorHovered2
-                //                 acceptedDevices: PointerDevice.Mouse
-                //                 cursorShape: Qt.PointingHandCursor
-                //             }
-                //         }
-                //     }
-                // }
                 MyText{
                     id: selectButton
 
@@ -489,9 +468,35 @@ import QtQuick.Window
                     customTextColor: "#ffffff"
 
                     HoverHandler {
-                        id: cursorHovered2
+                        id: cursorHovered3
                         acceptedDevices: PointerDevice.Mouse
                         cursorShape: Qt.PointingHandCursor
+                    }
+                }
+
+                //deselect button
+                MyText{
+                    id: deselectButton
+
+                    x: workspace1.width-(width+selectButton.width+5)
+                    y: 0
+
+                    width: 110
+                    height: 28
+
+                    customRadius: 5
+                    customText: "Deselect All"
+                    customHAlignment: "Center"
+                    customSize: 15
+                    customColor: "#C9CACA"
+                    customHoveredColor: "#C9CACA"
+                    customTextColor: "#ffffff"
+
+                    HoverHandler {
+                        id: cursorHovered4
+                        acceptedDevices: PointerDevice.Mouse
+                        cursorShape: Qt.PointingHandCursor
+                        enabled: false
                     }
                 }
             }
