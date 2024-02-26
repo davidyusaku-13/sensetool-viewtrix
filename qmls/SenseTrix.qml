@@ -350,12 +350,11 @@ import QtQuick.Window
                                 }
 
                                 delegate: MyItem{
-                                    required property var deselectButton
+                                    id: listItem
+
                                     customItemName: model.text + index + selectState
                                     customWidth: workspaceItem.width
                                     customItemSize: 15
-
-
                                 }
                             }
                         }
@@ -375,7 +374,7 @@ import QtQuick.Window
 
                 //function button text
                 //add
-                MyText{
+                MyText2{
                     id: addButton
 
                     x: 0
@@ -388,8 +387,8 @@ import QtQuick.Window
                     customText: "Add"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: down ? "#332C2B" : customHoveredColor
-                    customHoveredColor: "#000000"
+                    customColor: "#000000"
+                    customHoveredColor: "#332C2B"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
@@ -400,7 +399,7 @@ import QtQuick.Window
                 }
 
                 //delete
-                MyText{
+                MyText2{
                     id: deleteButton
 
                     x: addButton.width+5
@@ -413,8 +412,8 @@ import QtQuick.Window
                     customText: "Delete"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: down ? "#332C2B" : customHoveredColor
-                    customHoveredColor: "#000000"
+                    customColor: "#000000"
+                    customHoveredColor: "#332C2B"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
@@ -425,7 +424,7 @@ import QtQuick.Window
                 }
 
                 //edit
-                MyText{
+                MyText2{
                     id: editButton
 
                     x: (addButton.width+5)+(deleteButton.width+5)
@@ -438,8 +437,8 @@ import QtQuick.Window
                     customText: "Edit"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: down ? "#332C2B" : customHoveredColor
-                    customHoveredColor: "#000000"
+                    customColor: "#000000"
+                    customHoveredColor: "#332C2B"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
@@ -450,7 +449,7 @@ import QtQuick.Window
                 }
 
                 //select button
-                MyText{
+                MyText2{
                     id: selectButton
 
                     x: workspace1.width-width
@@ -463,8 +462,8 @@ import QtQuick.Window
                     customText: "Select All"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: down ? "#332C2B" : customHoveredColor
-                    customHoveredColor: "#000000"
+                    customColor: "#000000"
+                    customHoveredColor: "#332C2B"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
@@ -475,7 +474,7 @@ import QtQuick.Window
                 }
 
                 //deselect button
-                MyText{
+                MyText2{
                     id: deselectButton
 
                     x: workspace1.width-(width+selectButton.width+5)
@@ -488,15 +487,21 @@ import QtQuick.Window
                     customText: "Deselect All"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: "#C9CACA"
-                    customHoveredColor: "#C9CACA"
+                    customColor: "#000000"
+                    customHoveredColor: "#332C2B"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
                         id: cursorHovered4
                         acceptedDevices: PointerDevice.Mouse
                         cursorShape: Qt.PointingHandCursor
-                        enabled: false
+                        enabled: parent.customColor === "#000000" ? true : false
+                    }
+
+                    onClicked: {
+                        if(listItem.selectState === true){
+                            listItem.selectState = false
+                        }
                     }
                 }
             }
