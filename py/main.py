@@ -3,11 +3,11 @@ import resource_rc
 from pathlib import Path
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
-from logger import CustomLogger
+from logger import AppLogger
 from model import PrjSetModel
 from logic import AppLogic
 
-logger = CustomLogger.get_instance()
+logger = AppLogger.get_instance()
 format = "[%(asctime)s] ___ %(levelname)s ___ %(message)s"
 level = logger.level("INFO")
 logger.configure_logging(level, format, "app.log")

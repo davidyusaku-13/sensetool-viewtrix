@@ -4,17 +4,17 @@ import logging.config
 from logging.handlers import RotatingFileHandler
 
 
-class CustomLogger:
+class AppLogger:
     _instance = None
     _lock = threading.Lock()
 
     @staticmethod
     def get_instance():
-        if CustomLogger._instance is None:
-            with CustomLogger._lock:
-                if CustomLogger._instance is None:
-                    CustomLogger._instance = CustomLogger()
-        return CustomLogger._instance
+        if AppLogger._instance is None:
+            with AppLogger._lock:
+                if AppLogger._instance is None:
+                    AppLogger._instance = AppLogger()
+        return AppLogger._instance
 
     def level(self, val):
         levels = {
