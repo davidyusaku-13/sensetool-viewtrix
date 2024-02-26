@@ -374,11 +374,11 @@ import PrjSetModel
                                 }
 
                                 delegate: MyItem{
-                                    id: listItem
-
+                                    required property var deselectButton
                                     customItemName: model.text + index + selectState
                                     customWidth: workspaceItem.width
                                     customItemSize: 15
+
 
                                 }
                             }
@@ -399,7 +399,7 @@ import PrjSetModel
 
                 //function button text
                 //add
-                MyText2{
+                MyText{
                     id: addButton
 
                     x: 0
@@ -412,8 +412,8 @@ import PrjSetModel
                     customText: "Add"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
+                    customColor: down ? "#332C2B" : customHoveredColor
+                    customHoveredColor: "#000000"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
@@ -421,14 +421,10 @@ import PrjSetModel
                         acceptedDevices: PointerDevice.Mouse
                         cursorShape: Qt.PointingHandCursor
                     }
-
-                    onClicked: {
-                        window.manager.add("item", "value", "desc", "false")
-                    }
                 }
 
                 //delete
-                MyText2{
+                MyText{
                     id: deleteButton
 
                     x: addButton.width+5
@@ -441,8 +437,8 @@ import PrjSetModel
                     customText: "Delete"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
+                    customColor: down ? "#332C2B" : customHoveredColor
+                    customHoveredColor: "#000000"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
@@ -453,7 +449,7 @@ import PrjSetModel
                 }
 
                 //edit
-                MyText2{
+                MyText{
                     id: editButton
 
                     x: (addButton.width+5)+(deleteButton.width+5)
@@ -466,8 +462,8 @@ import PrjSetModel
                     customText: "Edit"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
+                    customColor: down ? "#332C2B" : customHoveredColor
+                    customHoveredColor: "#000000"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
@@ -478,7 +474,7 @@ import PrjSetModel
                 }
 
                 //select button
-                MyText2{
+                MyText{
                     id: selectButton
 
                     x: workspace1.width-width
@@ -507,7 +503,7 @@ import PrjSetModel
                 }
 
                 //deselect button
-                MyText2{
+                MyText{
                     id: deselectButton
 
                     x: workspace1.width-(width+selectButton.width+5)
@@ -520,19 +516,15 @@ import PrjSetModel
                     customText: "Deselect All"
                     customHAlignment: "Center"
                     customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
+                    customColor: "#C9CACA"
+                    customHoveredColor: "#C9CACA"
                     customTextColor: "#ffffff"
 
                     HoverHandler {
                         id: cursorHovered4
                         acceptedDevices: PointerDevice.Mouse
                         cursorShape: Qt.PointingHandCursor
-                        enabled: parent.customColor === "#000000" ? true : false
-                    }
-
-                    onClicked: {
-                        window.manager.deselectAll()
+                        enabled: false
                     }
                 }
             }
