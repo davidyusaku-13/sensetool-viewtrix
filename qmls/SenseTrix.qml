@@ -24,7 +24,6 @@ import PrjSetModel
             width: 1920
             height: 1080
 
-            property PrjSetModel prjSetModel: PrjSetModel{}
             property bool menuState: false
             property bool settingState: false
             property bool selectState: false
@@ -334,8 +333,28 @@ import PrjSetModel
                             anchors.fill: parent
                             rows: itemModel.length
 
+                                DelegateModel {
+                                    id: visualModel
+                                    model: window.manager.prjSetModel
+
+                                    groups: [
+                                        DelegateModelGroup { name: "selected" }
+                                    ]
+                                    
+                                    delegate: MyItem{
+                                        id: listItem
+
+                                        // customItemName: model.text + index + selectState
+                                        customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
+                                        customWidth: workspaceItem.width
+                                        customItemSize: 15
+                                    }
+                                }
+
                             ListView{
                                 anchors.fill: parent
+                                model: visualModel
+
                                 // model: ListModel{
                                 //     ListElement{text: "file 1 - csnjacbnjknbjcbn"}
                                 //     ListElement{text: "file 2 - csnjacbnjknbjcbn"}
@@ -351,15 +370,14 @@ import PrjSetModel
                                 //     ListElement{text: "file 12 - csnjacbnjknbjcbn"}
                                 // }
 
-                                model: root.prjSetModel
+                                // delegate: MyItem{
+                                //     id: listItem
 
-                                delegate: MyItem{
-                                    id: listItem
-
-                                    customItemName: model.text + index + selectState
-                                    customWidth: workspaceItem.width
-                                    customItemSize: 15
-                                }
+                                //     // customItemName: model.text + index + selectState
+                                //     customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
+                                //     customWidth: workspaceItem.width
+                                //     customItemSize: 15
+                                // }
                             }
                         }
                     }
@@ -399,6 +417,10 @@ import PrjSetModel
                         id: cursorHovered
                         acceptedDevices: PointerDevice.Mouse
                         cursorShape: Qt.PointingHandCursor
+                    }
+
+                    onClicked: {
+                        window.manager.add("item", "value", "desc", "false")
                     }
                 }
 
@@ -475,6 +497,13 @@ import PrjSetModel
                         acceptedDevices: PointerDevice.Mouse
                         cursorShape: Qt.PointingHandCursor
                     }
+
+                    onClicked: {
+                        window.manager.selectAll()
+                        for(var i=0; i<visualModel.model.rowCount(); i++){
+                            listItem.checklistIcon.visible = true
+                        }
+                    }
                 }
 
                 //deselect button
@@ -503,9 +532,7 @@ import PrjSetModel
                     }
 
                     onClicked: {
-                        if(listItem.selectState === true){
-                            listItem.selectState = false
-                        }
+                        window.manager.deselectAll()
                     }
                 }
             }
