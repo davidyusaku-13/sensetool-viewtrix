@@ -379,6 +379,7 @@ import PrjSetModel
                                     customItemName: model.text + index + selectState
                                     customWidth: workspaceItem.width
                                     customItemSize: 15
+
                                 }
                             }
                         }
