@@ -4,7 +4,7 @@ import PrjSetModel
 import AppLogic
 
 ApplicationWindow {
-    id: root
+    id: window
     title: qsTr("Viewtrix")
 
     property int w: 1280
@@ -15,8 +15,8 @@ ApplicationWindow {
     }
 
     visible: true
-    width: root.w
-    height: root.h
+    width: window.w
+    height: window.h
 
     SenseTrix{
         anchors.fill: parent

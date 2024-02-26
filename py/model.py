@@ -69,6 +69,12 @@ class PrjSetModel(QAbstractListModel):
         })
         return roles
 
+    @Slot(int, result=QObject)
+    def get(self, index):
+        if 0 <= index < len(self._items):
+            return self._items[index]
+        return None
+
     @Slot(str, str, str, str)
     def addItem(self, setitem, val, desc, selectState):
         logger.log(f"Added item: {setitem} - {val} - {desc}", level)
@@ -89,6 +95,18 @@ class PrjSetModel(QAbstractListModel):
         if 0 <= index < len(self._items):
             self._items[index]._selectState = new_state
             self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
+
+    @Slot()
+    def deselectAll(self):
+        for i, item in enumerate(self._items):
+            item._selectState = "false"
+            self.dataChanged.emit(self.index(i, 0), self.index(i, 0))
+
+    @Slot()
+    def selectAll(self):
+        for i, item in enumerate(self._items):
+            item._selectState = "true"
+            self.dataChanged.emit(self.index(i, 0), self.index(i, 0))
 
     @Slot()
     def clear(self):

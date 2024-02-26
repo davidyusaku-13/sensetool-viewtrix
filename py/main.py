@@ -13,7 +13,7 @@ level = logger.level("INFO")
 logger.configure_logging(level, format, "app.log")
 
 if __name__ == "__main__":
-    # DEFAULT QML LOAD
+    # DEFAULT QML LOAD``
     app = QGuiApplication(sys.argv)
     engine = QQmlApplicationEngine()
     qml_file = Path(__file__).resolve().parent / "../qmls/main.qml"
