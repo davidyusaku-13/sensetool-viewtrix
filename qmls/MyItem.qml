@@ -13,6 +13,7 @@ Item {
 
     property alias state: checklistIcon.visible
     // property bool selectState: false
+    // property bool selectState: false
 
     width: customWidth
     height: customHeight
@@ -73,11 +74,42 @@ Item {
             // }
 
             if(checklistIcon.visible === false){
+
+            // if(checklistIcon.visible === false){
+            //     checklistIcon.visible = true
+            //     selectState = true
+            //     listItem.DelegateModel.inSelected
+            //     window.manager.editState(listItem.DelegateModel.itemsIndex, "true")
+            // }else{
+            //     checklistIcon.visible = false
+            //     selectState = false
+            //     !listItem.DelegateModel.inSelected
+            //     window.manager.editState(listItem.DelegateModel.itemsIndex, "false")
+            // }
+
+            // if(listItem.selectState==="true"){
+            //     checklistIcon.visible = true
+            //     selectState = true
+            //     listItem.DelegateModel.inSelected
+            //     window.manager.editState(listItem.DelegateModel.itemsIndex, "true")
+            // } else {
+            //     checklistIcon.visible = false
+            //     selectState = false
+            //     !listItem.DelegateModel.inSelected
+            //     window.manager.editState(listItem.DelegateModel.itemsIndex, "false")
+            // }
+
+            // print(visualModel.model.get(listItem.DelegateModel.itemsIndex).selectState)
+
+            if(visualModel.model.get(listItem.DelegateModel.itemsIndex).selectState === "false"){
                 checklistIcon.visible = true
                 selectState = true
                 listItem.DelegateModel.inSelected
                 window.manager.editState(listItem.DelegateModel.itemsIndex, "true")
             }else{
+                listItem.DelegateModel.inSelected
+                window.manager.editState(listItem.DelegateModel.itemsIndex, "true")
+            } else {
                 checklistIcon.visible = false
                 selectState = false
                 !listItem.DelegateModel.inSelected

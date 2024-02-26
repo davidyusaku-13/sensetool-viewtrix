@@ -24,7 +24,6 @@ import PrjSetModel
             width: 1920
             height: 1080
 
-            property PrjSetModel prjSetModel: PrjSetModel{}
             property bool menuState: false
             property bool settingState: false
             property bool selectState: false
@@ -334,55 +333,51 @@ import PrjSetModel
                             anchors.fill: parent
                             rows: itemModel.length
 
-                            // FROM BACKEND DO NOT DELETE
-                            // DelegateModel {
-                            //     id: visualModel
-                            //     model: window.manager.prjSetModel
+                                DelegateModel {
+                                    id: visualModel
+                                    model: window.manager.prjSetModel
 
-                            //     groups: [
-                            //         DelegateModelGroup { name: "selected" }
-                            //     ]
-                                
-                            //     delegate: MyItem{
-                            //         id: listItem
+                                    groups: [
+                                        DelegateModelGroup { name: "selected" }
+                                    ]
+                                    
+                                    delegate: MyItem{
+                                        id: listItem
 
-                            //         state: selectState === "true" ? true : false
-                            //         customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
-                            //         customWidth: workspaceItem.width
-                            //         customItemSize: 15
-                            //     }
-                            // }
+                                        // customItemName: model.text + index + selectState
+                                        customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
+                                        customWidth: workspaceItem.width
+                                        customItemSize: 15
+                                    }
+                                }
 
                             ListView{
                                 anchors.fill: parent
+                                model: visualModel
 
-                                // FROM BACKEND DO NOT DELETE
-                                // model: visualModel
+                                // model: ListModel{
+                                //     ListElement{text: "file 1 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 2 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 3 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 4 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 5 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 6 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 7 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 8 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 9 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 10 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 11 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 12 - csnjacbnjknbjcbn"}
+                                // }
 
-                                model: ListModel{
-                                    ListElement{text: "file 1 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 2 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 3 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 4 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 5 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 6 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 7 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 8 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 9 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 10 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 11 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 12 - csnjacbnjknbjcbn"}
-                                }
+                                // delegate: MyItem{
+                                //     id: listItem
 
-                                model: root.prjSetModel
-
-                                delegate: MyItem{
-                                    id: listItem
-
-                                    customItemName: model.text + index + selectState
-                                    customWidth: workspaceItem.width
-                                    customItemSize: 15
-                                }
+                                //     // customItemName: model.text + index + selectState
+                                //     customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
+                                //     customWidth: workspaceItem.width
+                                //     customItemSize: 15
+                                // }
                             }
                         }
                     }
@@ -422,6 +417,10 @@ import PrjSetModel
                         id: cursorHovered
                         acceptedDevices: PointerDevice.Mouse
                         cursorShape: Qt.PointingHandCursor
+                    }
+
+                    onClicked: {
+                        window.manager.add("item", "value", "desc", "false")
                     }
                 }
 
@@ -501,6 +500,9 @@ import PrjSetModel
 
                     onClicked: {
                         window.manager.selectAll()
+                        for(var i=0; i<visualModel.model.rowCount(); i++){
+                            listItem.checklistIcon.visible = true
+                        }
                     }
                 }
 
@@ -530,9 +532,7 @@ import PrjSetModel
                     }
 
                     onClicked: {
-                        if(listItem.selectState === true){
-                            listItem.selectState = false
-                        }
+                        window.manager.deselectAll()
                     }
                 }
             }
