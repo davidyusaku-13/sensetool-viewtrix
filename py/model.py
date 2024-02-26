@@ -12,11 +12,12 @@ level = logger.level("INFO")
 
 @QmlElement
 class PrjSetModelItem(QObject):
-    def __init__(self, setitem, val, desc, parent=None):
+    def __init__(self, setitem, val, desc, selectState, parent=None):
         super().__init__(parent)
         self._setitem = setitem
         self._val = val
         self._desc = desc
+        self._selectState = selectState
 
     @Property(str)
     def setitem(self):
@@ -29,6 +30,10 @@ class PrjSetModelItem(QObject):
     @Property(str)
     def desc(self):
         return self._desc
+
+    @Property(str)
+    def selectState(self):
+        return self._selectState
 
 
 @QmlElement
@@ -51,21 +56,24 @@ class PrjSetModel(QAbstractListModel):
             return self._items[index.row()].val
         elif role == Qt.UserRole + 2:
             return self._items[index.row()].desc
+        elif role == Qt.UserRole + 3:
+            return self._items[index.row()].selectState
 
     def roleNames(self):
         roles = super().roleNames()
         roles.update({
             Qt.DisplayRole: b"setitem",
             Qt.UserRole + 1: b"val",
-            Qt.UserRole + 2: b"desc"
+            Qt.UserRole + 2: b"desc",
+            Qt.UserRole + 3: b"selectState"
         })
         return roles
 
-    @Slot(str, str, str)
-    def addItem(self, setitem, val, desc):
+    @Slot(str, str, str, str)
+    def addItem(self, setitem, val, desc, selectState):
         logger.log(f"Added item: {setitem} - {val} - {desc}", level)
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
-        item = PrjSetModelItem(setitem, val, desc, self)
+        item = PrjSetModelItem(setitem, val, desc, selectState, self)
         self._items.append(item)
         self.endInsertRows()
 
@@ -75,6 +83,12 @@ class PrjSetModel(QAbstractListModel):
             self.beginRemoveRows(QModelIndex(), index, index)
             del self._items[index]
             self.endRemoveRows()
+
+    @Slot(int, str)
+    def editState(self, index, new_state):
+        if 0 <= index < len(self._items):
+            self._items[index]._selectState = new_state
+            self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
 
     @Slot()
     def clear(self):
@@ -88,4 +102,4 @@ class PrjSetModel(QAbstractListModel):
 
     @Property(list, constant=True)
     def itemsData(self):
-        return [(item.setitem, item.val, item.desc) for item in self._items]
+        return [(item.setitem, item.val, item.desc, item.selectState) for item in self._items]
