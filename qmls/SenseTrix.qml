@@ -24,6 +24,7 @@ import PrjSetModel
             width: 1920
             height: 1080
 
+            property PrjSetModel prjSetModel: PrjSetModel{}
             property bool menuState: false
             property bool settingState: false
             property bool selectState: false
@@ -372,6 +373,8 @@ import PrjSetModel
                                     ListElement{text: "file 11 - csnjacbnjknbjcbn"}
                                     ListElement{text: "file 12 - csnjacbnjknbjcbn"}
                                 }
+
+                                model: root.prjSetModel
 
                                 delegate: MyItem{
                                     id: listItem
