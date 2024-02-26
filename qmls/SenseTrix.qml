@@ -3,6 +3,7 @@ import QtQuick.Controls 6.5
 import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
 import QtQuick.Window
+import PrjSetModel
 
 // ApplicationWindow{
 //     width: 1920
@@ -23,6 +24,7 @@ import QtQuick.Window
             width: 1920
             height: 1080
 
+            property PrjSetModel prjSetModel: PrjSetModel{}
             property bool menuState: false
             property bool settingState: false
             property bool selectState: false
@@ -334,20 +336,22 @@ import QtQuick.Window
 
                             ListView{
                                 anchors.fill: parent
-                                model: ListModel{
-                                    ListElement{text: "file 1 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 2 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 3 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 4 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 5 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 6 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 7 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 8 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 9 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 10 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 11 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 12 - csnjacbnjknbjcbn"}
-                                }
+                                // model: ListModel{
+                                //     ListElement{text: "file 1 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 2 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 3 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 4 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 5 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 6 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 7 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 8 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 9 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 10 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 11 - csnjacbnjknbjcbn"}
+                                //     ListElement{text: "file 12 - csnjacbnjknbjcbn"}
+                                // }
+
+                                model: root.prjSetModel
 
                                 delegate: MyItem{
                                     id: listItem
