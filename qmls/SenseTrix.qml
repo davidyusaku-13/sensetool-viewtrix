@@ -360,16 +360,6 @@ import QtQuick.Window
                             anchors.fill: parent
                             rows: itemModel.length
 
-                            // Repeater{
-                            //     model: root.itemModel
-                            //     MyItem{
-                            //         required property bool deselectState
-                            //         customItemName: model.customName
-                            //         customWidth: workspace1.width
-                            //         customHeight: 50
-                            //         deselectState: selectState === true ? true : false
-                            //     }
-                            // }
                             ListView{
                                 anchors.fill: parent
                                 model: ListModel{
@@ -388,9 +378,10 @@ import QtQuick.Window
                                 }
 
                                 delegate: MyItem{
-                                    customItemName: model.text
+                                    customItemName: model.text + index + selectState
                                     customWidth: workspaceItem.width
                                     customItemSize: 15
+
                                 }
                             }
                         }
@@ -443,41 +434,64 @@ import QtQuick.Window
                 }
 
                 //select button
-                Grid {
-                    id: grid2
+                // Grid {
+                //     id: grid2
 
-                    x: workspace1.width-grid1.width
-                    y: parent.y-(menu.height+(menu.anchors.topMargin*2))
+                //     x: workspace1.width-grid1.width
+                //     y: parent.y-(menu.height+(menu.anchors.topMargin*2))
 
-                    width: 300
-                    height: 38
-                    layoutDirection: Qt.RightToLeft
+                //     width: 300
+                //     height: 38
+                //     layoutDirection: Qt.RightToLeft
 
-                    spacing: 5
-                    columns: selectBtnModel.length
+                //     spacing: 5
+                //     columns: selectBtnModel.length
 
-                    Repeater{
-                        id: repeater1
-                        model: selectBtnModel
-                        MyText{
-                            // required property bool deselectState
-                            width: model.customWidth
-                            height: 28
+                //     Repeater{
+                //         id: repeater1
+                //         model: selectBtnModel
+                //         MyText{
+                //             // required property bool deselectState
+                //             width: model.customWidth
+                //             height: 28
 
-                            customRadius: 5
-                            customText: model.customName
-                            customHAlignment: "Center"
-                            customSize: 15
-                            customColor: down ? "#332C2B" : customHoveredColor
-                            customHoveredColor: "#000000"
-                            customTextColor: "#ffffff"
+                //             customRadius: 5
+                //             customText: model.customName
+                //             customHAlignment: "Center"
+                //             customSize: 15
+                //             customColor: down ? "#332C2B" : customHoveredColor
+                //             customHoveredColor: "#000000"
+                //             customTextColor: "#ffffff"
 
-                            HoverHandler {
-                                id: cursorHovered2
-                                acceptedDevices: PointerDevice.Mouse
-                                cursorShape: Qt.PointingHandCursor
-                            }
-                        }
+                //             HoverHandler {
+                //                 id: cursorHovered2
+                //                 acceptedDevices: PointerDevice.Mouse
+                //                 cursorShape: Qt.PointingHandCursor
+                //             }
+                //         }
+                //     }
+                // }
+                MyText{
+                    id: selectButton
+
+                    x: workspace1.width-width
+                    y: 0
+
+                    width: 90
+                    height: 28
+
+                    customRadius: 5
+                    customText: "Select All"
+                    customHAlignment: "Center"
+                    customSize: 15
+                    customColor: down ? "#332C2B" : customHoveredColor
+                    customHoveredColor: "#000000"
+                    customTextColor: "#ffffff"
+
+                    HoverHandler {
+                        id: cursorHovered2
+                        acceptedDevices: PointerDevice.Mouse
+                        cursorShape: Qt.PointingHandCursor
                     }
                 }
             }
