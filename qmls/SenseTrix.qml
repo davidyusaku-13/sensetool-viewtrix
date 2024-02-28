@@ -344,7 +344,7 @@ import PrjSetModel
                                     delegate: MyItem{
                                         id: listItem
 
-                                        // customItemName: model.text + index + selectState
+                                        state: selectState === "true" ? true : false
                                         customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
                                         customWidth: workspaceItem.width
                                         customItemSize: 15
@@ -373,8 +373,7 @@ import PrjSetModel
                                 // delegate: MyItem{
                                 //     id: listItem
 
-                                //     // customItemName: model.text + index + selectState
-                                //     customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
+                                //     customItemName: model.text + index + selectState
                                 //     customWidth: workspaceItem.width
                                 //     customItemSize: 15
                                 // }
@@ -500,9 +499,6 @@ import PrjSetModel
 
                     onClicked: {
                         window.manager.selectAll()
-                        for(var i=0; i<visualModel.model.rowCount(); i++){
-                            listItem.checklistIcon.visible = true
-                        }
                     }
                 }
 
