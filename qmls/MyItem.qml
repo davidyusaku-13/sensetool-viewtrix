@@ -74,28 +74,13 @@ Item {
             // }
 
             if(checklistIcon.visible === false){
-
-            // if(checklistIcon.visible === false){
-            //     checklistIcon.visible = true
-            //     selectState = true
-            //     listItem.DelegateModel.inSelected
-            //     window.manager.editState(listItem.DelegateModel.itemsIndex, "true")
-            // }else{
-            //     checklistIcon.visible = false
-            //     selectState = false
-            //     !listItem.DelegateModel.inSelected
-            //     window.manager.editState(listItem.DelegateModel.itemsIndex, "false")
-            // }
-
-            if(listItem.state===false){
-                state = true
+                checklistIcon.visible = true
+                selectState = true
                 listItem.DelegateModel.inSelected
                 window.manager.editState(listItem.DelegateModel.itemsIndex, "true")
             }else{
-                listItem.DelegateModel.inSelected
-                window.manager.editState(listItem.DelegateModel.itemsIndex, "true")
-            } else {
-                state = false
+                checklistIcon.visible = false
+                selectState = false
                 !listItem.DelegateModel.inSelected
                 window.manager.editState(listItem.DelegateModel.itemsIndex, "false")
             }
