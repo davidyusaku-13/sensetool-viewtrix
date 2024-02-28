@@ -333,50 +333,53 @@ import PrjSetModel
                             anchors.fill: parent
                             rows: itemModel.length
 
-                                DelegateModel {
-                                    id: visualModel
-                                    model: window.manager.prjSetModel
+                            // FROM BACKEND DO NOT DELETE
+                            // DelegateModel {
+                            //     id: visualModel
+                            //     model: window.manager.prjSetModel
 
-                                    groups: [
-                                        DelegateModelGroup { name: "selected" }
-                                    ]
-                                    
-                                    delegate: MyItem{
-                                        id: listItem
+                            //     groups: [
+                            //         DelegateModelGroup { name: "selected" }
+                            //     ]
+                                
+                            //     delegate: MyItem{
+                            //         id: listItem
 
-                                        state: selectState === "true" ? true : false
-                                        customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
-                                        customWidth: workspaceItem.width
-                                        customItemSize: 15
-                                    }
-                                }
+                            //         state: selectState === "true" ? true : false
+                            //         customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
+                            //         customWidth: workspaceItem.width
+                            //         customItemSize: 15
+                            //     }
+                            // }
 
                             ListView{
                                 anchors.fill: parent
-                                model: visualModel
 
-                                // model: ListModel{
-                                //     ListElement{text: "file 1 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 2 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 3 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 4 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 5 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 6 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 7 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 8 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 9 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 10 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 11 - csnjacbnjknbjcbn"}
-                                //     ListElement{text: "file 12 - csnjacbnjknbjcbn"}
-                                // }
+                                // FROM BACKEND DO NOT DELETE
+                                // model: visualModel
 
-                                // delegate: MyItem{
-                                //     id: listItem
+                                model: ListModel{
+                                    ListElement{text: "file 1 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 2 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 3 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 4 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 5 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 6 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 7 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 8 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 9 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 10 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 11 - csnjacbnjknbjcbn"}
+                                    ListElement{text: "file 12 - csnjacbnjknbjcbn"}
+                                }
 
-                                //     customItemName: model.text + index + selectState
-                                //     customWidth: workspaceItem.width
-                                //     customItemSize: 15
-                                // }
+                                delegate: MyItem{
+                                    id: listItem
+
+                                    customItemName: model.text + index + selectState
+                                    customWidth: workspaceItem.width
+                                    customItemSize: 15
+                                }
                             }
                         }
                     }
