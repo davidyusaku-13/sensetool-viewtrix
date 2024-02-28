@@ -8,7 +8,7 @@ ApplicationWindow {
     title: qsTr("Viewtrix")
 
     property int w: 1280
-    property int h: 720
+    property int h: 400
     property AppManager manager: AppManager{
         prjSetModel: PrjSetModel{}
         logic: AppLogic{}
