@@ -4,22 +4,19 @@ import Qt5Compat.GraphicalEffects
 
 Button {
     id: myButton
+    width: 50
+    height: 50
 
+    //property
     property string customColor: "#d6d6d6"
     property string customHoveredColor: "#ffffff"
 
     property string customImage:"images/menu-icon2.png"
 
-    property int customIconWidth: width-12
-    property int customIconHeight: height-12
+    property int customIconWidth: myButton.width-10
+    property int customIconHeight: myButton.height-10
 
-    property int customRadius: 10
-
-    x: 500
-    y: 500
-
-    width: 35
-    height: 35
+    property int customRadius: 5
 
     Image {
         id: menuIcon
@@ -35,11 +32,8 @@ Button {
     }
 
     background: Rectangle{
-        width: parent.width
-        height: parent.height
-
         color: parent.down ? customColor :
-        parent.hovered ? customHoveredColor : customColor
+                             parent.hovered ? customHoveredColor : customColor
 
         radius:customRadius
     }
