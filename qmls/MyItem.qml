@@ -12,7 +12,6 @@ Item {
     property int customHeight: 50
 
     property alias state: checklistIcon.visible
-    // property bool selectState: false
 
     width: customWidth
     height: customHeight
