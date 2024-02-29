@@ -3,7 +3,8 @@ import QtQuick.Controls 6.5
 import Qt5Compat.GraphicalEffects
 import QtQuick.Dialogs
 import QtQuick.Window
-import PrjSetModel
+import QtQuick.Layouts
+//import PrjSetModel
 
 // ApplicationWindow{
 //     width: 1920
@@ -31,11 +32,11 @@ import PrjSetModel
             anchors.fill: parent
             color: "#ffffff"
 
-            Drawer{
-                id: drawer
-                width: 0.66 * root.width
-                height: root.height
-            }
+            // Drawer{
+            //     id: drawer
+            //     width: 0.66 * root.width
+            //     height: root.height
+            // }
 
             //mouse area for close every window
             MouseArea {
@@ -105,484 +106,466 @@ import PrjSetModel
                 }
             ]
 
-            //left sidebar
-            Rectangle {
-                id: leftSidebar
 
-                x:-width
-                y: root.y
+            ColumnLayout{
+                anchors.fill: parent
 
-                width: menu.width+menu.anchors.leftMargin*2
-                height: root.height
+                //header
+                RowLayout{
+                    Layout.fillWidth: true
+                    height: 50
+                    //menu button
+                    MyButton {
+                        id: menu
 
-                visible: true
+                        width: 50
+                        height: 50
 
-                color: "#ffffff"
-                border.width: 0
+                        customImage: "images/menu-icon2"
+                        customColor: "#ffffff"
+                        customHoveredColor: "#DCDDDD"
+                        customRadius: 5
 
-                //animation
-                PropertyAnimation{
-                    id: lsAnimationOn
-                    target: leftSidebar
-                    property: "x"
-                    to: root.x
-                    duration: 150
-                }
+                        MouseArea{
+                            anchors.fill:parent
+                            onClicked:{
+                                if(menuState === false){
+                                    lsAnimationOn.running = true
+                                    menuState = true
 
-                PropertyAnimation{
-                    id: lsAnimationOff
-                    target: leftSidebar
-                    property: "x"
-                    to: -width
-                    duration: 150
-                }
+                                    if(workspace1.visible === true){
+                                        workspace1.anchors.leftMargin = 50+leftSidebar.width
+                                    }
+                                }else{
+                                    lsAnimationOff.running = true
+                                    menuState = false
 
-                //list menu
-                Grid {
-                    id: grid
-
-                    x: menu.anchors.leftMargin
-                    y: menu.height+menu.anchors.topMargin*2
-
-                    width: leftSidebar.width-menu.anchors.leftMargin*2
-                    height: leftSidebar.height - (menu.height +
-                                                  menu.anchors.topMargin*2)
-                    spacing: 10
-
-                    rows: 1
-                    columns: 1
-                    Repeater{
-                        id: repeater
-                        model: root.menuList
-                        MyButton{
-                            customIconWidth: 25
-                            customIconHeight: 25
-                            customImage: model.customImage
-                            customColor: "#ffffff"
-                            customHoveredColor: "#DCDDDD"
-                            customRadius: 5
-
-                            onClicked: {
-                                customColor = "#DCDDDD"
-                                if(model.customWorkspace === workspace1){
-                                    workspace1.visible = true
-                                    workspace1.anchors.leftMargin = 50 +
-                                            leftSidebar.width
+                                    if(workspace1.visible === true){
+                                        workspace1.anchors.leftMargin = 50
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            }
 
-            //left sidebar shadow
-            DropShadow{
-                anchors.fill: leftSidebar
-                horizontalOffset: 0
-                verticalOffset: 0
-                radius: 4.0
-                color: "#80000000"
-                source: leftSidebar
-            }
+                    Item{
+                        Layout.fillWidth: true
+                    }
 
-            //menu button
-            MyButton {
-                id: menu
+                    //setting
+                    MyButton {
+                        id: setting
 
-                anchors.left: root.left
-                anchors.top: root.top
-                anchors.leftMargin: 10
-                anchors.topMargin: 10
+                        customImage: "images/setting.png"
+                        customColor: "#ffffff"
+                        customHoveredColor: "#DCDDDC"
+                        customRadius: 5
 
-                customImage: "images/menu-icon2"
-                customColor: "#ffffff"
-                customHoveredColor: "#DCDDDD"
-                customRadius: 5
-
-                MouseArea{
-                    anchors.fill:parent
-                    onClicked:{
-                        if(menuState === false){
-                            lsAnimationOn.running = true
-                            menuState = true
-
-                            if(workspace1.visible === true){
-                                workspace1.anchors.leftMargin = 50+leftSidebar.width
-                            }
-                        }else{
-                            lsAnimationOff.running = true
-                            menuState = false
-
-                            if(workspace1.visible === true){
-                                workspace1.anchors.leftMargin = 50
+                        MouseArea{
+                            anchors.fill:parent
+                            onClicked:{
+                                if(settingState === false){
+                                    settingPopUp.visible = true
+                                    settingState = true
+                                }else{
+                                    settingPopUp.visible = false
+                                    settingState = false
+                                }
                             }
                         }
                     }
-                }
-            }
 
-            //grid for right icon
-            Grid {
-                id: rightIconGrid
+                    //notification icon
+                    MyButton {
+                        id: notification
 
-                x: 1480
+                        customImage: "images/notification.png"
+                        customColor: "#ffffff"
+                        customHoveredColor: "#DCDDDD"
+                        customRadius: 5
 
-                anchors.right: root.right
-                anchors.top: root.top
-                anchors.rightMargin: menu.anchors.leftMargin
-                anchors.topMargin: menu.anchors.topMargin
+                        MouseArea{
+                            anchors.fill:parent
+                            onClicked:{
 
-                spacing: 5
-                layoutDirection: Qt.RightToLeft
-
-                width: 420
-                height: 45
-
-                //setting
-                MyButton {
-                    id: setting
-
-                    customImage: "images/setting.png"
-                    customColor: "#ffffff"
-                    customHoveredColor: "#DCDDDC"
-                    customRadius: 5
-
-                    MouseArea{
-                        anchors.fill:parent
-                        onClicked:{
-                            if(settingState === false){
-                                settingPopUp.visible = true
-                                settingState = true
-                            }else{
-                                settingPopUp.visible = false
-                                settingState = false
                             }
                         }
                     }
+
                 }
 
-                //notification icon
-                MyButton {
-                    id: notification
+                RowLayout{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    //left sidebar
+                    Rectangle {
+                        id: leftSidebar
 
-                    customImage: "images/notification.png"
-                    customColor: "#ffffff"
-                    customHoveredColor: "#DCDDDD"
-                    customRadius: 5
+                        Layout.fillHeight: true
+                        width: 100
 
-                    MouseArea{
-                        anchors.fill:parent
-                        onClicked:{
+                        visible: true
 
+                        color: "#ffffff"
+                        border.width: 0
+
+                        //animation
+                        PropertyAnimation{
+                            id: lsAnimationOn
+                            target: leftSidebar
+                            property: "x"
+                            to: root.x
+                            duration: 150
                         }
+
+                        PropertyAnimation{
+                            id: lsAnimationOff
+                            target: leftSidebar
+                            property: "x"
+                            to: -width
+                            duration: 150
+                        }
+
+                        //list menu
+                        Column{
+                            id: column1
+
+                            spacing: 10
+                            Repeater{
+                                id: repeater
+                                model: root.menuList
+                                MyButton{
+                                    customIconWidth: 25
+                                    customIconHeight: 25
+                                    customImage: model.customImage
+                                    customColor: "#ffffff"
+                                    customHoveredColor: "#DCDDDD"
+                                    customRadius: 5
+
+                                    onClicked: {
+                                        customColor = "#DCDDDD"
+                                        if(model.customWorkspace === workspace1){
+                                            workspace1.visible = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // //left sidebar shadow
+                        // DropShadow{
+                        //     anchors.fill: leftSidebar
+                        //     horizontalOffset: 1
+                        //     verticalOffset: 1
+                        //     radius: 4.0
+                        //     color: "#80000000"
+                        //     source: leftSidebar
+                        // }
                     }
-                }
-            }
 
-            //workspace1
-            Rectangle {
-                id: workspace1
+                    //workspace1
+                    Item {
+                        //id: workspace1
 
-                anchors.top: parent.top
-                anchors.topMargin: ((menu.anchors.topMargin*2)+menu.height)
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 50
-                anchors.left: parent.left
-                anchors.leftMargin: 50
-                anchors.right: parent.right
-                anchors.rightMargin: 50
-                anchors.horizontalCenter: parent.horizontalCenter
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
 
-                color: "#ffffff"
-                radius: 5
-                border.width: 0
-                border.color: "#332C2B"
-
-                visible: false
-
-                Rectangle{
-                    id: workspaceItem
-                    anchors.top: parent.top
-                    anchors.topMargin: 40
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    color: "#ffffff"
-                    radius: 5
-                    border.width: 0
-                    border.color: "#A1A1A1"
-
-                    layer.enabled: true
-                    layer.effect: DropShadow{
-                        horizontalOffset: 0
-                        verticalOffset: 0
-                        radius: 4.0
-                        color: "#80000000"
-                    }
-
-                    ScrollView{
-                        id: scrollItem
                         anchors.fill: parent
-                        hoverEnabled: true
-                        //enabled: itemModel.length*50>workspaceItem.height ? true : false
-                        enabled: true
 
-                        Grid{
-                            anchors.fill: parent
-                            rows: itemModel.length
+                        // width: 100
+                        // height: 100
 
-                            // FROM BACKEND DO NOT DELETE
-                            // DelegateModel {
-                            //     id: visualModel
-                            //     model: window.manager.prjSetModel
+                        // color: "#ffffff"
+                        // radius: 5
+                        // border.width: 0
+                        // border.color: "#332C2B"
 
-                            //     groups: [
-                            //         DelegateModelGroup { name: "selected" }
-                            //     ]
-                                
-                            //     delegate: MyItem{
-                            //         id: listItem
+                        visible: false
 
-                            //         state: selectState === "true" ? true : false
-                            //         customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
-                            //         customWidth: workspaceItem.width
-                            //         customItemSize: 15
-                            //     }
-                            // }
+                        //function button icon
+                        // MyButton{
+                        //     width: 28
+                        //     height: 28
 
-                            ListView{
-                                anchors.fill: parent
+                        //     customImage: model.customImage
+                        //     customColor: "#ffffff"
+                        //     customHoveredColor: "#DCDDDD"
+                        //     customRadius: 5
+                        // }
 
-                                // FROM BACKEND DO NOT DELETE
-                                // model: visualModel
+                        //function button text
 
-                                model: ListModel{
-                                    ListElement{text: "file 1 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 2 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 3 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 4 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 5 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 6 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 7 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 8 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 9 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 10 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 11 - csnjacbnjknbjcbn"}
-                                    ListElement{text: "file 12 - csnjacbnjknbjcbn"}
-                                }
+                        // Column{
+                        //     anchors.fill: parent
+                        //     Row{
+                        //         Row{
+                        //             //add
+                        //             MyText2{
+                        //                 id: addButton
 
-                                delegate: MyItem{
-                                    id: listItem
+                        //                 width: 50
+                        //                 height: 28
 
-                                    customItemName: model.text + index + selectState
-                                    customWidth: workspaceItem.width
-                                    customItemSize: 15
-                                }
-                            }
-                        }
+                        //                 customRadius: 5
+                        //                 customText: "Add"
+                        //                 customHAlignment: "Center"
+                        //                 customSize: 15
+                        //                 customColor: "#000000"
+                        //                 customHoveredColor: "#332C2B"
+                        //                 customTextColor: "#ffffff"
+
+                        //                 HoverHandler {
+                        //                     id: cursorHovered
+                        //                     acceptedDevices: PointerDevice.Mouse
+                        //                     cursorShape: Qt.PointingHandCursor
+                        //                 }
+
+                        //                 onClicked: {
+                        //                     window.manager.add("item", "value", "desc", "false")
+                        //                 }
+                        //             }
+
+                        //             //delete
+                        //             MyText2{
+                        //                 id: deleteButton
+
+                        //                 width: 70
+                        //                 height: 28
+
+                        //                 customRadius: 5
+                        //                 customText: "Delete"
+                        //                 customHAlignment: "Center"
+                        //                 customSize: 15
+                        //                 customColor: "#000000"
+                        //                 customHoveredColor: "#332C2B"
+                        //                 customTextColor: "#ffffff"
+
+                        //                 HoverHandler {
+                        //                     id: cursorHovered1
+                        //                     acceptedDevices: PointerDevice.Mouse
+                        //                     cursorShape: Qt.PointingHandCursor
+                        //                 }
+                        //             }
+
+                        //             //edit
+                        //             MyText2{
+                        //                 id: editButton
+
+                        //                 width: 50
+                        //                 height: 28
+
+                        //                 customRadius: 5
+                        //                 customText: "Edit"
+                        //                 customHAlignment: "Center"
+                        //                 customSize: 15
+                        //                 customColor: "#000000"
+                        //                 customHoveredColor: "#332C2B"
+                        //                 customTextColor: "#ffffff"
+
+                        //                 HoverHandler {
+                        //                     id: cursorHovered2
+                        //                     acceptedDevices: PointerDevice.Mouse
+                        //                     cursorShape: Qt.PointingHandCursor
+                        //                 }
+                        //             }
+                        //         }
+
+                        //         Row{
+                        //             //select button
+                        //             MyText2{
+                        //                 id: selectButton
+
+                        //                 width: 90
+                        //                 height: 28
+
+                        //                 customRadius: 5
+                        //                 customText: "Select All"
+                        //                 customHAlignment: "Center"
+                        //                 customSize: 15
+                        //                 customColor: "#000000"
+                        //                 customHoveredColor: "#332C2B"
+                        //                 customTextColor: "#ffffff"
+
+                        //                 HoverHandler {
+                        //                     id: cursorHovered3
+                        //                     acceptedDevices: PointerDevice.Mouse
+                        //                     cursorShape: Qt.PointingHandCursor
+                        //                 }
+
+                        //                 onClicked: {
+                        //                     window.manager.selectAll()
+                        //                 }
+                        //             }
+
+                        //             //deselect button
+                        //             MyText2{
+                        //                 id: deselectButton
+
+                        //                 width: 110
+                        //                 height: 28
+
+                        //                 customRadius: 5
+                        //                 customText: "Deselect All"
+                        //                 customHAlignment: "Center"
+                        //                 customSize: 15
+                        //                 customColor: "#000000"
+                        //                 customHoveredColor: "#332C2B"
+                        //                 customTextColor: "#ffffff"
+
+                        //                 HoverHandler {
+                        //                     id: cursorHovered4
+                        //                     acceptedDevices: PointerDevice.Mouse
+                        //                     cursorShape: Qt.PointingHandCursor
+                        //                     enabled: parent.customColor === "#000000" ? true : false
+                        //                 }
+
+                        //                 onClicked: {
+                        //                     window.manager.deselectAll()
+                        //                 }
+                        //             }
+                        //         }
+
+                        //     }
+                        //     Rectangle{
+                        //         id: workspaceItem
+                        //         // anchors.top: parent.top
+                        //         // anchors.topMargin: 40
+                        //         // anchors.bottom: parent.bottom
+                        //         // anchors.left: parent.left
+                        //         // anchors.right: parent.right
+                        //         // anchors.horizontalCenter: parent.horizontalCenter
+
+                        //         color: "#ffffff"
+                        //         radius: 5
+                        //         border.width: 0
+                        //         border.color: "#A1A1A1"
+
+                        //         layer.enabled: true
+                        //         layer.effect: DropShadow{
+                        //             horizontalOffset: 0
+                        //             verticalOffset: 0
+                        //             radius: 4.0
+                        //             color: "#80000000"
+                        //         }
+
+                        //         ScrollView{
+                        //             id: scrollItem
+                        //             anchors.fill: parent
+                        //             hoverEnabled: true
+                        //             //enabled: itemModel.length*50>workspaceItem.height ? true : false
+                        //             enabled: true
+
+                        //             Grid{
+                        //                 anchors.fill: parent
+                        //                 rows: itemModel.length
+
+                        //                 //FROM BACKEND DO NOT DELETE
+                        //                 // DelegateModel {
+                        //                 //     id: visualModel
+                        //                 //     model: window.manager.prjSetModel
+
+                        //                 //     groups: [
+                        //                 //         DelegateModelGroup { name: "selected" }
+                        //                 //     ]
+
+                        //                 //     delegate: MyItem{
+                        //                 //         id: listItem
+
+                        //                 //         state: selectState === "true" ? true : false
+                        //                 //         customItemName: setitem + " | " + val + " | " + desc + " | " + selectState
+                        //                 //         customWidth: workspaceItem.width
+                        //                 //         customItemSize: 15
+                        //                 //     }
+                        //                 // }
+
+                        //                 ListView{
+                        //                     anchors.fill: parent
+
+                        //                     // FROM BACKEND DO NOT DELETE
+                        //                     // model: visualModel
+
+                        //                     model: ListModel{
+                        //                         ListElement{text: "file 1 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 2 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 3 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 4 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 5 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 6 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 7 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 8 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 9 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 10 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 11 - csnjacbnjknbjcbn"}
+                        //                         ListElement{text: "file 12 - csnjacbnjknbjcbn"}
+                        //                     }
+
+                        //                     delegate: MyItem{
+                        //                         id: listItem
+
+                        //                         customItemName: model.text + index + selectState
+                        //                         customWidth: workspaceItem.width
+                        //                         customItemSize: 15
+                        //                     }
+                        //                 }
+                        //             }
+                        //         }
+                        //     }
+                        // }
+
                     }
+
                 }
 
-                //function button icon
-                // MyButton{
-                //     width: 28
-                //     height: 28
-
-                //     customImage: model.customImage
-                //     customColor: "#ffffff"
-                //     customHoveredColor: "#DCDDDD"
-                //     customRadius: 5
-                // }
-
-                //function button text
-                //add
-                MyText2{
-                    id: addButton
-
-                    x: 0
-                    y: 0
-
-                    width: 50
-                    height: 28
-
-                    customRadius: 5
-                    customText: "Add"
-                    customHAlignment: "Center"
-                    customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
-                    customTextColor: "#ffffff"
-
-                    HoverHandler {
-                        id: cursorHovered
-                        acceptedDevices: PointerDevice.Mouse
-                        cursorShape: Qt.PointingHandCursor
-                    }
-
-                    onClicked: {
-                        window.manager.add("item", "value", "desc", "false")
-                    }
-                }
-
-                //delete
-                MyText2{
-                    id: deleteButton
-
-                    x: addButton.width+5
-                    y: 0
-
-                    width: 70
-                    height: 28
-
-                    customRadius: 5
-                    customText: "Delete"
-                    customHAlignment: "Center"
-                    customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
-                    customTextColor: "#ffffff"
-
-                    HoverHandler {
-                        id: cursorHovered1
-                        acceptedDevices: PointerDevice.Mouse
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                }
-
-                //edit
-                MyText2{
-                    id: editButton
-
-                    x: (addButton.width+5)+(deleteButton.width+5)
-                    y: 0
-
-                    width: 50
-                    height: 28
-
-                    customRadius: 5
-                    customText: "Edit"
-                    customHAlignment: "Center"
-                    customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
-                    customTextColor: "#ffffff"
-
-                    HoverHandler {
-                        id: cursorHovered2
-                        acceptedDevices: PointerDevice.Mouse
-                        cursorShape: Qt.PointingHandCursor
-                    }
-                }
-
-                //select button
-                MyText2{
-                    id: selectButton
-
-                    x: workspace1.width-width
-                    y: 0
-
-                    width: 90
-                    height: 28
-
-                    customRadius: 5
-                    customText: "Select All"
-                    customHAlignment: "Center"
-                    customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
-                    customTextColor: "#ffffff"
-
-                    HoverHandler {
-                        id: cursorHovered3
-                        acceptedDevices: PointerDevice.Mouse
-                        cursorShape: Qt.PointingHandCursor
-                    }
-
-                    onClicked: {
-                        window.manager.selectAll()
-                    }
-                }
-
-                //deselect button
-                MyText2{
-                    id: deselectButton
-
-                    x: workspace1.width-(width+selectButton.width+5)
-                    y: 0
-
-                    width: 110
-                    height: 28
-
-                    customRadius: 5
-                    customText: "Deselect All"
-                    customHAlignment: "Center"
-                    customSize: 15
-                    customColor: "#000000"
-                    customHoveredColor: "#332C2B"
-                    customTextColor: "#ffffff"
-
-                    HoverHandler {
-                        id: cursorHovered4
-                        acceptedDevices: PointerDevice.Mouse
-                        cursorShape: Qt.PointingHandCursor
-                        enabled: parent.customColor === "#000000" ? true : false
-                    }
-
-                    onClicked: {
-                        window.manager.deselectAll()
-                    }
-                }
             }
 
-            //setting pop up
-            Rectangle{
-                id: settingPopUp
 
-                width: 150
-                height: 30*3
+            // //setting pop up
+            // Rectangle{
+            //     id: settingPopUp
 
-                radius: 5*3
+            //     width: 150
+            //     height: 30*3
 
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.rightMargin: menu.anchors.leftMargin
-                anchors.topMargin: setting.height+rightIconGrid.anchors.topMargin+10
+            //     radius: 5*3
 
-                visible: false
+            //     anchors.right: parent.right
+            //     anchors.top: parent.top
+            //     anchors.rightMargin: menu.anchors.leftMargin
+            //     anchors.topMargin: setting.height+rightIconGrid.anchors.topMargin+10
 
-                color: "#ffffff"
+            //     visible: false
 
-                layer.enabled: true
-                layer.effect: DropShadow{
-                    horizontalOffset: 0
-                    verticalOffset: 0
-                    radius: 4.0
-                    color: "#80000000"
-                }
+            //     color: "#ffffff"
 
-                Grid{
-                    id: settingGrid
-                    anchors.fill: parent
+            //     layer.enabled: true
+            //     layer.effect: DropShadow{
+            //         horizontalOffset: 0
+            //         verticalOffset: 0
+            //         radius: 4.0
+            //         color: "#80000000"
+            //     }
 
-                    rows: 10
-                    flow: Grid.TopToBottom
+            //     Grid{
+            //         id: settingGrid
+            //         anchors.fill: parent
 
-                    Repeater{
-                        model: root.settingModel
-                        MyText{
-                            width: parent.width
-                            height: 30
+            //         rows: 10
+            //         flow: Grid.TopToBottom
 
-                            customText: model.customName
-                            customSize: 15
-                            customRadius: 5
-                            customFont: "Montserrat"
-                        }
-                    }
-                }
-            }
+            //         Repeater{
+            //             model: root.settingModel
+            //             MyText{
+            //                 width: parent.width
+            //                 height: 30
+
+            //                 customText: model.customName
+            //                 customSize: 15
+            //                 customRadius: 5
+            //                 customFont: "Montserrat"
+            //             }
+            //         }
+            //     }
+            // }
         }
 //     }
 // }
