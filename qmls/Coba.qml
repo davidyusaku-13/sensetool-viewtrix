@@ -45,22 +45,6 @@ Rectangle{
                         customHoveredColor: buttonHover
 
                         onClicked: {
-                            // if(sidebarState === false){
-                            //     sidebarOn.running = true
-                            //     sidebarState = true
-                            // }else{
-                            //     sidebarOff.running = true
-                            //     sidebarState = false
-                            // }
-                            // if(sidebar.x === 0){
-                            //     sidebar.x = -sidebar.width
-                            //     sidebar.visible = false
-                            // }else{
-                            //     sidebar.x = 0
-                            //     sidebar.width = 50
-                            //     sidebar.visible = true
-                            // }
-
                             sidebar.folded = !sidebar.folded
                         }
                     }
@@ -126,12 +110,6 @@ Rectangle{
                     radius: 4.0
                     color: "#80000000"
                 }
-                // Behavior on "width, visible" {
-                //     PropertyAnimation {
-                //         duration: 1000
-                //         easing.type: Easing.InCubic
-                //     }
-                // }
                 transitions: [
                     Transition {
                         NumberAnimation {
@@ -154,23 +132,6 @@ Rectangle{
                         PropertyChanges{target: sidebar; visible: false}
                     }
                 ]
-
-
-                //animation
-                // PropertyAnimation{
-                //     id: sidebarOn
-                //     target: sidebar
-                //     property: "x"
-                //     to: root.x
-                //     duration: 150
-                // }
-                // PropertyAnimation{
-                //     id: sidebarOff
-                //     target: sidebar
-                //     property: "x"
-                //     to: -width
-                //     duration: 150
-                // }
 
                 //ws1btn
                 Item{
@@ -202,7 +163,7 @@ Rectangle{
                 ColumnLayout{
                     anchors.fill: parent
                     anchors.margins: 20
-                    spacing: buttonMargin
+                    spacing: 10
                     //toolbar
                     Rectangle{
                         Layout.fillWidth: true
@@ -370,8 +331,16 @@ Rectangle{
                     Rectangle{
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        color: "#ffffff"
+                        radius: 5
 
-                        color: "green"
+                        layer.enabled: true
+                        layer.effect: DropShadow{
+                            horizontalOffset: 0
+                            verticalOffset: 1
+                            radius: 4.0
+                            color: "#80000000"
+                        }
                         ListView{
                             anchors.fill: parent
                             clip: true
@@ -396,7 +365,6 @@ Rectangle{
 
                             delegate: MyItem{
                                 id: listItem
-
                                 customItemName: model.text + index + selectState
                                 customWidth: ListView.view.width
                                 customItemSize: 15
