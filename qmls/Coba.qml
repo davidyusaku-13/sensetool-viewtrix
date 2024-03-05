@@ -13,66 +13,95 @@ Rectangle{
     property int buttonMargin: 7
     property string buttonColor: "#ffffff"
     property string buttonHover: "#d6d6d6"
+    property bool sidebarState: false
 
     ColumnLayout{
         anchors.fill: parent
-        spacing: 0
+        spacing: 1
         //header
-        RowLayout{
-            height: 100
+        Rectangle{
+            id: header
             Layout.fillWidth: true
-            //menuBtn
-            Item{
-                id: menuBtn
-                width: buttonSize
-                height: buttonSize
-                MyButton{
-                    anchors.fill: parent
-                    anchors.margins: buttonMargin
-                    customColor: buttonColor
-                    customHoveredColor: buttonHover
+            height: 50
 
-                    onClicked: {
-                        sidebar.visible === true ? sidebar.visible=false : sidebar.visible=true
+            layer.enabled: true
+            layer.effect: DropShadow{
+                horizontalOffset: 0
+                verticalOffset: 0
+                radius: 4.0
+                color: "#80000000"
+            }
+            RowLayout{
+                anchors.fill: parent
+                //menuBtn
+                Item{
+                    id: menuBtn
+                    width: buttonSize
+                    height: buttonSize
+                    MyButton{
+                        anchors.fill: parent
+                        anchors.margins: buttonMargin
+                        customColor: buttonColor
+                        customHoveredColor: buttonHover
+
+                        onClicked: {
+                            // if(sidebarState === false){
+                            //     sidebarOn.running = true
+                            //     sidebarState = true
+                            // }else{
+                            //     sidebarOff.running = true
+                            //     sidebarState = false
+                            // }
+                            // if(sidebar.x === 0){
+                            //     sidebar.x = -sidebar.width
+                            //     sidebar.visible = false
+                            // }else{
+                            //     sidebar.x = 0
+                            //     sidebar.width = 50
+                            //     sidebar.visible = true
+                            // }
+
+                            sidebar.folded = !sidebar.folded
+                        }
                     }
                 }
-            }
-            //fill empty space
-            Item{
-                Layout.fillWidth: true
-            }
-            //notif
-            Item{
-                width: buttonSize
-                height: buttonSize
-                anchors.right: settingBtn.left
-                anchors.rightMargin: -10
-                MyButton{
-                    anchors.fill: parent
-                    anchors.margins: buttonMargin
-                    customColor: buttonColor
-                    customHoveredColor: buttonHover
-                    customImage: "images/notification"
+                //fill empty space
+                Item{
+                    Layout.fillWidth: true
+                }
+                //notif
+                Item{
+                    width: buttonSize
+                    height: buttonSize
+                    anchors.right: settingBtn.left
+                    anchors.rightMargin: -10
+                    MyButton{
+                        anchors.fill: parent
+                        anchors.margins: buttonMargin
+                        customColor: buttonColor
+                        customHoveredColor: buttonHover
+                        customImage: "images/notification"
 
-                    onClicked: {
+                        onClicked: {
 
+                        }
                     }
                 }
-            }
-            //setting
-            Item{
-                id: settingBtn
-                width: buttonSize
-                height: buttonSize
-                MyButton{
-                    anchors.fill: parent
-                    anchors.margins: buttonMargin
-                    customColor: buttonColor
-                    customHoveredColor: buttonHover
-                    customImage: "images/setting"
+                //setting
+                Item{
+                    id: settingBtn
+                    width: buttonSize
+                    height: buttonSize
+                    MyButton{
+                        anchors.fill: parent
+                        anchors.margins: buttonMargin
+                        customColor: buttonColor
+                        customHoveredColor: buttonHover
+                        customImage: "images/setting"
 
-                    onClicked: {
+                        onClicked: {
 
+                        }
                     }
                 }
             }
@@ -88,9 +117,60 @@ Rectangle{
                 id: sidebar
                 width: 50
                 Layout.fillHeight: true
-                visible: false
+                color: "#ffffff"
 
-                // color: "blue"
+                layer.enabled: true
+                layer.effect: DropShadow{
+                    horizontalOffset: 0
+                    verticalOffset: 1
+                    radius: 4.0
+                    color: "#80000000"
+                }
+                // Behavior on "width, visible" {
+                //     PropertyAnimation {
+                //         duration: 1000
+                //         easing.type: Easing.InCubic
+                //     }
+                // }
+                transitions: [
+                    Transition {
+                        NumberAnimation {
+                            properties: "width,opacity"
+                            duration: 200
+                        }
+                    }
+                ]
+                property bool folded: false
+                state: !folded ? "Visible" : "Invisible"
+                states: [
+                    State{
+                        name: "Visible"
+                        PropertyChanges{target: sidebar; width: 50}
+                        PropertyChanges{target: sidebar; visible: true}
+                    },
+                    State{
+                        name:"Invisible"
+                        PropertyChanges{target: sidebar; width: 0.0}
+                        PropertyChanges{target: sidebar; visible: false}
+                    }
+                ]
+
+
+                //animation
+                // PropertyAnimation{
+                //     id: sidebarOn
+                //     target: sidebar
+                //     property: "x"
+                //     to: root.x
+                //     duration: 150
+                // }
+                // PropertyAnimation{
+                //     id: sidebarOff
+                //     target: sidebar
+                //     property: "x"
+                //     to: -width
+                //     duration: 150
+                // }
 
                 //ws1btn
                 Item{
@@ -116,14 +196,13 @@ Rectangle{
                 id: workspace1
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: false
-
-                // color: "yellow"
+                color: "#00000000"
+                visible: true
 
                 ColumnLayout{
                     anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 10
+                    anchors.margins: 20
+                    spacing: buttonMargin
                     //toolbar
                     Rectangle{
                         Layout.fillWidth: true
@@ -293,8 +372,36 @@ Rectangle{
                         Layout.fillHeight: true
 
                         color: "green"
+                        ListView{
+                            anchors.fill: parent
+                            clip: true
 
+                            // FROM BACKEND DO NOT DELETE
+                            // model: visualModel
 
+                            model: ListModel{
+                                ListElement{text: "file 1 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 2 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 3 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 4 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 5 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 6 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 7 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 8 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 9 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 10 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 11 - csnjacbnjknbjcbn"}
+                                ListElement{text: "file 12 - csnjacbnjknbjcbn"}
+                            }
+
+                            delegate: MyItem{
+                                id: listItem
+
+                                customItemName: model.text + index + selectState
+                                customWidth: ListView.view.width
+                                customItemSize: 15
+                            }
+                        }
                     }
                 }
             }
