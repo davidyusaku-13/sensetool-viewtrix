@@ -1,4 +1,4 @@
-import QtQuick 2.15
+import QtQuick
 import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
@@ -167,20 +167,18 @@ Rectangle{
                     //toolbar
                     Rectangle{
                         Layout.fillWidth: true
-                        height: 28
-
-                        // color: "pink"
+                        implicitHeight: 28
+                        //color: "pink"
 
                         RowLayout{
                             anchors.fill: parent
 
                             //addBtn
                             Item{
-                                width: 50
-                                height: 28
+                                implicitWidth: 50
+                                implicitHeight: 28
                                 MyText2{
                                     id: addButton
-
                                     anchors.fill: parent
 
                                     customRadius: 5
@@ -192,21 +190,27 @@ Rectangle{
                                     customTextColor: "#ffffff"
 
                                     HoverHandler {
-                                        // id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
 
                                     onClicked: {
-                                        window.manager.add("item", "value", "desc", "false")
+                                        //window.manager.add("item", "value", "desc", "false")
+                                        // let item = {item:"fewfe", value:"9", desc:"vekfi"}
+                                        // itemList.append(item);
+                                        addWindow.show()
                                     }
+                                }
+                                AddWindow{
+                                    id: addWindow
+                                    visible: false
                                 }
                             }
 
                             //editBtn
                             Item{
-                                width: 50
-                                height: 28
+                                implicitWidth: 50
+                                implicitHeight: 28
                                 MyText2{
                                     id: editBtn
 
@@ -227,15 +231,15 @@ Rectangle{
                                     }
 
                                     onClicked: {
-                                        window.manager.add("item", "value", "desc", "false")
+                                        //window.manager.add("item", "value", "desc", "false")
                                     }
                                 }
                             }
 
                             //deleteBtn
                             Item{
-                                width: 70
-                                height: 28
+                                implicitWidth: 70
+                                implicitHeight: 28
                                 MyText2{
                                     id: deleteBtn
 
@@ -256,7 +260,7 @@ Rectangle{
                                     }
 
                                     onClicked: {
-                                        window.manager.add("item", "value", "desc", "false")
+                                        //window.manager.add("item", "value", "desc", "false")
                                     }
                                 }
                             }
@@ -269,8 +273,8 @@ Rectangle{
 
                             //deselectAllBtn
                             Item{
-                                width: 110
-                                height: 28
+                                implicitWidth: 110
+                                implicitHeight: 28
                                 MyText2{
                                     id: deselectAllBtn
 
@@ -291,15 +295,15 @@ Rectangle{
                                     }
 
                                     onClicked: {
-                                        window.manager.add("item", "value", "desc", "false")
+                                        //window.manager.add("item", "value", "desc", "false")
                                     }
                                 }
                             }
 
                             //selectAllBtn
                             Item{
-                                width: 90
-                                height: 28
+                                implicitWidth: 90
+                                implicitHeight: 28
                                 MyText2{
                                     id: selectAllBtn
 
@@ -320,7 +324,7 @@ Rectangle{
                                     }
 
                                     onClicked: {
-                                        window.manager.add("item", "value", "desc", "false")
+                                        //window.manager.add("item", "value", "desc", "false")
                                     }
                                 }
                             }
@@ -337,10 +341,15 @@ Rectangle{
                         layer.enabled: true
                         layer.effect: DropShadow{
                             horizontalOffset: 0
-                            verticalOffset: 1
-                            radius: 4.0
+                            verticalOffset: 0
+                            radius: 3.0
                             color: "#80000000"
                         }
+
+                        //addButton.clicked: {
+
+                        //}
+
                         ListView{
                             anchors.fill: parent
                             clip: true
@@ -349,25 +358,22 @@ Rectangle{
                             // model: visualModel
 
                             model: ListModel{
-                                ListElement{text: "file 1 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 2 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 3 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 4 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 5 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 6 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 7 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 8 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 9 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 10 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 11 - csnjacbnjknbjcbn"}
-                                ListElement{text: "file 12 - csnjacbnjknbjcbn"}
+                                id: itemList
+                                // ListElement{item: "GUI_ENABLE"; value: ""; desc: "Used for enable the gui feature (DEBUG USE)"}
+                                // ListElement{item: "OS_EVENT_QUEUE"; value: "8"; desc: "Queue deep value"}
+                                // ListElement{item: "OS_MSG_LEN_QUEUE"; value: "12"; desc: "Message length for queue"}
+                                // ListElement{item: "OS_UART_LEN_QUEUE"; value: "64"; desc: "Message length for UART queue"}
+                                // ListElement{item: "EVT_FIFO_DEEP_MAX"; value: "16"; desc: ""}
+                                // ListElement{item: "EVT_FIFO_LEN_MAX"; value: "sizeof(sEventFIFOmsg)"; desc: ""}
+                                // ListElement{item: "CMD_FIFO_DEEP_MAX"; value: "8"; desc: ""}
                             }
 
                             delegate: MyItem{
                                 id: listItem
-                                customItemName: model.text + index + selectState
+                                customItem: model.item
+                                customValue: model.value
+                                customDesc: model.desc
                                 customWidth: ListView.view.width
-                                customItemSize: 15
                             }
                         }
                     }
@@ -376,3 +382,4 @@ Rectangle{
         }
     }
 }
+
