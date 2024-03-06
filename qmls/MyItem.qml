@@ -9,30 +9,49 @@ Item{
 
     property int customWidth: 1000
     property int customHeight: 50
-
-    property Rectangle shadow: Rectangle{
-        layer.enabled: true
-        layer.effect: DropShadow{
-            horizontalOffset: 0
-            verticalOffset: 0
-            radius: 4.0
-            color: "#80000000"
-        }
-    }
+    property bool checkState: false
 
     RowLayout{
         anchors.fill: parent
         spacing: 0
         //checklist box
-        CheckBox{
+        Item{
+            width: 50
+            Layout.fillHeight: true
+            Button{
+                anchors.fill: parent
+                anchors.margins: 15
+                background: Rectangle{
+                    color: checkState === false ? "#ffffff" : "#000000"
+                    layer.enabled: true
+                    radius: 3
+                    layer.effect: DropShadow{
+                        horizontalOffset: 0
+                        verticalOffset: 0
+                        radius: 3
+                        color: "#80000000"
+                    }
 
+                }
+                HoverHandler {
+                    acceptedDevices: PointerDevice.Mouse
+                    cursorShape: Qt.PointingHandCursor
+                }
+                onClicked: {
+                    checkState = !checkState
+                }
+            }
         }
+
         //item
         Item{
             Layout.fillWidth: true
             Layout.fillHeight: true
             MyText{
                 anchors.fill: parent
+                customSize: 15
+                customText: "OS_EVENT_QUEUE"
+                customRadius: 0
             }
         }
 
@@ -42,6 +61,9 @@ Item{
             Layout.fillHeight: true
             MyText{
                 anchors.fill: parent
+                customSize: 15
+                customText: "8"
+                customRadius: 0
             }
         }
 
@@ -51,6 +73,9 @@ Item{
             Layout.fillHeight: true
             MyText{
                 anchors.fill: parent
+                customSize: 15
+                customText: "Queue deep value"
+                customRadius: 0
             }
         }
 
