@@ -9,6 +9,9 @@ Item{
 
     property int customWidth: 1000
     property int customHeight: 50
+    property string customItem: "OS_EVENT_QUEUE"
+    property string customValue: "8"
+    property string customDesc: "Queue deep value"
     property bool checkState: false
 
     RowLayout{
@@ -50,7 +53,7 @@ Item{
             MyText{
                 anchors.fill: parent
                 customSize: 15
-                customText: "OS_EVENT_QUEUE"
+                customText: customItem
                 customRadius: 0
             }
         }
@@ -62,7 +65,7 @@ Item{
             MyText{
                 anchors.fill: parent
                 customSize: 15
-                customText: "8"
+                customText: customValue
                 customRadius: 0
             }
         }
@@ -74,7 +77,7 @@ Item{
             MyText{
                 anchors.fill: parent
                 customSize: 15
-                customText: "Queue deep value"
+                customText: customDesc
                 customRadius: 0
             }
         }
