@@ -85,7 +85,7 @@ Item{
             Layout.fillHeight: true
             Image{
                 anchors.fill: parent
-                anchors.margins: 10
+                anchors.margins: 13
                 source: "images/drag"
 
                 HoverHandler {
