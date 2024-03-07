@@ -10,6 +10,23 @@ Window {
     minimumHeight: 500
     maximumWidth: 500
     maximumHeight: 500
+
+    signal create(var object)
+    property PrjSetItem object: PrjSetItem{}
+    property int index: -1
+
+    function edit(i: int, model: var){
+        if(i != -1){
+            object.name = model.name
+            object.value = model.value
+            object.desc = model.desc
+        } else {
+            object.reset()
+        }
+        index = i
+        root.show()
+    }
+
     ColumnLayout{
         anchors.fill: parent
         spacing: 20
@@ -20,19 +37,20 @@ Window {
             Layout.fillHeight: true
             spacing: 5
             Text{
-                text: "Item"
+                text: "Name"
                 font.family: "Montserrat Medium"
                 font.pixelSize: 20
             }
             TextArea{
-                id: itemName
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: ""
+                text: object.name
+                onTextChanged: object.name = text
                 font.family: "Montserrat"
                 font.pixelSize: 17
-                verticalAlignment: Text.AlignVTop
+                verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
+                selectionColor: "#6d6d6d"
                 Layout.preferredHeight: 0
                 Layout.preferredWidth: 0
                 background: Shadow{}
@@ -49,14 +67,15 @@ Window {
                 font.pixelSize: 20
             }
             TextArea{
-                id: value
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: ""
+                text: object.value
+                onTextChanged: object.value = text
                 font.family: "Montserrat"
                 font.pixelSize: 17
-                verticalAlignment: Text.AlignVTop
+                verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
+                selectionColor: "#6d6d6d"
                 Layout.preferredHeight: 0
                 Layout.preferredWidth: 0
                 background: Shadow{}
@@ -73,14 +92,15 @@ Window {
                 font.pixelSize: 20
             }
             TextArea{
-                id: desc
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                text: ""
+                text: object.desc
+                onTextChanged: object.desc = text
                 font.family: "Montserrat"
                 font.pixelSize: 17
-                verticalAlignment: Text.AlignVTop
+                verticalAlignment: Text.AlignTop
                 wrapMode: Text.Wrap
+                selectionColor: "#6d6d6d"
                 Layout.preferredHeight: 0
                 Layout.preferredWidth: 0
                 background: Shadow{}
@@ -92,6 +112,7 @@ Window {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignRight
             spacing: 5
+            //add
             MyText2{
                 implicitWidth: 50
                 implicitHeight: 30
@@ -102,7 +123,15 @@ Window {
                 customHAlignment: "Center"
                 customColor: "#000000"
                 customHoveredColor: "#332C2B"
+
+                onClicked: {
+                    root.create(object)
+                    object.reset()
+                    root.close()
+                    //root.visible = false
+                }
             }
+            //cancel
             MyText2{
                 implicitWidth: 70
                 implicitHeight: 30
@@ -113,6 +142,12 @@ Window {
                 customHAlignment: "Center"
                 customColor: "#000000"
                 customHoveredColor: "#332C2B"
+
+                onClicked: {
+                    object.reset()
+                    root.close()
+                    //root.visible = false
+                }
             }
         }
     }

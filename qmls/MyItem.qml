@@ -4,6 +4,7 @@ import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 
 Item{
+    id: root
     width: customWidth
     height: customHeight
 
@@ -12,20 +13,24 @@ Item{
     property string customItem: "OS_EVENT_QUEUE"
     property string customValue: "8"
     property string customDesc: "Queue deep value"
-    property bool checkState: false
+
+    signal checked(bool status)
 
     RowLayout{
         anchors.fill: parent
         spacing: 0
         //checklist box
         Item{
-            width: 50
+            implicitWidth: 50
             Layout.fillHeight: true
             Button{
+                id: btn
+                property bool checkState: false
+
                 anchors.fill: parent
                 anchors.margins: 15
                 background: Rectangle{
-                    color: checkState === false ? "#ffffff" : "#000000"
+                    color: parent.checkState ? "#000000" : "#ffffff"
                     layer.enabled: true
                     radius: 3
                     layer.effect: DropShadow{
@@ -42,6 +47,7 @@ Item{
                 }
                 onClicked: {
                     checkState = !checkState
+                    root.checked(checkState)
                 }
             }
         }
@@ -53,19 +59,19 @@ Item{
             MyText{
                 anchors.fill: parent
                 customSize: 15
-                customText: customItem
+                customText: root.customItem
                 customRadius: 0
             }
         }
 
         //value
         Item{
-            width: 200
+            implicitWidth: 200
             Layout.fillHeight: true
             MyText{
                 anchors.fill: parent
                 customSize: 15
-                customText: customValue
+                customText: root.customValue
                 customRadius: 0
             }
         }
@@ -77,14 +83,14 @@ Item{
             MyText{
                 anchors.fill: parent
                 customSize: 15
-                customText: customDesc
+                customText: root.customDesc
                 customRadius: 0
             }
         }
 
         //drag
         Item{
-            width: 50
+            implicitWidth: 50
             Layout.fillHeight: true
             Image{
                 anchors.fill: parent

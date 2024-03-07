@@ -196,14 +196,16 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
-                                        // let item = {item:"fewfe", value:"9", desc:"vekfi"}
-                                        // itemList.append(item);
-                                        addWindow.show()
+                                        addWindow.edit(-1,null)
                                     }
                                 }
                                 AddWindow{
                                     id: addWindow
-                                    visible: false
+
+                                    onCreate: (object) => {
+                                                  itemList.append(object);
+                                                  editWindow.create(object)
+                                              }
                                 }
                             }
 
@@ -232,6 +234,11 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
+                                        if(selectedGroup.count > 0){
+                                            let firstSelected = selectedGroup.get(0)
+                                            let i = firstSelected.itemsIndex
+                                            addWindow.edit(i, firstSelected.model)
+                                        }
                                     }
                                 }
                             }
@@ -333,6 +340,7 @@ Rectangle{
 
                     //content
                     Rectangle{
+                        id: content
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         color: "#ffffff"
@@ -346,19 +354,37 @@ Rectangle{
                             color: "#80000000"
                         }
 
-                        //addButton.clicked: {
+                        DelegateModel{
+                            id: itemModel
+                            model: ListModel{
+                                id: itemList
+                            }
+                            groups: [
+                                DelegateModelGroup {
+                                    id: selectedGroup
+                                    name: "selected"}
+                            ]
+                            delegate: MyItem{
+                                id: itemDel
+                                required property var model
+                                customItem: selectedGroup.count + model.name
+                                customValue: model.value
+                                customDesc: model.desc
+                                customWidth: ListView.view.width
 
-                        //}
+                                onChecked: (checkState) => {
+                                               itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                                           }
+                            }
+                        }
 
                         ListView{
                             anchors.fill: parent
                             clip: true
+                            model: itemModel
 
-                            // FROM BACKEND DO NOT DELETE
-                            // model: visualModel
-
-                            model: ListModel{
-                                id: itemList
+                            //model: ListModel{
+                                //id: itemList
                                 // ListElement{item: "GUI_ENABLE"; value: ""; desc: "Used for enable the gui feature (DEBUG USE)"}
                                 // ListElement{item: "OS_EVENT_QUEUE"; value: "8"; desc: "Queue deep value"}
                                 // ListElement{item: "OS_MSG_LEN_QUEUE"; value: "12"; desc: "Message length for queue"}
@@ -366,15 +392,7 @@ Rectangle{
                                 // ListElement{item: "EVT_FIFO_DEEP_MAX"; value: "16"; desc: ""}
                                 // ListElement{item: "EVT_FIFO_LEN_MAX"; value: "sizeof(sEventFIFOmsg)"; desc: ""}
                                 // ListElement{item: "CMD_FIFO_DEEP_MAX"; value: "8"; desc: ""}
-                            }
-
-                            delegate: MyItem{
-                                id: listItem
-                                customItem: model.item
-                                customValue: model.value
-                                customDesc: model.desc
-                                customWidth: ListView.view.width
-                            }
+                            //}
                         }
                     }
                 }
