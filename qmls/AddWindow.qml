@@ -6,7 +6,7 @@ import QtQuick.Layouts
 Window {
     id: root
     title: "Add File"
-    minimumWidth: 500
+    minimumWidth:500
     minimumHeight: 500
     maximumWidth: 500
     maximumHeight: 500
@@ -31,8 +31,10 @@ Window {
                 text: ""
                 font.family: "Montserrat"
                 font.pixelSize: 17
-                verticalAlignment: Text.AlignVCenter
+                verticalAlignment: Text.AlignVTop
                 wrapMode: Text.Wrap
+                Layout.preferredHeight: 0
+                Layout.preferredWidth: 0
                 background: Shadow{}
             }
         }
@@ -53,8 +55,10 @@ Window {
                 text: ""
                 font.family: "Montserrat"
                 font.pixelSize: 17
-                verticalAlignment: Text.AlignVCenter
+                verticalAlignment: Text.AlignVTop
                 wrapMode: Text.Wrap
+                Layout.preferredHeight: 0
+                Layout.preferredWidth: 0
                 background: Shadow{}
             }
         }
@@ -75,8 +79,10 @@ Window {
                 text: ""
                 font.family: "Montserrat"
                 font.pixelSize: 17
-                verticalAlignment: Text.AlignVCenter
+                verticalAlignment: Text.AlignVTop
                 wrapMode: Text.Wrap
+                Layout.preferredHeight: 0
+                Layout.preferredWidth: 0
                 background: Shadow{}
             }
         }
