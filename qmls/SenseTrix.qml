@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 
@@ -12,8 +11,10 @@ Rectangle{
     property int buttonSize: 50
     property int buttonMargin: 7
     property string buttonColor: "#ffffff"
-    property string buttonHover: "#d6d6d6"
+    property string buttonHover: "#sd6d6d6"
     property bool sidebarState: false
+    property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0) : ""
+    property int i: firstSelected.itemsIndex
 
     ColumnLayout{
         anchors.fill: parent
@@ -22,7 +23,7 @@ Rectangle{
         Rectangle{
             id: header
             Layout.fillWidth: true
-            height: 50
+            implicitHeight: 50
 
             layer.enabled: true
             layer.effect: DropShadow{
@@ -36,13 +37,13 @@ Rectangle{
                 //menuBtn
                 Item{
                     id: menuBtn
-                    width: buttonSize
-                    height: buttonSize
+                    implicitWidth: root.buttonSize
+                    implicitHeight: root.buttonSize
                     MyButton{
                         anchors.fill: parent
-                        anchors.margins: buttonMargin
-                        customColor: buttonColor
-                        customHoveredColor: buttonHover
+                        anchors.margins: root.buttonMargin
+                        customColor: root.buttonColor
+                        customHoveredColor: root.buttonHover
 
                         onClicked: {
                             sidebar.folded = !sidebar.folded
@@ -55,15 +56,15 @@ Rectangle{
                 }
                 //notif
                 Item{
-                    width: buttonSize
-                    height: buttonSize
+                    implicitWidth: root.buttonSize
+                    implicitHeight: root.buttonSize
                     anchors.right: settingBtn.left
                     anchors.rightMargin: -10
                     MyButton{
                         anchors.fill: parent
-                        anchors.margins: buttonMargin
-                        customColor: buttonColor
-                        customHoveredColor: buttonHover
+                        anchors.margins: root.buttonMargin
+                        customColor: root.buttonColor
+                        customHoveredColor: root.buttonHover
                         customImage: "images/notification"
 
                         onClicked: {
@@ -74,13 +75,13 @@ Rectangle{
                 //setting
                 Item{
                     id: settingBtn
-                    width: buttonSize
-                    height: buttonSize
+                    implicitWidth: root.buttonSize
+                    implicitHeight: root.buttonSize
                     MyButton{
                         anchors.fill: parent
-                        anchors.margins: buttonMargin
-                        customColor: buttonColor
-                        customHoveredColor: buttonHover
+                        anchors.margins: root.buttonMargin
+                        customColor: root.buttonColor
+                        customHoveredColor: root.buttonHover
                         customImage: "images/setting"
 
                         onClicked: {
@@ -99,7 +100,7 @@ Rectangle{
             //sidebar
             Rectangle{
                 id: sidebar
-                width: 50
+                implicitWidth: 50
                 Layout.fillHeight: true
                 color: "#ffffff"
 
@@ -136,13 +137,13 @@ Rectangle{
                 //ws1btn
                 Item{
                     id: ws1btn
-                    width: buttonSize
-                    height: buttonSize
+                    width: root.buttonSize
+                    height: root.buttonSize
                     MyButton{
                         anchors.fill: parent
-                        anchors.margins: buttonMargin
-                        customColor: buttonColor
-                        customHoveredColor: buttonHover
+                        anchors.margins: root.buttonMargin
+                        customColor: root.buttonColor
+                        customHoveredColor: root.buttonHover
                         customImage: "images/import"
 
                         onClicked: {
@@ -173,6 +174,8 @@ Rectangle{
                         RowLayout{
                             anchors.fill: parent
 
+
+
                             //addBtn
                             Item{
                                 implicitWidth: 50
@@ -196,16 +199,18 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
-                                        addWindow.edit(-1,null)
+                                        prjSetWindow.manage(-1,null)
                                     }
                                 }
-                                AddWindow{
-                                    id: addWindow
-
+                                PrjSetWindow{
+                                    id: prjSetWindow
                                     onCreate: (object) => {
                                                   itemList.append(object);
-                                                  editWindow.create(object)
                                               }
+                                    onEdit: (object) => {
+                                                print(root.i)
+                                                itemList.set(root.i, object)
+                                            }
                                 }
                             }
 
@@ -235,9 +240,9 @@ Rectangle{
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
                                         if(selectedGroup.count > 0){
-                                            let firstSelected = selectedGroup.get(0)
-                                            let i = firstSelected.itemsIndex
-                                            addWindow.edit(i, firstSelected.model)
+                                            // firstSelected = selectedGroup.get(0)
+                                            // i = firstSelected.itemsIndex
+                                            prjSetWindow.manage(root.i, root.firstSelected.model)
                                         }
                                     }
                                 }
@@ -268,6 +273,10 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
+                                        // if(firstSelected != ""){
+                                        //     i = first
+                                        // }
+                                        itemList.remove(root.i, selectedGroup.count)
                                     }
                                 }
                             }
@@ -367,7 +376,7 @@ Rectangle{
                             delegate: MyItem{
                                 id: itemDel
                                 required property var model
-                                customItem: selectedGroup.count + model.name
+                                customItem: model.name
                                 customValue: model.value
                                 customDesc: model.desc
                                 customWidth: ListView.view.width
