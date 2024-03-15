@@ -13,6 +13,7 @@ Item{
     property string customItem: "OS_EVENT_QUEUE"
     property string customValue: "8"
     property string customDesc: "Queue deep value"
+    property bool checkState: false
 
     signal checked(bool status)
 
@@ -25,12 +26,11 @@ Item{
             Layout.fillHeight: true
             Button{
                 id: btn
-                property bool checkState: false
 
                 anchors.fill: parent
                 anchors.margins: 15
                 background: Rectangle{
-                    color: parent.checkState ? "#000000" : "#ffffff"
+                    color: root.checkState ? "#000000" : "#ffffff"
                     layer.enabled: true
                     radius: 3
                     layer.effect: DropShadow{
@@ -46,8 +46,7 @@ Item{
                     cursorShape: Qt.PointingHandCursor
                 }
                 onClicked: {
-                    checkState = !checkState
-                    root.checked(checkState)
+                    root.checked(root.checkState)
                 }
             }
         }

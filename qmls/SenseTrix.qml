@@ -11,10 +11,9 @@ Rectangle{
     property int buttonSize: 50
     property int buttonMargin: 7
     property string buttonColor: "#ffffff"
-    property string buttonHover: "#sd6d6d6"
-    property bool sidebarState: false
+    property string buttonHover: "#d6d6d6"
     property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0) : ""
-    property int i: firstSelected.itemsIndex
+    property int i: firstSelected !== "" ? firstSelected.itemsIndex : 0
 
     ColumnLayout{
         anchors.fill: parent
@@ -34,6 +33,7 @@ Rectangle{
             }
             RowLayout{
                 anchors.fill: parent
+                spacing: 0
                 //menuBtn
                 Item{
                     id: menuBtn
@@ -58,8 +58,6 @@ Rectangle{
                 Item{
                     implicitWidth: root.buttonSize
                     implicitHeight: root.buttonSize
-                    anchors.right: settingBtn.left
-                    anchors.rightMargin: -10
                     MyButton{
                         anchors.fill: parent
                         anchors.margins: root.buttonMargin
@@ -124,13 +122,11 @@ Rectangle{
                 states: [
                     State{
                         name: "Visible"
-                        PropertyChanges{target: sidebar; width: 50}
-                        PropertyChanges{target: sidebar; visible: true}
+                        PropertyChanges{target: sidebar; width: 50; visible: true}
                     },
                     State{
                         name:"Invisible"
-                        PropertyChanges{target: sidebar; width: 0.0}
-                        PropertyChanges{target: sidebar; visible: false}
+                        PropertyChanges{target: sidebar; width: 0.0; visible: false}
                     }
                 ]
 
@@ -161,6 +157,13 @@ Rectangle{
                 color: "#00000000"
                 visible: true
 
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked:{
+                        sidebar.folded = true
+                    }
+                }
+
                 ColumnLayout{
                     anchors.fill: parent
                     anchors.margins: 20
@@ -173,8 +176,6 @@ Rectangle{
 
                         RowLayout{
                             anchors.fill: parent
-
-
 
                             //addBtn
                             Item{
@@ -207,10 +208,9 @@ Rectangle{
                                     onCreate: (object) => {
                                                   itemList.append(object);
                                               }
-                                    onEdit: (object) => {
-                                                print(root.i)
-                                                itemList.set(root.i, object)
-                                            }
+                                    onModify: (object) => {
+                                                  itemList.set(root.i, object)
+                                              }
                                 }
                             }
 
@@ -273,10 +273,11 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
-                                        // if(firstSelected != ""){
-                                        //     i = first
-                                        // }
-                                        itemList.remove(root.i, selectedGroup.count)
+                                        print(selectedGroup.count)
+                                        for(let i = selectedGroup.count-1; i>=0; i--){
+                                            let itemSelected = selectedGroup.get(i)
+                                            itemList.remove(itemSelected.itemsIndex)
+                                        }
                                     }
                                 }
                             }
@@ -312,6 +313,12 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
+                                        for(var i=0; i< itemModel.items.count; i++){
+                                            if(itemModel.items.get(i).inSelected){
+                                                itemModel.items.get(i).inSelected = false
+                                            }
+                                            print(i)
+                                        }
                                     }
                                 }
                             }
@@ -341,6 +348,11 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
+                                        for(var i=0; i< itemModel.items.count; i++){
+                                            if(!itemModel.items.get(i).inSelected){
+                                                itemModel.items.get(i).inSelected = true
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -363,48 +375,49 @@ Rectangle{
                             color: "#80000000"
                         }
 
-                        DelegateModel{
-                            id: itemModel
-                            model: ListModel{
-                                id: itemList
-                            }
-                            groups: [
-                                DelegateModelGroup {
-                                    id: selectedGroup
-                                    name: "selected"}
-                            ]
-                            delegate: MyItem{
-                                id: itemDel
-                                required property var model
-                                customItem: model.name
-                                customValue: model.value
-                                customDesc: model.desc
-                                customWidth: ListView.view.width
-
-                                onChecked: (checkState) => {
-                                               itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
-                                           }
-                            }
-                        }
-
                         ListView{
                             anchors.fill: parent
                             clip: true
-                            model: itemModel
+
+                            model: DelegateModel{
+                                id: itemModel
+                                model: ListModel{
+                                    id: itemList
+                                }
+                                groups: [
+                                    DelegateModelGroup {
+                                        id: selectedGroup
+                                        name: "selected"}
+                                ]
+                                delegate: MyItem{
+                                    id: itemDel
+                                    required property var model
+                                    customItem: model.name+checkState
+                                    customValue: model.value
+                                    customDesc: model.desc
+                                    customWidth: ListView.view.width
+                                    checkState: itemDel.DelegateModel.inSelected
+
+                                    onChecked: (checkState) => {
+                                                   itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                                               }
+                                }
+                            }
 
                             //model: ListModel{
-                                //id: itemList
-                                // ListElement{item: "GUI_ENABLE"; value: ""; desc: "Used for enable the gui feature (DEBUG USE)"}
-                                // ListElement{item: "OS_EVENT_QUEUE"; value: "8"; desc: "Queue deep value"}
-                                // ListElement{item: "OS_MSG_LEN_QUEUE"; value: "12"; desc: "Message length for queue"}
-                                // ListElement{item: "OS_UART_LEN_QUEUE"; value: "64"; desc: "Message length for UART queue"}
-                                // ListElement{item: "EVT_FIFO_DEEP_MAX"; value: "16"; desc: ""}
-                                // ListElement{item: "EVT_FIFO_LEN_MAX"; value: "sizeof(sEventFIFOmsg)"; desc: ""}
-                                // ListElement{item: "CMD_FIFO_DEEP_MAX"; value: "8"; desc: ""}
+                            //id: itemList
+                            // ListElement{item: "GUI_ENABLE"; value: ""; desc: "Used for enable the gui feature (DEBUG USE)"}
+                            // ListElement{item: "OS_EVENT_QUEUE"; value: "8"; desc: "Queue deep value"}
+                            // ListElement{item: "OS_MSG_LEN_QUEUE"; value: "12"; desc: "Message length for queue"}
+                            // ListElement{item: "OS_UART_LEN_QUEUE"; value: "64"; desc: "Message length for UART queue"}
+                            // ListElement{item: "EVT_FIFO_DEEP_MAX"; value: "16"; desc: ""}
+                            // ListElement{item: "EVT_FIFO_LEN_MAX"; value: "sizeof(sEventFIFOmsg)"; desc: ""}
+                            // ListElement{item: "CMD_FIFO_DEEP_MAX"; value: "8"; desc: ""}
                             //}
                         }
                     }
                 }
+
             }
         }
     }

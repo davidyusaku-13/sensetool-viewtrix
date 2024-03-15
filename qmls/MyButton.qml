@@ -1,9 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Controls 2.15
-import Qt5Compat.GraphicalEffects
+import QtQuick
+import QtQuick.Controls
 
 Button {
-    id: myButton
+    id: root
     width: 50
     height: 50
 
@@ -13,21 +12,21 @@ Button {
 
     property string customImage:"images/menu-icon2.png"
 
-    property int customIconWidth: myButton.width-10
-    property int customIconHeight: myButton.height-10
+    property int customIconWidth: root.width-13
+    property int customIconHeight: root.height-13
 
     property int customRadius: 5
 
     Image {
         id: menuIcon
 
-        width: customIconHeight
-        height: customIconHeight
+        width: root.customIconHeight
+        height: root.customIconHeight
 
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
 
-        source: customImage
+        source: root.customImage
         fillMode: Image.PreserveAspectFit
     }
 
@@ -35,6 +34,6 @@ Button {
         color: parent.down ? customColor :
                              parent.hovered ? customHoveredColor : customColor
 
-        radius:customRadius
+        radius: root.customRadius
     }
 }
