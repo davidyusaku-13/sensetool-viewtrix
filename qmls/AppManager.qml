@@ -22,8 +22,15 @@ QtObject {
     prjSetModel.deselectAll()
   }
 
-  function selectAll()
-  {
-    prjSetModel.selectAll()
-  }
+    function selectAll(){
+      prjSetModel.selectAll()
+    }
+
+    function exportYAML(){
+      prjSetModel.exportYAML()
+    }
+
+    function importYAML(file){
+      prjSetModel.importYAML(file)
+    }
 }

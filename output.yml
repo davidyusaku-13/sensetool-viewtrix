@@ -1,9 +1,9 @@
 - desc: Queue deep value
-  item: OS_EVENT_QUEUE
+  name: OS_EVENT_QUEUE
   value: 8
 - desc: Message length for queue
-  item: OS_MSG_LEN_QUEUE
+  name: OS_MSG_LEN_QUEUE
   value: 12
 - desc: Message length for UART queue
-  item: OS_UART_LEN_QUEUE
+  name: OS_UART_LEN_QUEUE
   value: 64
