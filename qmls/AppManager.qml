@@ -23,4 +23,12 @@ QtObject {
     function selectAll(){
       prjSetModel.selectAll()
     }
+
+    function exportYAML(){
+      prjSetModel.exportYAML()
+    }
+
+    function importYAML(file){
+      prjSetModel.importYAML(file)
+    }
 }
