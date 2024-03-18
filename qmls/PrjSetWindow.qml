@@ -5,24 +5,26 @@ import QtQuick.Layouts
 Window {
     id: root
     title: "Add File"
-    minimumWidth:500
+    minimumWidth: 500
     minimumHeight: 500
     maximumWidth: 500
     maximumHeight: 500
 
     signal create(var object)
-    signal edit(var object)
+    signal modify(var object)
+
     property PrjSetItem object: PrjSetItem{}
     property int index: -1
     property bool isEdit: false
 
     function manage(i: int, model: var){
-        if(i != -1){
+        if(i !== -1){
             isEdit = true
             object.name = model.name
             object.value = model.value
             object.desc = model.desc
-        } else {
+
+        }else {
             isEdit = false
             object.reset()
         }
@@ -130,7 +132,7 @@ Window {
 
                 onClicked: {
                     if(isEdit == true){
-                        root.edit(root.object)
+                        root.modify(root.object)
                         root.object.reset()
                         root.close()
                     }else{

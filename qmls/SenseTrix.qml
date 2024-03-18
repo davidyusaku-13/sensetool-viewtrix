@@ -220,28 +220,25 @@ Rectangle{
                                 implicitHeight: 28
                                 MyText2{
                                     id: editBtn
-
                                     anchors.fill: parent
-
                                     customRadius: 5
                                     customText: "Edit"
                                     customHAlignment: "Center"
                                     customSize: 15
-                                    customColor: "#000000"
-                                    customHoveredColor: "#332C2B"
+                                    customColor: selectedGroup.count === 1 ? "#000000" : "#8B8B8C"
+                                    customHoveredColor: selectedGroup.count === 1 ? "#332C2B" : customColor
                                     customTextColor: "#ffffff"
 
                                     HoverHandler {
-                                        // id: cursorHovered
+                                        id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
+                                        enabled: selectedGroup.count === 1 ? true : false
                                     }
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
-                                        if(selectedGroup.count > 0){
-                                            // firstSelected = selectedGroup.get(0)
-                                            // i = firstSelected.itemsIndex
+                                        if(selectedGroup.count === 1){
                                             prjSetWindow.manage(root.i, root.firstSelected.model)
                                         }
                                     }
@@ -254,15 +251,13 @@ Rectangle{
                                 implicitHeight: 28
                                 MyText2{
                                     id: deleteBtn
-
                                     anchors.fill: parent
-
                                     customRadius: 5
                                     customText: "Delete"
                                     customHAlignment: "Center"
                                     customSize: 15
-                                    customColor: "#000000"
-                                    customHoveredColor: "#332C2B"
+                                    customColor: selectedGroup.count > 0 ? "#000000" : "#8B8B8C"
+                                    customHoveredColor: selectedGroup.count > 0 ? "#332C2B" : customColor
                                     customTextColor: "#ffffff"
 
                                     HoverHandler {
@@ -392,7 +387,7 @@ Rectangle{
                                 delegate: MyItem{
                                     id: itemDel
                                     required property var model
-                                    customItem: model.name+checkState
+                                    customItem: model.name
                                     customValue: model.value
                                     customDesc: model.desc
                                     customWidth: ListView.view.width
@@ -403,17 +398,6 @@ Rectangle{
                                                }
                                 }
                             }
-
-                            //model: ListModel{
-                            //id: itemList
-                            // ListElement{item: "GUI_ENABLE"; value: ""; desc: "Used for enable the gui feature (DEBUG USE)"}
-                            // ListElement{item: "OS_EVENT_QUEUE"; value: "8"; desc: "Queue deep value"}
-                            // ListElement{item: "OS_MSG_LEN_QUEUE"; value: "12"; desc: "Message length for queue"}
-                            // ListElement{item: "OS_UART_LEN_QUEUE"; value: "64"; desc: "Message length for UART queue"}
-                            // ListElement{item: "EVT_FIFO_DEEP_MAX"; value: "16"; desc: ""}
-                            // ListElement{item: "EVT_FIFO_LEN_MAX"; value: "sizeof(sEventFIFOmsg)"; desc: ""}
-                            // ListElement{item: "CMD_FIFO_DEEP_MAX"; value: "8"; desc: ""}
-                            //}
                         }
                     }
                 }
