@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Window {
     id: root
-    title: "Add File"
+    title: isEdit === false ? "Add File" : "Edit File"
     minimumWidth: 500
     minimumHeight: 500
     maximumWidth: 500
@@ -15,7 +15,7 @@ Window {
 
     property PrjSetItem object: PrjSetItem{}
     property int index: -1
-    property bool isEdit: false
+    property bool isEdit: true
 
     function manage(i: int, model: var){
         if(i !== -1){
@@ -32,7 +32,9 @@ Window {
         root.show()
 
     }
-
+    ConfirmWindow{
+        id: confirmWindow
+    }
     ColumnLayout{
         anchors.fill: parent
         spacing: 20
@@ -132,14 +134,15 @@ Window {
 
                 onClicked: {
                     if(isEdit == true){
-                        root.modify(root.object)
-                        root.object.reset()
-                        root.close()
+                        confirmWindow.show()
+                        if(confirmWindow.save === true){
+                            root.modify(root.object)
+                            root.object.reset()
+                        }
                     }else{
                         root.create(root.object)
                         root.object.reset()
                         root.close()
-                        //root.visible = false
                     }
                 }
             }
@@ -158,7 +161,6 @@ Window {
                 onClicked: {
                     root.object.reset()
                     root.close()
-                    //root.visible = false
                 }
             }
         }

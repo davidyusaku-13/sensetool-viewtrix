@@ -15,6 +15,10 @@ Rectangle{
     property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0) : ""
     property int i: firstSelected !== "" ? firstSelected.itemsIndex : 0
 
+    ConfirmWindow{
+        id: confirmWindow
+    }
+
     ColumnLayout{
         anchors.fill: parent
         spacing: 1
