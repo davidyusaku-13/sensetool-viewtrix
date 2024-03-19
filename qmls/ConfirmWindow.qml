@@ -7,7 +7,11 @@ Window {
     width: 400
     height: 100
     title: "Warning"
-    property bool save: true
+
+    signal saved(var state)
+
+    property bool state
+
     ColumnLayout{
         anchors.fill: parent
         spacing: 10
@@ -38,7 +42,7 @@ Window {
                     customHAlignment: "Center"
                     customRadius: 20
                     onClicked: {
-                        root.save = true
+                        root.saved(true)
                         root.close()
                     }
                 }
@@ -55,7 +59,7 @@ Window {
                     customHAlignment: "Center"
                     customRadius: 20
                     onClicked: {
-                        root.save = false
+                        root.saved(false)
                         root.close()
                     }
                 }

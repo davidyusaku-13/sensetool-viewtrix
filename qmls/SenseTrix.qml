@@ -15,10 +15,18 @@ Rectangle{
     property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0) : ""
     property int i: firstSelected !== "" ? firstSelected.itemsIndex : 0
 
-    ConfirmWindow{
-        id: confirmWindow
+    function history(status, object){
+        var temp = {
+            "status": status,
+            "name": object["name"],
+            "value": object["value"],
+            "desc": object["desc"]
+        }
+        historyList.append(temp)
     }
-
+    ListModel{
+        id: historyList
+    }
     ColumnLayout{
         anchors.fill: parent
         spacing: 1
@@ -70,7 +78,10 @@ Rectangle{
                         customImage: "images/notification"
 
                         onClicked: {
-
+                            notif.visible = !notif.visible
+                            for(let i=0; i<historyList.count; i++){
+                                    print(JSON.stringify(historyList.get(i)))
+                                }
                         }
                     }
                 }
@@ -176,7 +187,19 @@ Rectangle{
                     Rectangle{
                         Layout.fillWidth: true
                         implicitHeight: 28
-                        //color: "pink"
+
+                        //add or edit window
+                        PrjSetWindow{
+                            id: prjSetWindow
+                            onCreate: (object) => {
+                                          itemList.append(object);
+                                          root.history("Added", object)
+                                      }
+                            onModify: (object) => {
+                                          itemList.set(root.i, object)
+                                          root.history("Modified", object)
+                                      }
+                        }
 
                         RowLayout{
                             anchors.fill: parent
@@ -206,15 +229,6 @@ Rectangle{
                                         //window.manager.add("item", "value", "desc", "false")
                                         prjSetWindow.manage(-1,null)
                                     }
-                                }
-                                PrjSetWindow{
-                                    id: prjSetWindow
-                                    onCreate: (object) => {
-                                                  itemList.append(object);
-                                              }
-                                    onModify: (object) => {
-                                                  itemList.set(root.i, object)
-                                              }
                                 }
                             }
 
@@ -274,8 +288,10 @@ Rectangle{
                                         //window.manager.add("item", "value", "desc", "false")
                                         print(selectedGroup.count)
                                         for(let i = selectedGroup.count-1; i>=0; i--){
-                                            let itemSelected = selectedGroup.get(i)
-                                            itemList.remove(itemSelected.itemsIndex)
+                                                let itemSelected = selectedGroup.get(i)
+                                                var object = itemList.get(itemSelected.itemsIndex)
+                                                root.history("Deleted", object)
+                                                itemList.remove(itemSelected.itemsIndex)
                                         }
                                     }
                                 }
@@ -316,7 +332,6 @@ Rectangle{
                                             if(itemModel.items.get(i).inSelected){
                                                 itemModel.items.get(i).inSelected = false
                                             }
-                                            print(i)
                                         }
                                     }
                                 }
@@ -403,9 +418,39 @@ Rectangle{
                                 }
                             }
                         }
+                    } 
+                }
+            }
+            //notif pop-up
+            Rectangle{
+                id: notif
+                implicitWidth:  350
+                Layout.fillHeight: true
+                color: "#ffffff"
+                visible: false
+
+                layer.enabled: true
+                layer.effect: DropShadow{
+                    horizontalOffset: 0
+                    verticalOffset: 1
+                    radius: 4.0
+                    color: "#80000000"
+                }
+                ListView{
+                    anchors.fill: parent
+                    anchors.margins: 15
+                    clip: true
+                    model: historyList
+                    delegate: Text{
+                        required property var model
+                        width: parent.width
+                        text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
+                        font.pixelSize: 15
+                        font.family: "Montserrat Medium"
+                        wrapMode: Text.WordWrap
+                        fontSizeMode: Text.Fit
                     }
                 }
-
             }
         }
     }
