@@ -2,38 +2,38 @@ import QtQuick
 import QtQuick.Controls
 
 Button {
-    id: root
-    width: 50
-    height: 50
+  id: root
+  width: 50
+  height: 50
 
-    //property
-    property string customColor: "#d6d6d6"
-    property string customHoveredColor: "#ffffff"
+  //property
+  property string customColor: "#d6d6d6"
+  property string customHoveredColor: "#ffffff"
 
-    property string customImage:"images/menu-icon2.png"
+  property string customImage: "images/menu-icon2.png"
 
-    property int customIconWidth: root.width-13
-    property int customIconHeight: root.height-13
+  property int customIconWidth: root.width-13
+  property int customIconHeight: root.height-13
 
-    property int customRadius: 5
+  property int customRadius: 5
 
-    Image {
-        id: menuIcon
+  Image {
+    id: menuIcon
 
-        width: root.customIconHeight
-        height: root.customIconHeight
+    width: root.customIconHeight
+    height: root.customIconHeight
 
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
 
-        source: root.customImage
-        fillMode: Image.PreserveAspectFit
-    }
+    source: root.customImage
+    fillMode: Image.PreserveAspectFit
+  }
 
-    background: Rectangle{
-        color: parent.down ? customColor :
-                             parent.hovered ? customHoveredColor : customColor
+  background: Rectangle{
+    color: parent.down ? customColor:
+    parent.hovered ? customHoveredColor: customColor
 
-        radius: root.customRadius
-    }
+    radius: root.customRadius
+  }
 }
