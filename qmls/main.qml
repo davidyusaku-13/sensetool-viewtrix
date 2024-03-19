@@ -38,9 +38,9 @@ ApplicationWindow {
     //             ListElement { setitem: "CMD_FIFO_LEN_MAX" }
     //         }
 
-            groups: [
-                DelegateModelGroup { name: "selected" }
-            ]
+    //        groups: [
+    //            DelegateModelGroup { name: "selected" }
+    //        ]
 
     //         delegate: Rectangle {
     //             id: item
