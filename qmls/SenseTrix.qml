@@ -268,7 +268,6 @@ Rectangle{
 
                                     onClicked: {
                                         //window.manager.add("item", "value", "desc", "false")
-                                        print(selectedGroup.count)
                                         for(let i = selectedGroup.count-1; i>=0; i--){
                                             let itemSelected = selectedGroup.get(i)
                                             itemList.remove(itemSelected.itemsIndex)
@@ -312,7 +311,6 @@ Rectangle{
                                             if(itemModel.items.get(i).inSelected){
                                                 itemModel.items.get(i).inSelected = false
                                             }
-                                            print(i)
                                         }
                                     }
                                 }
