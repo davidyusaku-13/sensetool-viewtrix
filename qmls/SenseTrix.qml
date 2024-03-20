@@ -188,21 +188,21 @@ Rectangle{
                         Layout.fillWidth: true
                         implicitHeight: 28
 
-                        //add or edit window
-                        PrjSetWindow{
-                            id: prjSetWindow
-                            onCreate: (object) => {
-                                          itemList.append(object);
-                                          root.history("Added", object)
-                                      }
-                            onModify: (object) => {
-                                          itemList.set(root.i, object)
-                                          root.history("Modified", object)
-                                      }
-                        }
-
                         RowLayout{
                             anchors.fill: parent
+
+                            //add or edit window
+                            PrjSetWindow{
+                                id: prjSetWindow
+                                onCreate: (object) => {
+                                              itemList.append(object);
+                                              root.history("Added", object)
+                                          }
+                                onModify: (object) => {
+                                              itemList.set(root.i, object)
+                                              root.history("Modified", object)
+                                          }
+                            }
 
                             //addBtn
                             Item{
@@ -448,7 +448,6 @@ Rectangle{
                         font.pixelSize: 15
                         font.family: "Montserrat Medium"
                         wrapMode: Text.WordWrap
-                        fontSizeMode: Text.Fit
                     }
                 }
             }
