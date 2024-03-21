@@ -13,7 +13,6 @@ ApplicationWindow {
   AppManager{
     id: manager
     prjSetModel: PrjSetModel { }
-    logic: AppLogic { }
   }
 
   visible: true

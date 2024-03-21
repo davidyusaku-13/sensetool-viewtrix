@@ -6,16 +6,15 @@ QtObject {
   id: manager
 
   required property PrjSetModel prjSetModel
-  required property var logic
 
-  function add(item, val, desc, state)
+  function add(name, value, desc, state)
   {
-    prjSetModel.addItem(item, val, desc, state)
+    prjSetModel.addItem(name, value, desc, state)
   }
 
-  function editState(index, val)
+  function editState(index, state)
   {
-    prjSetModel.editState(index, val)
+    prjSetModel.editState(index, state)
   }
 
   function deselectAll()
