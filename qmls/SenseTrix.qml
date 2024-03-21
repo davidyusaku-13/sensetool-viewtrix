@@ -222,7 +222,6 @@ Rectangle{
                                     }
                                 }
                             }
-
                             //editBtn
                             Item{
                                 implicitWidth: 50
@@ -253,7 +252,6 @@ Rectangle{
                                     }
                                 }
                             }
-
                             //deleteBtn
                             Item{
                                 implicitWidth: 70
@@ -287,13 +285,11 @@ Rectangle{
                                     }
                                 }
                             }
-
                             //fill empty space
                             Item{
                                 Layout.fillWidth: true
                                 Layout.fillHeight: true
                             }
-
                             //deselectAllBtn
                             Item{
                                 implicitWidth: 110
@@ -327,7 +323,6 @@ Rectangle{
                                     }
                                 }
                             }
-
                             //selectAllBtn
                             Item{
                                 implicitWidth: 90
@@ -399,15 +394,15 @@ Rectangle{
                                             required property string modelData
                                             Layout.fillHeight: true
                                             Layout.fillWidth: true
-                                            color: "#ffffff"
+                                            color: "transparent"
 
-                                            layer.enabled: true
-                                            layer.effect: DropShadow{
-                                                horizontalOffset: 0
-                                                verticalOffset: 0
-                                                radius: 3.0
-                                                color: "#80000000"
-                                            }
+                                            // layer.enabled: true
+                                            // layer.effect: DropShadow{
+                                            //     horizontalOffset: 0
+                                            //     verticalOffset: 0
+                                            //     radius: 3.0
+                                            //     color: "#80000000"
+                                            // }
                                             Text {
                                                 text: parent.modelData
                                                 anchors.centerIn: parent
@@ -464,9 +459,14 @@ Rectangle{
                 }
                 ListView{
                     anchors.fill: parent
-                    anchors.margins: 15
                     clip: true
                     model: historyList
+                    //header
+                    header: Rectangle{
+                        width: parent.width
+                        height: 50
+                        color: "red"
+                    }
                     delegate: Text{
                         required property var model
                         width: parent.width
