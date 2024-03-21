@@ -465,7 +465,13 @@ Rectangle{
                     header: Rectangle{
                         width: parent.width
                         height: 50
-                        color: "red"
+                        color: "#d6d6d6"
+                        Text{
+                            text: "Notification"
+                            font.pixelSize: 20
+                            font.family: "Montserrat Medium"
+                            anchors.centerIn: parent
+                        }
                     }
                     delegate: Text{
                         required property var model
