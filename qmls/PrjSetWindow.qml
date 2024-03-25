@@ -15,7 +15,7 @@ Window {
 
     property PrjSetItem object: PrjSetItem{}
     property int index: -1
-    property bool isEdit: true
+    property bool isEdit: false
 
     function manage(i: int, model: var){
         if(i !== -1){
@@ -48,7 +48,6 @@ Window {
         ColumnLayout{
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 5
             Text{
                 text: "Name"
                 font.family: "Montserrat Medium"
@@ -56,8 +55,9 @@ Window {
             }
             Frame{
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.preferredHeight: itemInput.lineCount*childrenRect.height
                 TextInput{
+                    id: itemInput
                     anchors.fill: parent
                     text: root.object.name
                     onTextChanged: root.object.name = text
@@ -74,7 +74,6 @@ Window {
         ColumnLayout{
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 5
             Text{
                 text: "Value"
                 font.family: "Montserrat Medium"
@@ -82,8 +81,9 @@ Window {
             }
             Frame{
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.preferredHeight: valueInput.lineCount*childrenRect.height
                 TextInput{
+                    id: valueInput
                     anchors.fill: parent
                     text: root.object.value
                     onTextChanged: root.object.value = text
@@ -100,7 +100,6 @@ Window {
         ColumnLayout{
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 5
             Text{
                 text: "Description"
                 font.family: "Montserrat Medium"
@@ -108,15 +107,14 @@ Window {
             }
             Frame{
                 Layout.fillWidth: true
-                implicitHeight: 150
-                TextInput{
+                Layout.fillHeight: true
+                TextArea{
                     anchors.fill: parent
                     text: root.object.desc
                     onTextChanged: root.object.desc = text
                     font.family: "Montserrat"
                     font.pixelSize: 17
                     wrapMode: Text.Wrap
-                    autoScroll: false
                     selectByMouse: true
                 }
             }
@@ -136,8 +134,8 @@ Window {
                 customTextColor: "#ffffff"
                 customSize: 15
                 customHAlignment: "Center"
-                customColor: "#000000"
-                customHoveredColor: "#332C2B"
+                customColor: root.object.name !== "" ? "#000000" : "#8B8B8C"
+                customHoveredColor: root.object.name !== ""  ? "#332C2B" : customColor
 
                 onClicked: {
                     if(root.isEdit == true){

@@ -394,15 +394,15 @@ Rectangle{
                                             required property string modelData
                                             Layout.fillHeight: true
                                             Layout.fillWidth: true
-                                            color: "transparent"
+                                            color: "#d6d6d6"
 
-                                            // layer.enabled: true
-                                            // layer.effect: DropShadow{
-                                            //     horizontalOffset: 0
-                                            //     verticalOffset: 0
-                                            //     radius: 3.0
-                                            //     color: "#80000000"
-                                            // }
+                                            layer.enabled: true
+                                            layer.effect: DropShadow{
+                                                horizontalOffset: 0
+                                                verticalOffset: 0
+                                                radius: 3.0
+                                                color: "#80000000"
+                                            }
                                             Text {
                                                 text: parent.modelData
                                                 anchors.centerIn: parent
