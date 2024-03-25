@@ -16,7 +16,6 @@ Item{
     property bool checkState: false
 
     signal checked(bool status)
-
     RowLayout{
         anchors.fill: parent
         spacing: 0
@@ -72,7 +71,8 @@ Item{
         }
         //desc
         Item{
-            Layout.fillWidth: true
+            //Layout.fillWidth: true
+            implicitWidth: 500
             Layout.fillHeight: true
             MyText{
                 anchors.fill: parent

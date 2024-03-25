@@ -378,22 +378,23 @@ Rectangle{
                             ListView{
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
-                                interactive: false
+                                interactive: true
                                 clip: true
                                 //header
+                                headerPositioning: ListView.PullBackHeader
                                 header: RowLayout{
                                     id: workspaceHeader
                                     width: parent.width
                                     height: 50
                                     spacing: 0
-
                                     Item{implicitWidth: 50}
                                     Repeater{
                                         model: ["Item", "Value", "Description"]
                                         Rectangle{
                                             required property string modelData
                                             Layout.fillHeight: true
-                                            Layout.fillWidth: true
+                                            Layout.fillWidth: modelData === "Description" ? false : true
+                                            implicitWidth: modelData === "Description" ? 500 : 0
                                             color: "#d6d6d6"
 
                                             layer.enabled: true

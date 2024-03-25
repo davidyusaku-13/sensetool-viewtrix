@@ -67,6 +67,7 @@ Window {
                     clip: true
                     autoScroll: false
                     selectByMouse: true
+                    validator: RegularExpressionValidator { regularExpression: /[0-9a-zA-Z_]+/ }
                 }
             }
         }
@@ -93,6 +94,7 @@ Window {
                     clip: true
                     autoScroll: false
                     selectByMouse: true
+                    validator: RegularExpressionValidator { regularExpression: /[0-9a-zA-Z*()_+]+/ }
                 }
             }
         }
