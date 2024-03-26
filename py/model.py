@@ -10,6 +10,7 @@ logger = AppLogger.get_instance()
 format = "[%(asctime)s] ___ %(levelname)s ___ %(message)s"
 level = logger.level("INFO")
 
+
 @QmlElement
 class PrjSetModelItem(QObject):
     def __init__(self, name, value, desc, selectState, parent=None):
@@ -137,11 +138,12 @@ class PrjSetModel(QAbstractListModel):
             with open(file, 'r') as yaml_file:
                 yaml_data = yaml.load(yaml_file, Loader=yaml.FullLoader)
                 if isinstance(yaml_data, list):
-                    for item in yaml_data:
-                        # Assuming your model has a method to add new items
-                        self.addItem(item['name'], item['value'], item['desc'], "false")
+                    for items in yaml_data:
+                        for item in items['data']:
+                            self.addItem(
+                                item['name'], item['value'], item['desc'], "false")
                 else:
-                    print("Invalueid YAML format. Expected a list.")
+                    print("Invalid YAML format. Expected a list.")
         except FileNotFoundError:
             print("File not found:", file)
         except yaml.YAMLError as e:
