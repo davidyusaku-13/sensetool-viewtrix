@@ -59,6 +59,29 @@ ColumnLayout{
         }
         Frame{
             Layout.fillWidth: true
+<<<<<<< HEAD
+            Layout.fillHeight: true
+            Text{
+                text: "Name"
+                font.family: "Montserrat Medium"
+                font.pixelSize: 20
+            }
+            Frame{
+                Layout.fillWidth: true
+                Layout.preferredHeight: itemInput.lineCount*childrenRect.height
+                TextInput{
+                    id: itemInput
+                    anchors.fill: parent
+                    text: root.object.name
+                    onTextChanged: root.object.name = text
+                    font.family: "Montserrat"
+                    font.pixelSize: 17
+                    wrapMode: Text.Wrap
+                    clip: true
+                    autoScroll: false
+                    selectByMouse: true
+                    validator: RegularExpressionValidator { regularExpression: /[0-9a-zA-Z_+<>()]+/ }
+=======
             Layout.preferredHeight: itemInput.lineCount*childrenRect.height
             TextInput{
                 id: itemInput

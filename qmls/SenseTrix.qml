@@ -1,7 +1,7 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
-import QtQuick.Dialogs
+    import QtQuick.Controls
 
 Rectangle{
     id: root
@@ -12,11 +12,10 @@ Rectangle{
     property int buttonMargin: 7
     property string buttonColor: "#ffffff"
     property string buttonHover: "#d6d6d6"
-    property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0): ""
-    property int i: firstSelected !== "" ? firstSelected.itemsIndex: 0
-    
-    function history(status, object)
-    {
+    property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0) : ""
+    property int i: firstSelected !== "" ? firstSelected.itemsIndex : 0
+
+    function history(status, object){
         var temp = {
             "status": status,
             "name": object["name"],
@@ -80,8 +79,9 @@ Rectangle{
                         
                         onClicked: {
                             notif.visible = !notif.visible
-                            // for(let i=0; i<historyList.count; i++){
-                            // print(JSON.stringify(historyList.get(i)))}
+                            for(let i=0; i<historyList.count; i++){
+                                    print(JSON.stringify(historyList.get(i)))
+                                }
                         }
                     }
                 }
@@ -96,9 +96,9 @@ Rectangle{
                         customColor: root.buttonColor
                         customHoveredColor: root.buttonHover
                         customImage: "images/setting"
-                        
+
                         onClicked: {
-                            window.manager.historyModel.clear()
+
                         }
                     }
                 }
@@ -114,7 +114,7 @@ Rectangle{
                 implicitWidth: 50
                 Layout.fillHeight: true
                 color: "#ffffff"
-                
+
                 layer.enabled: true
                 layer.effect: DropShadow{
                     horizontalOffset: 0
@@ -125,25 +125,21 @@ Rectangle{
                 transitions: [
                     Transition {
                         NumberAnimation {
-                            properties: "width, opacity"
+                            properties: "width,opacity"
                             duration: 200
                         }
                     }
                 ]
                 property bool folded: false
-                state: !folded ? "Visible": "Invisible"
+                state: !folded ? "Visible" : "Invisible"
                 states: [
                     State{
                         name: "Visible"
-                        PropertyChanges{
-                            target: sidebar; width: 50; visible: true
-                        }
+                        PropertyChanges{target: sidebar; width: 50; visible: true}
                     },
                     State{
-                        name: "Invisible"
-                        PropertyChanges{
-                            target: sidebar; width: 0.0; visible: false
-                        }
+                        name:"Invisible"
+                        PropertyChanges{target: sidebar; width: 0.0; visible: false}
                     }
                 ]
                 //ws1btn
@@ -154,12 +150,12 @@ Rectangle{
                     MyButton{
                         anchors.fill: parent
                         anchors.margins: root.buttonMargin
-                        customColor: root.buttonColor
-                        customHoveredColor: root.buttonHover
+                        customColor: workspace1.visible === false ? root.buttonColor : root.buttonHover
+                        customHoveredColor: workspace1.visible === false ? root.buttonHover : "#C2C2C2"
                         customImage: "images/import"
-                        
+
                         onClicked: {
-                            workspace1.visible === true ? workspace1.visible=false: workspace1.visible=true
+                            workspace1.visible === true ? workspace1.visible = false : workspace1.visible = true
                         }
                     }
                 }
@@ -171,10 +167,10 @@ Rectangle{
                 Layout.fillHeight: true
                 color: "#00000000"
                 visible: true
-                
+
                 MouseArea{
                     anchors.fill: parent
-                    onClicked: {
+                    onClicked:{
                         sidebar.folded = true
                     }
                 }
@@ -191,8 +187,14 @@ Rectangle{
                             //add or edit window
                             PrjSetWindow{
                                 id: prjSetWindow
-                                onCreate: (object) => {itemList.append(object); root.history("Added", object)}
-                                onModify: (object) => {itemList.set(root.i, object); root.history("Modified", object)}
+                                onCreate: (object) => {
+                                              itemList.append(object);
+                                              root.history("Added", object)
+                                          }
+                                onModify: (object) => {
+                                              itemList.set(root.i, object)
+                                              root.history("Modified", object)
+                                          }
                             }
                             //importBtn
                             Item{
@@ -201,7 +203,7 @@ Rectangle{
                                 MyText2{
                                     id: importBtn
                                     anchors.fill: parent
-                                    
+
                                     customRadius: 5
                                     customText: "Import"
                                     customHAlignment: "Center"
@@ -209,36 +211,21 @@ Rectangle{
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-                                    
+
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-                                    
-                                    onClicked: {
-                                        dialogImport.open()
-                                    }
-                                }
-                                FileDialog {
-                                    id: dialogImport
-                                    selectedNameFilter.index: 1
-                                    fileMode: FileDialog.OpenFile
-                                    nameFilters: ["YAML files (*.yaml *.yml)"]
-                                    onAccepted: {
-                                        window.manager.importYAML(selectedFile)
-                                        window.manager.addHistory("Imported", selectedFile)
-                                    }
                                 }
                             }
-                            
-                            // exportBtn
+                            //exportBtn
                             Item{
                                 implicitWidth: 70
                                 implicitHeight: 28
                                 MyText2{
                                     id: exportBtn
                                     anchors.fill: parent
-                                    
+
                                     customRadius: 5
                                     customText: "Export"
                                     customHAlignment: "Center"
@@ -246,28 +233,13 @@ Rectangle{
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-                                    
+
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-                                    
-                                    onClicked: {
-                                        dialogExport.open()
-                                    }
-                                }
-                                FileDialog {
-                                    id: dialogExport
-                                    selectedNameFilter.index: 1
-                                    fileMode: FileDialog.SaveFile
-                                    nameFilters: ["YAML files (*.yaml *.yml)"]
-                                    onAccepted: {
-                                        window.manager.exportYAML(selectedFile)
-                                        window.manager.addHistory("Exported", selectedFile)
-                                    }
                                 }
                             }
-                            
                             //addBtn
                             Item{
                                 implicitWidth: 50
@@ -275,7 +247,7 @@ Rectangle{
                                 MyText2{
                                     id: addButton
                                     anchors.fill: parent
-                                    
+
                                     customRadius: 5
                                     customText: "Add"
                                     customHAlignment: "Center"
@@ -283,14 +255,15 @@ Rectangle{
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-                                    
+
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-                                    
+
                                     onClicked: {
-                                        prjSetWindow.manage(-1, null)
+                                        //window.manager.add("item", "value", "desc", "false")
+                                        prjSetWindow.manage(-1,null)
                                     }
                                 }
                             }
@@ -305,20 +278,20 @@ Rectangle{
                                     customText: "Edit"
                                     customHAlignment: "Center"
                                     customSize: 15
-                                    customColor: selectedGroup.count === 1 ? "#000000": "#8B8B8C"
-                                    customHoveredColor: selectedGroup.count === 1 ? "#332C2B": customColor
+                                    customColor: selectedGroup.count === 1 ? "#000000" : "#8B8B8C"
+                                    customHoveredColor: selectedGroup.count === 1 ? "#332C2B" : customColor
                                     customTextColor: "#ffffff"
-                                    
+
                                     HoverHandler {
                                         id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
-                                        enabled: selectedGroup.count === 1 ? true: false
+                                        enabled: selectedGroup.count === 1 ? true : false
                                     }
-                                    
+
                                     onClicked: {
-                                        if(selectedGroup.count === 1)
-                                        {
+                                        //window.manager.add("item", "value", "desc", "false")
+                                        if(selectedGroup.count === 1){
                                             prjSetWindow.manage(root.i, root.firstSelected.model)
                                         }
                                     }
@@ -335,22 +308,25 @@ Rectangle{
                                     customText: "Delete"
                                     customHAlignment: "Center"
                                     customSize: 15
-                                    customColor: selectedGroup.count > 0 ? "#000000": "#8B8B8C"
-                                    customHoveredColor: selectedGroup.count > 0 ? "#332C2B": customColor
+                                    customColor: selectedGroup.count > 0 ? "#000000" : "#8B8B8C"
+                                    customHoveredColor: selectedGroup.count > 0 ? "#332C2B" : customColor
                                     customTextColor: "#ffffff"
-                                    
+
                                     HoverHandler {
+                                        // id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-                                    
+
                                     onClicked: {
+                                        //window.manager.add("item", "value", "desc", "false")
+                                        print(selectedGroup.count)
                                         for(let i = selectedGroup.count-1; i>=0; i--){
-                                            let itemSelected = selectedGroup.get(i)
-                                            var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
-                                            // root.history("Deleted", object)
-                                            window.manager.addHistory("Deleted", object.name, object.value, object.desc)
-                                            window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)}
+                                                let itemSelected = selectedGroup.get(i)
+                                                var object = itemList.get(itemSelected.itemsIndex)
+                                                root.history("Deleted", object)
+                                                itemList.remove(itemSelected.itemsIndex)
+                                        }
                                     }
                                 }
                             }
@@ -365,9 +341,9 @@ Rectangle{
                                 implicitHeight: 28
                                 MyText2{
                                     id: deselectAllBtn
-                                    
+
                                     anchors.fill: parent
-                                    
+
                                     customRadius: 5
                                     customText: "Deselect All"
                                     customHAlignment: "Center"
@@ -375,17 +351,20 @@ Rectangle{
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-                                    
+
                                     HoverHandler {
+                                        // id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-                                    
+
                                     onClicked: {
+                                        //window.manager.add("item", "value", "desc", "false")
                                         for(var i=0; i< itemModel.items.count; i++){
-                                            if(itemModel.items.get(i).inSelected)
-                                            {
-                                                itemModel.items.get(i).inSelected = false}}
+                                            if(itemModel.items.get(i).inSelected){
+                                                itemModel.items.get(i).inSelected = false
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -395,9 +374,9 @@ Rectangle{
                                 implicitHeight: 28
                                 MyText2{
                                     id: selectAllBtn
-                                    
+
                                     anchors.fill: parent
-                                    
+
                                     customRadius: 5
                                     customText: "Select All"
                                     customHAlignment: "Center"
@@ -405,16 +384,19 @@ Rectangle{
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-                                    
+
                                     HoverHandler {
+                                        // id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-                                    
+
                                     onClicked: {
+                                        //window.manager.add("item", "value", "desc", "false")
                                         for(var i=0; i< itemModel.items.count; i++){
                                             if(!itemModel.items.get(i).inSelected){
-                                                itemModel.items.get(i).inSelected = true}
+                                                itemModel.items.get(i).inSelected = true
+                                            }
                                         }
                                     }
                                 }
@@ -427,7 +409,7 @@ Rectangle{
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         color: "#ffffff"
-                        
+
                         layer.enabled: true
                         layer.effect: DropShadow{
                             horizontalOffset: 0
@@ -438,20 +420,18 @@ Rectangle{
                         ColumnLayout{
                             anchors.fill: parent
                             ListView{
-                                id: view
-                                Layout.fillHeight: true
                                 Layout.fillWidth: true
-                                highlightMoveDuration: 100
+                                Layout.fillHeight: true
                                 interactive: true
                                 clip: true
                                 //header
                                 headerPositioning: ListView.OverlayHeader
                                 header: RowLayout{
-                                    id: workspaceHeader
-                                    z: 3
+                                    id: workspace1Header
                                     width: parent.width
                                     height: 50
                                     spacing: 0
+                                    z: 2
                                     Rectangle{
                                         implicitWidth: 50
                                         Layout.fillHeight: true
@@ -462,17 +442,17 @@ Rectangle{
                                         Rectangle{
                                             required property string modelData
                                             Layout.fillHeight: true
-                                            Layout.fillWidth: modelData === "Description" ? false: true
-                                            implicitWidth: modelData === "Description" ? 500: 0
+                                            Layout.fillWidth: modelData === "Description" ? false : true
+                                            implicitWidth: modelData === "Description" ? 500 : 0
                                             color: "#d6d6d6"
-                                            
-                                            layer.enabled: false
-                                            layer.effect: DropShadow{
-                                                horizontalOffset: 0
-                                                verticalOffset: 0
-                                                radius: 3.0
-                                                color: "#80000000"
-                                            }
+
+                                            // layer.enabled: true
+                                            // layer.effect: DropShadow{
+                                            //     horizontalOffset: 2
+                                            //     verticalOffset: 0
+                                            //     radius: 2.0
+                                            //     color: "#80767676"
+                                            // }
                                             Text {
                                                 text: parent.modelData
                                                 anchors.centerIn: parent
@@ -487,17 +467,16 @@ Rectangle{
                                         color: "#d6d6d6"
                                     }
                                 }
+                                //item list
                                 model: DelegateModel{
                                     id: itemModel
-                                    // model: ListModel{
-                                    //     id: itemList
-                                    // }
-                                    model: window.manager.prjSetModel
+                                    model: ListModel{
+                                        id: itemList
+                                    }
                                     groups: [
                                         DelegateModelGroup {
                                             id: selectedGroup
-                                            name: "selected"
-                                        }
+                                            name: "selected"}
                                     ]
                                     delegate: MyItem{
                                         id: itemDel
@@ -506,28 +485,41 @@ Rectangle{
                                         customValue: model.value
                                         customDesc: model.desc
                                         customWidth: ListView.view.width
-                                        checkState: DelegateModel.inSelected
-                                        color: DelegateModel.inSelected ? "lightsteelblue": "transparent"
-                                        
-                                        onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
+                                        checkState: itemDel.DelegateModel.inSelected
+
+                                        onChecked: (checkState) => {
+                                                       itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                                                   }
                                     }
                                 }
-                                onCountChanged: {
-                                    currentIndex = count-1
+                                //footer
+                                footerPositioning: ListView.OverlayFooter
+                                footer: Rectangle{
+                                    id: workspace1Footer
+                                    width: parent.width
+                                    height: 50
+                                    color: "#d6d6d6"
+                                    z: 2
+                                    Text{
+                                        anchors.centerIn: parent
+                                        text: selectedGroup.count + " of " + itemModel.count + " selected"
+                                        font.pointSize: 12
+                                        font.family: "Montserrat SemiBold"
+                                    }
                                 }
                             }
                         }
-                    }
+                    } 
                 }
             }
             //notif pop-up
             Rectangle{
                 id: notif
-                implicitWidth: 350
+                implicitWidth:  350
                 Layout.fillHeight: true
                 color: "#ffffff"
                 visible: false
-                
+
                 layer.enabled: true
                 layer.effect: DropShadow{
                     horizontalOffset: 0
@@ -535,31 +527,54 @@ Rectangle{
                     radius: 4.0
                     color: "#80000000"
                 }
-                ListView{
+                ColumnLayout{
                     anchors.fill: parent
-                    clip: true
-                    // model: historyList
-                    model: window.manager.historyModel
-                    //header
-                    header: Rectangle{
-                        width: parent.width
-                        height: 50
-                        color: "#d6d6d6"
-                        Text{
-                            text: "Notification"
-                            font.pixelSize: 20
+                    ListView{
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        clip: true
+                        model: historyList
+                        //header
+                        header: Rectangle{
+                            width: parent.width
+                            height: 50
+                            color: "#d6d6d6"
+                            Text{
+                                text: "Notification"
+                                font.pixelSize: 20
+                                font.family: "Montserrat Medium"
+                                anchors.centerIn: parent
+                            }
+                        }
+                        delegate: Text{
+                            required property var model
+                            width: parent.width
+                            text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
+                            font.pixelSize: 15
                             font.family: "Montserrat Medium"
-                            anchors.centerIn: parent
+                            wrapMode: Text.WordWrap
                         }
                     }
-                    delegate: Text{
-                        required property var model
-                        width: parent.width
-                        // text: model.action + "(name: " + model.name + ", value: " + model.value + ", desc: "+model.desc+") on " + model.time
-                        text: model.history
-                        font.pixelSize: 15
-                        font.family: "Montserrat Medium"
-                        wrapMode: Text.WordWrap
+                    Item{
+                        implicitWidth: 70
+                        implicitHeight: 28
+                        anchors.margins: 20
+                        MyText2{
+                            anchors.fill: parent
+
+                            customRadius: 5
+                            customText: "Clear"
+                            customHAlignment: "Center"
+                            customSize: 15
+                            customColor: "#000000"
+                            customHoveredColor: "#332C2B"
+                            customTextColor: "#ffffff"
+
+                            HoverHandler {
+                                acceptedDevices: PointerDevice.Mouse
+                                cursorShape: Qt.PointingHandCursor
+                            }
+                        }
                     }
                 }
             }
