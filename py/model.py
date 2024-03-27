@@ -84,6 +84,19 @@ class PrjSetModel(QAbstractListModel):
         self._items.append(item)
         self.endInsertRows()
 
+    @Slot(int, str, str, str)
+    def edit(self, index, name, value, desc):
+        if 0 <= index < len(self._items):
+            item = self._items[index]
+            item._name = name
+            item._value = value
+            item._desc = desc
+            self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
+            logger.log(f"Edited item at index {index}: {
+                       name} - {value} - {desc}", level)
+        else:
+            logger.log(f"Attempt to edit item at invalid index {index}", level)
+
     @Slot(int)
     def removeItem(self, index):
         if 0 <= index < len(self._items):
@@ -140,8 +153,11 @@ class PrjSetModel(QAbstractListModel):
                 if isinstance(yaml_data, list):
                     for items in yaml_data:
                         for item in items['data']:
-                            self.addItem(
-                                item['name'], item['value'], item['desc'], "false")
+                            pName = item['name']
+                            pVal = item['value']
+                            pDesc = item['desc'] if item['desc'] != None else ""
+                            pState = "false"
+                            self.addItem(pName, pVal, pDesc, pState)
                 else:
                     print("Invalid YAML format. Expected a list.")
         except FileNotFoundError:

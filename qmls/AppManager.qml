@@ -12,6 +12,11 @@ QtObject {
     prjSetModel.addItem(name, value, desc, state)
   }
 
+  function edit(index, name, value, desc)
+  {
+    prjSetModel.edit(index, name, value, desc)
+  }
+
   function editState(index, state)
   {
     prjSetModel.editState(index, state)
@@ -22,15 +27,18 @@ QtObject {
     prjSetModel.deselectAll()
   }
 
-    function selectAll(){
-      prjSetModel.selectAll()
-    }
+  function selectAll()
+  {
+    prjSetModel.selectAll()
+  }
 
-    function exportYAML(){
-      prjSetModel.exportYAML()
-    }
+  function exportYAML()
+  {
+    prjSetModel.exportYAML()
+  }
 
-    function importYAML(file){
-      prjSetModel.importYAML(file)
-    }
+  function importYAML(file)
+  {
+    prjSetModel.importYAML(file)
+  }
 }
