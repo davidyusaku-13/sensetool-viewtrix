@@ -4,7 +4,8 @@ from pathlib import Path
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from logger import AppLogger
-from model import PrjSetModel
+from model_prjset import PrjSetModel
+from model_history import HistoryModel
 from logic import AppLogic
 
 logger = AppLogger.get_instance()

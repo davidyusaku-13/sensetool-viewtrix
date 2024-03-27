@@ -44,7 +44,8 @@ Button {
 
   background: Rectangle{
     anchors.fill: parent
-    color: parent.down? customColor: (parent.hovered ? customHoveredColor: customColor)
+    // color: parent.down? customColor: (parent.hovered ? customHoveredColor: customColor)
+    color: "transparent"
 
     radius: customRadius
   }

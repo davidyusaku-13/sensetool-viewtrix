@@ -1,11 +1,13 @@
 import QtQuick
 import PrjSetModel
+import HistoryModel
 import AppLogic
 
 QtObject {
   id: manager
 
   required property PrjSetModel prjSetModel
+  required property HistoryModel historyModel
 
   function add(name, value, desc, state)
   {
@@ -22,6 +24,11 @@ QtObject {
     prjSetModel.editState(index, state)
   }
 
+  function addHistory(action, name, value, desc)
+  {
+    historyModel.addHistory(action, name, value, desc)
+  }
+
   function deselectAll()
   {
     prjSetModel.deselectAll()
@@ -32,9 +39,9 @@ QtObject {
     prjSetModel.selectAll()
   }
 
-  function exportYAML()
+  function exportYAML(file)
   {
-    prjSetModel.exportYAML()
+    prjSetModel.exportYAML(file)
   }
 
   function importYAML(file)

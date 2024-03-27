@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 
-Item{
+Rectangle{
     id: root
     width: customWidth
     height: customHeight
@@ -28,7 +28,7 @@ Item{
                 anchors.fill: parent
                 anchors.margins: 15
                 background: Rectangle{
-                    color: root.checkState ? "#000000" : "#ffffff"
+                    color: root.checkState ? "#000000": "#ffffff"
                     radius: 3
                     layer.enabled: true
                     layer.effect: DropShadow{

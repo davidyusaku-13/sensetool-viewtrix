@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import PrjSetModel
+import HistoryModel
 import AppLogic
 
 ApplicationWindow {
@@ -12,7 +13,9 @@ ApplicationWindow {
     width: 1280
     height: 400
 
-    property AppManager manager: AppManager{prjSetModel: PrjSetModel { }}
+    property AppManager manager: AppManager{
+    prjSetModel: PrjSetModel { }
+    historyModel: HistoryModel{ }}
 
     SenseTrix{
         anchors.fill: parent

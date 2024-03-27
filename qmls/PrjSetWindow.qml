@@ -38,6 +38,7 @@ ConfirmWindow{
     if(state === true)
     {
         window.manager.edit(root.index, root.object['name'], root.object['value'], root.object['desc'])
+        window.manager.addHistory("Modified", root.object['name'], root.object['value'], root.object['desc'])
         // root.modify(root.object)
         root.close()
     }
@@ -71,7 +72,7 @@ ColumnLayout{
                 autoScroll: false
                 selectByMouse: true
                 validator: RegularExpressionValidator {
-                    regularExpression: /[0-9a-zA-Z_]+/
+                    regularExpression: /[0-9A-Z_]+/
                 }
             }
         }
@@ -100,7 +101,7 @@ ColumnLayout{
                 autoScroll: false
                 selectByMouse: true
                 validator: RegularExpressionValidator {
-                    regularExpression: /[0-9a-zA-Z*()_+]+/
+                    regularExpression: /[0-9a-zA-Z*()_+-: <>?]+/
                 }
             }
         }
@@ -152,6 +153,7 @@ ColumnLayout{
                     confirmWindow.show()
                 }else{
                 window.manager.add(root.object['name'], root.object['value'], root.object['desc'], false)
+                window.manager.addHistory("Added", root.object['name'], root.object['value'], root.object['desc'])
                 // root.create(root.object)
                 root.object.reset()
                 root.close()
