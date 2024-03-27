@@ -1,6 +1,7 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
+    import QtQuick.Controls
 
 Rectangle{
     id: root
@@ -458,29 +459,54 @@ Rectangle{
                     radius: 4.0
                     color: "#80000000"
                 }
-                ListView{
+                ColumnLayout{
                     anchors.fill: parent
-                    clip: true
-                    model: historyList
-                    //header
-                    header: Rectangle{
-                        width: parent.width
-                        height: 50
-                        color: "#d6d6d6"
-                        Text{
-                            text: "Notification"
-                            font.pixelSize: 20
+                    ListView{
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        clip: true
+                        model: historyList
+                        //header
+                        header: Rectangle{
+                            width: parent.width
+                            height: 50
+                            color: "#d6d6d6"
+                            Text{
+                                text: "Notification"
+                                font.pixelSize: 20
+                                font.family: "Montserrat Medium"
+                                anchors.centerIn: parent
+                            }
+                        }
+                        delegate: Text{
+                            required property var model
+                            width: parent.width
+                            text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
+                            font.pixelSize: 15
                             font.family: "Montserrat Medium"
-                            anchors.centerIn: parent
+                            wrapMode: Text.WordWrap
                         }
                     }
-                    delegate: Text{
-                        required property var model
-                        width: parent.width
-                        text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
-                        font.pixelSize: 15
-                        font.family: "Montserrat Medium"
-                        wrapMode: Text.WordWrap
+                    Item{
+                        implicitWidth: 70
+                        implicitHeight: 28
+                        anchors.margins: 20
+                        MyText2{
+                            anchors.fill: parent
+
+                            customRadius: 5
+                            customText: "Clear"
+                            customHAlignment: "Center"
+                            customSize: 15
+                            customColor: "#000000"
+                            customHoveredColor: "#332C2B"
+                            customTextColor: "#ffffff"
+
+                            HoverHandler {
+                                acceptedDevices: PointerDevice.Mouse
+                                cursorShape: Qt.PointingHandCursor
+                            }
+                        }
                     }
                 }
             }
