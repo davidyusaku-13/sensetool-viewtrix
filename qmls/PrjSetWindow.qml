@@ -9,21 +9,21 @@ Window {
     minimumHeight: 500
     maximumWidth: 500
     maximumHeight: 500
-
+    
     signal create(var object)
     signal modify(var object)
-
+    
     property PrjSetItem object: PrjSetItem{}
     property int index: -1
     property bool isEdit: false
-
+    
     function manage(i: int, model: var){
         if(i !== -1){
             isEdit = true
             object.name = model.name
             object.value = model.value
             object.desc = model.desc
-
+            
         }else {
             isEdit = false
             object.reset()
@@ -138,7 +138,7 @@ Window {
                 customHAlignment: "Center"
                 customColor: root.object.name !== "" ? "#000000" : "#8B8B8C"
                 customHoveredColor: root.object.name !== ""  ? "#332C2B" : customColor
-
+                
                 onClicked: {
                     if(root.isEdit == true){
                         confirmWindow.show()
@@ -160,7 +160,7 @@ Window {
                 customHAlignment: "Center"
                 customColor: "#000000"
                 customHoveredColor: "#332C2B"
-
+                
                 onClicked: {
                     root.object.reset()
                     root.close()
