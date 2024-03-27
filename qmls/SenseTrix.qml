@@ -2,6 +2,7 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
     import QtQuick.Controls
+    import QtQuick.Dialogs
 
 Rectangle{
     id: root
@@ -79,9 +80,6 @@ Rectangle{
                         
                         onClicked: {
                             notif.visible = !notif.visible
-                            for(let i=0; i<historyList.count; i++){
-                                    print(JSON.stringify(historyList.get(i)))
-                                }
                         }
                     }
                 }
@@ -98,7 +96,7 @@ Rectangle{
                         customImage: "images/setting"
 
                         onClicked: {
-
+window.manager.historyModel.clear()
                         }
                     }
                 }
@@ -187,14 +185,8 @@ Rectangle{
                             //add or edit window
                             PrjSetWindow{
                                 id: prjSetWindow
-                                onCreate: (object) => {
-                                              itemList.append(object);
-                                              root.history("Added", object)
-                                          }
-                                onModify: (object) => {
-                                              itemList.set(root.i, object)
-                                              root.history("Modified", object)
-                                          }
+                                onCreate: (object) => {itemList.append(object); root.history("Added", object)}
+                                onModify: (object) => {itemList.set(root.i, object); root.history("Modified", object)}
                             }
                             //importBtn
                             Item{
@@ -215,6 +207,20 @@ Rectangle{
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
+                                    }
+
+                                    onClicked: {
+                                        dialogImport.open()
+                                    }
+                                }
+                                FileDialog {
+                                    id: dialogImport
+                                    selectedNameFilter.index: 1
+                                    fileMode: FileDialog.OpenFile
+                                    nameFilters: ["YAML files (*.yaml *.yml)"]
+                                    onAccepted: {
+                                        window.manager.importYAML(selectedFile)
+                                        window.manager.addHistory("Imported", selectedFile)
                                     }
                                 }
                             }
@@ -237,6 +243,19 @@ Rectangle{
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
+                                    }
+                                    onClicked: {
+                                        dialogExport.open()
+                                    }
+                                }
+                                FileDialog {
+                                    id: dialogExport
+                                    selectedNameFilter.index: 1
+                                    fileMode: FileDialog.SaveFile
+                                    nameFilters: ["YAML files (*.yaml *.yml)"]
+                                    onAccepted: {
+                                        window.manager.exportYAML(selectedFile)
+                                        window.manager.addHistory("Exported", selectedFile)
                                     }
                                 }
                             }
@@ -262,8 +281,7 @@ Rectangle{
                                     }
 
                                     onClicked: {
-                                        //window.manager.add("item", "value", "desc", "false")
-                                        prjSetWindow.manage(-1,null)
+                                        prjSetWindow.manage(-1, null)
                                     }
                                 }
                             }
@@ -290,8 +308,8 @@ Rectangle{
                                     }
 
                                     onClicked: {
-                                        //window.manager.add("item", "value", "desc", "false")
-                                        if(selectedGroup.count === 1){
+                                        if(selectedGroup.count === 1)
+                                        {
                                             prjSetWindow.manage(root.i, root.firstSelected.model)
                                         }
                                     }
@@ -313,20 +331,17 @@ Rectangle{
                                     customTextColor: "#ffffff"
 
                                     HoverHandler {
-                                        // id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
 
                                     onClicked: {
-                                        //window.manager.add("item", "value", "desc", "false")
-                                        print(selectedGroup.count)
                                         for(let i = selectedGroup.count-1; i>=0; i--){
-                                                let itemSelected = selectedGroup.get(i)
-                                                var object = itemList.get(itemSelected.itemsIndex)
-                                                root.history("Deleted", object)
-                                                itemList.remove(itemSelected.itemsIndex)
-                                        }
+                                            let itemSelected = selectedGroup.get(i)
+                                            var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
+                                            // root.history("Deleted", object)
+                                            window.manager.addHistory("Deleted", object.name, object.value, object.desc)
+                                            window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)}
                                     }
                                 }
                             }
@@ -353,18 +368,15 @@ Rectangle{
                                     customTextColor: "#ffffff"
 
                                     HoverHandler {
-                                        // id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
 
                                     onClicked: {
-                                        //window.manager.add("item", "value", "desc", "false")
                                         for(var i=0; i< itemModel.items.count; i++){
-                                            if(itemModel.items.get(i).inSelected){
-                                                itemModel.items.get(i).inSelected = false
-                                            }
-                                        }
+                                            if(itemModel.items.get(i).inSelected)
+                                            {
+                                                itemModel.items.get(i).inSelected = false}}
                                     }
                                 }
                             }
@@ -386,17 +398,14 @@ Rectangle{
                                     customTextColor: "#ffffff"
 
                                     HoverHandler {
-                                        // id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
 
                                     onClicked: {
-                                        //window.manager.add("item", "value", "desc", "false")
                                         for(var i=0; i< itemModel.items.count; i++){
                                             if(!itemModel.items.get(i).inSelected){
-                                                itemModel.items.get(i).inSelected = true
-                                            }
+                                                itemModel.items.get(i).inSelected = true}
                                         }
                                     }
                                 }
@@ -420,8 +429,10 @@ Rectangle{
                         ColumnLayout{
                             anchors.fill: parent
                             ListView{
-                                Layout.fillWidth: true
+                                id: view
                                 Layout.fillHeight: true
+                                Layout.fillWidth: true
+highlightMoveDuration: 100
                                 interactive: true
                                 clip: true
                                 //header
@@ -470,9 +481,10 @@ Rectangle{
                                 //item list
                                 model: DelegateModel{
                                     id: itemModel
-                                    model: ListModel{
-                                        id: itemList
-                                    }
+                                    // model: ListModel{
+                                    //     id: itemList
+                                    // }
+                                    model: window.manager.prjSetModel
                                     groups: [
                                         DelegateModelGroup {
                                             id: selectedGroup
@@ -485,12 +497,14 @@ Rectangle{
                                         customValue: model.value
                                         customDesc: model.desc
                                         customWidth: ListView.view.width
-                                        checkState: itemDel.DelegateModel.inSelected
+                                        checkState: DelegateModel.inSelected
+                                        color: DelegateModel.inSelected ? "lightsteelblue": "transparent"
 
-                                        onChecked: (checkState) => {
-                                                       itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
-                                                   }
+                                        onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
                                     }
+                                }
+                                onCountChanged: {
+                                    currentIndex = count-1
                                 }
                                 //footer
                                 footerPositioning: ListView.OverlayFooter
@@ -533,7 +547,8 @@ Rectangle{
                         Layout.fillHeight: true
                         Layout.fillWidth: true
                         clip: true
-                        model: historyList
+                        // model: historyList
+                        model: window.manager.historyModel
                         //header
                         header: Rectangle{
                             width: parent.width
@@ -549,8 +564,9 @@ Rectangle{
                         delegate: Text{
                             required property var model
                             width: parent.width
-                            text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
-                            font.pixelSize: 15
+                            // text: model.action + "(name: " + model.name + ", value: " + model.value + ", desc: "+model.desc+") on " + model.time
+                        text: model.history
+                        font.pixelSize: 15
                             font.family: "Montserrat Medium"
                             wrapMode: Text.WordWrap
                         }
