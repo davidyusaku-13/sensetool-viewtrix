@@ -185,8 +185,18 @@ Rectangle{
                             //add or edit window
                             PrjSetWindow{
                                 id: prjSetWindow
-                                onCreate: (object) => {itemList.append(object); root.history("Added", object)}
-                                onModify: (object) => {itemList.set(root.i, object); root.history("Modified", object)}
+                                onCreate: (object) => {
+                                    window.manager.add(object.name, object.value, object.desc)
+                                    window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                    // itemList.append(object)
+                                    // root.history("Added", object)
+                                }
+                                onModify: (object) => {
+                                    window.manager.edit(root.i, object.name, object.value, object.desc)
+                                    window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                    // itemList.set(root.i, object)
+                                    // root.history("Modified", object)
+                                }
                             }
                             //importBtn
                             Item{
