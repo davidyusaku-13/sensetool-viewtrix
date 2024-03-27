@@ -1,8 +1,8 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
-    import QtQuick.Controls
-    import QtQuick.Dialogs
+import QtQuick.Controls
+import QtQuick.Dialogs
 
 Rectangle{
     id: root
@@ -15,7 +15,7 @@ Rectangle{
     property string buttonHover: "#d6d6d6"
     property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0) : ""
     property int i: firstSelected !== "" ? firstSelected.itemsIndex : 0
-
+    
     function history(status, object){
         var temp = {
             "status": status,
@@ -94,9 +94,9 @@ Rectangle{
                         customColor: root.buttonColor
                         customHoveredColor: root.buttonHover
                         customImage: "images/setting"
-
+                        
                         onClicked: {
-window.manager.historyModel.clear()
+                            
                         }
                     }
                 }
@@ -112,7 +112,7 @@ window.manager.historyModel.clear()
                 implicitWidth: 50
                 Layout.fillHeight: true
                 color: "#ffffff"
-
+                
                 layer.enabled: true
                 layer.effect: DropShadow{
                     horizontalOffset: 0
@@ -151,7 +151,7 @@ window.manager.historyModel.clear()
                         customColor: workspace1.visible === false ? root.buttonColor : root.buttonHover
                         customHoveredColor: workspace1.visible === false ? root.buttonHover : "#C2C2C2"
                         customImage: "images/import"
-
+                        
                         onClicked: {
                             workspace1.visible === true ? workspace1.visible = false : workspace1.visible = true
                         }
@@ -165,7 +165,7 @@ window.manager.historyModel.clear()
                 Layout.fillHeight: true
                 color: "#00000000"
                 visible: true
-
+                
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
@@ -195,7 +195,7 @@ window.manager.historyModel.clear()
                                 MyText2{
                                     id: importBtn
                                     anchors.fill: parent
-
+                                    
                                     customRadius: 5
                                     customText: "Import"
                                     customHAlignment: "Center"
@@ -203,12 +203,12 @@ window.manager.historyModel.clear()
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-
+                                    
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-
+                                    
                                     onClicked: {
                                         dialogImport.open()
                                     }
@@ -231,7 +231,7 @@ window.manager.historyModel.clear()
                                 MyText2{
                                     id: exportBtn
                                     anchors.fill: parent
-
+                                    
                                     customRadius: 5
                                     customText: "Export"
                                     customHAlignment: "Center"
@@ -239,7 +239,7 @@ window.manager.historyModel.clear()
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-
+                                    
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
@@ -266,7 +266,7 @@ window.manager.historyModel.clear()
                                 MyText2{
                                     id: addButton
                                     anchors.fill: parent
-
+                                    
                                     customRadius: 5
                                     customText: "Add"
                                     customHAlignment: "Center"
@@ -274,12 +274,12 @@ window.manager.historyModel.clear()
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-
+                                    
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-
+                                    
                                     onClicked: {
                                         prjSetWindow.manage(-1, null)
                                     }
@@ -299,14 +299,14 @@ window.manager.historyModel.clear()
                                     customColor: selectedGroup.count === 1 ? "#000000" : "#8B8B8C"
                                     customHoveredColor: selectedGroup.count === 1 ? "#332C2B" : customColor
                                     customTextColor: "#ffffff"
-
+                                    
                                     HoverHandler {
                                         id: cursorHovered
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                         enabled: selectedGroup.count === 1 ? true : false
                                     }
-
+                                    
                                     onClicked: {
                                         if(selectedGroup.count === 1)
                                         {
@@ -329,12 +329,12 @@ window.manager.historyModel.clear()
                                     customColor: selectedGroup.count > 0 ? "#000000" : "#8B8B8C"
                                     customHoveredColor: selectedGroup.count > 0 ? "#332C2B" : customColor
                                     customTextColor: "#ffffff"
-
+                                    
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-
+                                    
                                     onClicked: {
                                         for(let i = selectedGroup.count-1; i>=0; i--){
                                             let itemSelected = selectedGroup.get(i)
@@ -356,9 +356,9 @@ window.manager.historyModel.clear()
                                 implicitHeight: 28
                                 MyText2{
                                     id: deselectAllBtn
-
+                                    
                                     anchors.fill: parent
-
+                                    
                                     customRadius: 5
                                     customText: "Deselect All"
                                     customHAlignment: "Center"
@@ -366,12 +366,12 @@ window.manager.historyModel.clear()
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-
+                                    
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-
+                                    
                                     onClicked: {
                                         for(var i=0; i< itemModel.items.count; i++){
                                             if(itemModel.items.get(i).inSelected)
@@ -386,9 +386,9 @@ window.manager.historyModel.clear()
                                 implicitHeight: 28
                                 MyText2{
                                     id: selectAllBtn
-
+                                    
                                     anchors.fill: parent
-
+                                    
                                     customRadius: 5
                                     customText: "Select All"
                                     customHAlignment: "Center"
@@ -396,12 +396,12 @@ window.manager.historyModel.clear()
                                     customColor: "#000000"
                                     customHoveredColor: "#332C2B"
                                     customTextColor: "#ffffff"
-
+                                    
                                     HoverHandler {
                                         acceptedDevices: PointerDevice.Mouse
                                         cursorShape: Qt.PointingHandCursor
                                     }
-
+                                    
                                     onClicked: {
                                         for(var i=0; i< itemModel.items.count; i++){
                                             if(!itemModel.items.get(i).inSelected){
@@ -418,7 +418,7 @@ window.manager.historyModel.clear()
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         color: "#ffffff"
-
+                        
                         layer.enabled: true
                         layer.effect: DropShadow{
                             horizontalOffset: 0
@@ -432,7 +432,7 @@ window.manager.historyModel.clear()
                                 id: view
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
-highlightMoveDuration: 100
+                                highlightMoveDuration: 100
                                 interactive: true
                                 clip: true
                                 //header
@@ -456,7 +456,7 @@ highlightMoveDuration: 100
                                             Layout.fillWidth: modelData === "Description" ? false : true
                                             implicitWidth: modelData === "Description" ? 500 : 0
                                             color: "#d6d6d6"
-
+                                            
                                             // layer.enabled: true
                                             // layer.effect: DropShadow{
                                             //     horizontalOffset: 2
@@ -499,7 +499,7 @@ highlightMoveDuration: 100
                                         customWidth: ListView.view.width
                                         checkState: DelegateModel.inSelected
                                         color: DelegateModel.inSelected ? "lightsteelblue": "transparent"
-
+                                        
                                         onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
                                     }
                                 }
@@ -533,7 +533,7 @@ highlightMoveDuration: 100
                 Layout.fillHeight: true
                 color: "#ffffff"
                 visible: false
-
+                
                 layer.enabled: true
                 layer.effect: DropShadow{
                     horizontalOffset: 0
@@ -565,19 +565,20 @@ highlightMoveDuration: 100
                             required property var model
                             width: parent.width
                             // text: model.action + "(name: " + model.name + ", value: " + model.value + ", desc: "+model.desc+") on " + model.time
-                        text: model.history
-                        font.pixelSize: 15
+                            text: model.history
+                            font.pixelSize: 15
                             font.family: "Montserrat Medium"
                             wrapMode: Text.WordWrap
                         }
                     }
+                    //clear notif
                     Item{
                         implicitWidth: 70
                         implicitHeight: 28
                         anchors.margins: 20
                         MyText2{
                             anchors.fill: parent
-
+                            
                             customRadius: 5
                             customText: "Clear"
                             customHAlignment: "Center"
@@ -585,10 +586,13 @@ highlightMoveDuration: 100
                             customColor: "#000000"
                             customHoveredColor: "#332C2B"
                             customTextColor: "#ffffff"
-
+                            
                             HoverHandler {
                                 acceptedDevices: PointerDevice.Mouse
                                 cursorShape: Qt.PointingHandCursor
+                            }
+                            onClicked:{
+                                window.manager.historyModel.clear()
                             }
                         }
                     }
