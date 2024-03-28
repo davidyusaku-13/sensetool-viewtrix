@@ -9,21 +9,21 @@ Window {
     minimumHeight: 500
     maximumWidth: 500
     maximumHeight: 500
-    
+
     signal create(var object)
     signal modify(var object)
-    
+
     property PrjSetItem object: PrjSetItem{}
     property int index: -1
     property bool isEdit: false
-    
+
     function manage(i: int, model: var){
         if(i !== -1){
             isEdit = true
             object.name = model.name
             object.value = model.value
             object.desc = model.desc
-            
+
         }else {
             isEdit = false
             object.reset()
@@ -67,7 +67,7 @@ Window {
                     clip: true
                     autoScroll: false
                     selectByMouse: true
-                    validator: RegularExpressionValidator { regularExpression: /[0-9A-Z_]+/ }
+                    validator: RegularExpressionValidator {regularExpression: /[0-9A-Z_]+/}
                 }
             }
         }
@@ -94,11 +94,7 @@ Window {
                     clip: true
                     autoScroll: false
                     selectByMouse: true
-<<<<<<< HEAD
                     validator: RegularExpressionValidator {regularExpression: /[0-9a-zA-Z*()_" "<>+-/:?]+/}
-=======
-                    validator: RegularExpressionValidator { regularExpression: /[0-9a-zA-Z*<>()_+?-]+/ }
->>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                 }
             }
         }
@@ -135,14 +131,15 @@ Window {
             MyText2{
                 implicitWidth: root.isEdit === false ? 50 : 55
                 implicitHeight: 30
+                enabled: (customText == "Add" && root.object.name === "") ? false : true
                 customRadius: 5
                 customText: root.isEdit === false ? "Add" : "Save"
                 customTextColor: "#ffffff"
                 customSize: 15
                 customHAlignment: "Center"
-                customColor: root.object.name !== "" ? "#000000" : "#8B8B8C"
-                customHoveredColor: root.object.name !== ""  ? "#332C2B" : customColor
-                
+                customColor: ((isEdit === false && root.object.name !== "") || isEdit === true) ? "#000000" : "#8B8B8C"
+                customHoveredColor: ((isEdit === false && root.object.name !== "") || isEdit === true)  ? "#332C2B" : customColor
+
                 onClicked: {
                     if(root.isEdit == true){
                         confirmWindow.show()
@@ -164,7 +161,7 @@ Window {
                 customHAlignment: "Center"
                 customColor: "#000000"
                 customHoveredColor: "#332C2B"
-                
+
                 onClicked: {
                     root.object.reset()
                     root.close()
