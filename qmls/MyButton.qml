@@ -31,8 +31,8 @@ Button {
   }
 
   background: Rectangle{
-    color: parent.down ? customColor:
-    parent.hovered ? customHoveredColor: customColor
+    color: parent.down ? customColor : parent.hovered ? customHoveredColor : customColor
+    Behavior on color { ColorAnimation { duration: 100 } }
 
     radius: root.customRadius
   }

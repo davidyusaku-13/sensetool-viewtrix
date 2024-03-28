@@ -442,7 +442,7 @@ Rectangle{
                                 id: view
                                 Layout.fillHeight: true
                                 Layout.fillWidth: true
-                                highlightMoveDuration: 100
+                                highlightMoveDuration: 500
                                 interactive: true
                                 clip: true
                                 //header
@@ -509,6 +509,7 @@ Rectangle{
                                         customWidth: ListView.view.width
                                         checkState: DelegateModel.inSelected
                                         color: DelegateModel.inSelected ? "lightsteelblue": "transparent"
+                                        Behavior on color { ColorAnimation { duration: 100 } }
                                         
                                         onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
                                     }
@@ -573,9 +574,9 @@ Rectangle{
                         }
                         delegate: Text{
                             required property var model
-                            width: parent.width
+                            width: ListView.view.width
                             // text: model.action + "(name: " + model.name + ", value: " + model.value + ", desc: "+model.desc+") on " + model.time
-                            text: model.history
+                            text: model.history + "\n\n"
                             font.pixelSize: 15
                             font.family: "Montserrat Medium"
                             wrapMode: Text.WordWrap
@@ -585,7 +586,7 @@ Rectangle{
                     Item{
                         implicitWidth: 70
                         implicitHeight: 28
-                        anchors.margins: 20
+                        Layout.margins: 10
                         MyText2{
                             anchors.fill: parent
                             
@@ -611,4 +612,3 @@ Rectangle{
         }
     }
 }
-

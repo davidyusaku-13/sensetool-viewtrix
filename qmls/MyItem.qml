@@ -29,6 +29,7 @@ Rectangle{
                 anchors.margins: 15
                 background: Rectangle{
                     color: root.checkState ? "#000000": "#ffffff"
+                    Behavior on color { ColorAnimation { duration: 100 } }
                     radius: 3
                     layer.enabled: true
                     layer.effect: DropShadow{
