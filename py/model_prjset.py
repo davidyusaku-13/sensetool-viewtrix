@@ -3,7 +3,6 @@ from PySide6.QtQml import QmlElement
 from logger import AppLogger
 from model_history import HistoryModel
 import yaml
-import datetime
 
 QML_IMPORT_NAME = "PrjSetModel"
 QML_IMPORT_MAJOR_VERSION = 1

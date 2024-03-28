@@ -189,12 +189,25 @@ Rectangle{
                             PrjSetWindow{
                                 id: prjSetWindow
                                 onCreate: (object) => {
+<<<<<<< HEAD
                                               itemList.append(object);
                                               root.history("Added", object)
                                           }
                                 onModify: (object) => {
                                               itemList.set(root.i, object)
                                               root.history("Modified", object)
+=======
+                                              window.manager.add(object.name, object.value, object.desc)
+                                              window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                              // itemList.append(object)
+                                              // root.history("Added", object)
+                                          }
+                                onModify: (object) => {
+                                              window.manager.edit(root.i, object.name, object.value, object.desc)
+                                              window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                              // itemList.set(root.i, object)
+                                              // root.history("Modified", object)
+>>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                                           }
                             }
                             //importBtn
@@ -422,7 +435,11 @@ Rectangle{
                             anchors.fill: parent
                             ListView{
                                 Layout.fillWidth: true
+<<<<<<< HEAD
                                 Layout.fillHeight: true
+=======
+                                highlightMoveDuration: 500
+>>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                                 interactive: true
                                 clip: true
                                 //header
@@ -486,11 +503,19 @@ Rectangle{
                                         customValue: model.value
                                         customDesc: model.desc
                                         customWidth: ListView.view.width
+<<<<<<< HEAD
                                         checkState: itemDel.DelegateModel.inSelected
 
                                         onChecked: (checkState) => {
                                                        itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
                                                    }
+=======
+                                        checkState: DelegateModel.inSelected
+                                        color: DelegateModel.inSelected ? "lightsteelblue": "transparent"
+                                        Behavior on color { ColorAnimation { duration: 100 } }
+                                        
+                                        onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
+>>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                                     }
                                 }
                                 //footer
@@ -549,8 +574,14 @@ Rectangle{
                         }
                         delegate: Text{
                             required property var model
+<<<<<<< HEAD
                             width: parent.width
                             text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
+=======
+                            width: ListView.view.width
+                            // text: model.action + "(name: " + model.name + ", value: " + model.value + ", desc: "+model.desc+") on " + model.time
+                            text: model.history + "\n\n"
+>>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                             font.pixelSize: 15
                             font.family: "Montserrat Medium"
                             wrapMode: Text.WordWrap
@@ -559,7 +590,7 @@ Rectangle{
                     Item{
                         implicitWidth: 70
                         implicitHeight: 28
-                        anchors.margins: 20
+                        Layout.margins: 10
                         MyText2{
                             anchors.fill: parent
 
@@ -582,4 +613,3 @@ Rectangle{
         }
     }
 }
-

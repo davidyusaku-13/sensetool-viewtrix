@@ -32,7 +32,12 @@ Item{
                 implicitHeight: 25
                 anchors.centerIn: parent
                 background: Rectangle{
+<<<<<<< HEAD
                     color: root.checkState ? "#000000" : "#ffffff"
+=======
+                    color: root.checkState ? "#000000": "#ffffff"
+                    Behavior on color { ColorAnimation { duration: 100 } }
+>>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                     radius: 3
                     layer.enabled: true
                     layer.effect: DropShadow{

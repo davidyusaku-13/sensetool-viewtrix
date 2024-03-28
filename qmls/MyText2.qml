@@ -45,6 +45,7 @@ Button {
   background: Rectangle{
     anchors.fill: parent
     color: parent.down? customHoveredColor: (parent.hovered ? customColor: customColor)
+    Behavior on color { ColorAnimation { duration: 100 } }
 
     radius: customRadius
   }
