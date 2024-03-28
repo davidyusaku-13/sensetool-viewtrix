@@ -8,7 +8,7 @@ import AppLogic
 ApplicationWindow {
     id: window
     
-    title: qsTr("Viewtrix")
+    title: qsTr("Sense Trix")
     visible: true
     width: 1280
     height: 720
