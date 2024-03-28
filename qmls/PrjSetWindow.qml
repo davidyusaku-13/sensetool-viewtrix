@@ -67,7 +67,7 @@ Window {
                     clip: true
                     autoScroll: false
                     selectByMouse: true
-                    validator: RegularExpressionValidator { regularExpression: /[0-9a-zA-Z_+<>()]+/ }
+                    validator: RegularExpressionValidator { regularExpression: /[0-9A-Z_]+/ }
                 }
             }
         }
@@ -94,7 +94,7 @@ Window {
                     clip: true
                     autoScroll: false
                     selectByMouse: true
-                    validator: RegularExpressionValidator { regularExpression: /[0-9a-zA-Z*()_+]+/ }
+                    validator: RegularExpressionValidator {regularExpression: /[0-9a-zA-Z*()_" "<>+-/:?]+/}
                 }
             }
         }
@@ -110,7 +110,7 @@ Window {
             Frame{
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                TextArea{
+                TextEdit{
                     anchors.fill: parent
                     text: root.object.desc
                     onTextChanged: root.object.desc = text
