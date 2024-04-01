@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 
-Item{
+Rectangle{
     id: root
     width: customWidth
     height: name.lineCount>1 ? name.lineCount*(customHeight/2) :

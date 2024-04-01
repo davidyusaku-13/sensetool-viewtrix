@@ -2,6 +2,7 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 import QtQuick.Controls
+import QtQuick.Dialogs
 
 Rectangle{
     id: root
@@ -80,9 +81,6 @@ Rectangle{
                         
                         onClicked: {
                             notif.visible = !notif.visible
-                            for(let i=0; i<historyList.count; i++){
-                                print(JSON.stringify(historyList.get(i)))
-                            }
                         }
                     }
                 }
@@ -199,12 +197,16 @@ Rectangle{
                                 PrjSetWindow{
                                     id: prjSetWindow
                                     onCreate: (object) => {
-                                                  itemList.append(object);
-                                                  root.history("Added", object)
+                                                  window.manager.add(object.name, object.value, object.desc)
+                                                  window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                                  // itemList.append(object)
+                                                  // root.history("Added", object)
                                               }
                                     onModify: (object) => {
-                                                  itemList.set(root.i, object)
-                                                  root.history("Modified", object)
+                                                  window.manager.edit(root.i, object.name, object.value, object.desc)
+                                                  window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                                  // itemList.set(root.i, object)
+                                                  // root.history("Modified", object)
                                               }
                                 }
                                 //importBtn
@@ -227,6 +229,19 @@ Rectangle{
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
                                         }
+                                        onClicked: {
+                                            dialogImport.open()
+                                        }
+                                    }
+                                    FileDialog {
+                                        id: dialogImport
+                                        selectedNameFilter.index: 1
+                                        fileMode: FileDialog.OpenFile
+                                        nameFilters: ["YAML files (*.yaml *.yml)"]
+                                        onAccepted: {
+                                            window.manager.importYAML(selectedFile)
+                                            window.manager.addHistory("Imported", selectedFile)
+                                        }
                                     }
                                 }
                                 //exportBtn
@@ -248,6 +263,19 @@ Rectangle{
                                         HoverHandler {
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
+                                        }
+                                        onClicked: {
+                                            dialogExport.open()
+                                        }
+                                    }
+                                    FileDialog {
+                                        id: dialogExport
+                                        selectedNameFilter.index: 1
+                                        fileMode: FileDialog.SaveFile
+                                        nameFilters: ["YAML files (*.yaml *.yml)"]
+                                        onAccepted: {
+                                            window.manager.exportYAML(selectedFile)
+                                            window.manager.addHistory("Exported", selectedFile)
                                         }
                                     }
                                 }
@@ -331,12 +359,14 @@ Rectangle{
                                         
                                         onClicked: {
                                             //window.manager.add("item", "value", "desc", "false")
-                                            print(selectedGroup.count)
                                             for(let i = selectedGroup.count-1; i>=0; i--){
                                                 let itemSelected = selectedGroup.get(i)
-                                                var object = itemList.get(itemSelected.itemsIndex)
-                                                root.history("Deleted", object)
-                                                itemList.remove(itemSelected.itemsIndex)
+                                                // var object = itemList.get(itemSelected.itemsIndex)
+                                                // root.history("Deleted", object)
+                                                // itemList.remove(itemSelected.itemsIndex)
+                                                var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
+                                                window.manager.addHistory("Deleted", object.name, object.value, object.desc)
+                                                window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
                                             }
                                         }
                                     }
@@ -433,6 +463,7 @@ Rectangle{
                                 ListView{
                                     Layout.fillWidth: true
                                     Layout.fillHeight: true
+                                    highlightMoveDuration: 500
                                     interactive: true
                                     clip: true
                                     //header
@@ -481,28 +512,92 @@ Rectangle{
                                     //item list
                                     model: DelegateModel{
                                         id: itemModel
-                                        model: ListModel{
-                                            id: itemList
-                                        }
+                                        // model: ListModel{
+                                        //     id: itemList
+                                        // }
+                                        model: window.manager.prjSetModel
                                         groups: [
                                             DelegateModelGroup {
                                                 id: selectedGroup
                                                 name: "selected"}
                                         ]
-                                        delegate: MyItem{
-                                            id: itemDel
+                                        // delegate: MyItem{
+                                        //     id: itemDel
+                                        //     required property var model
+                                        //     customItem: model.name
+                                        //     customValue: model.value
+                                        //     customDesc: model.desc
+                                        //     customWidth: ListView.view.width
+                                        //     checkState: itemDel.DelegateModel.inSelected
+                                        
+                                        //     onChecked: (checkState) => {
+                                        //                    itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                                        //                }
+                                        // }
+                                        delegate: dragDelegate
+                                    }
+                                    onCountChanged: {
+                                        currentIndex = count-1
+                                    }
+                                    
+                                    // DRAG N DROP DELEGATE
+                                    Component {
+                                        id: dragDelegate
+                                        
+                                        Rectangle {
+                                            id: content
                                             required property var model
-                                            customItem: model.name
-                                            customValue: model.value
-                                            customDesc: model.desc
-                                            customWidth: ListView.view.width
-                                            checkState: itemDel.DelegateModel.inSelected
+                                            required property int index
+                                            width: ListView.view.width
+                                            height: itemDel.height
                                             
-                                            onChecked: (checkState) => {
-                                                           itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
-                                                       }
+                                            color: itemDel.dragArea.held ? "#d6d6d6": "white"
+                                            Behavior on color { ColorAnimation { duration: 100 } }
+                                            radius: 2
+                                            
+                                            MyItem{
+                                                id: itemDel
+                                                
+                                                states: State {
+                                                    when: itemDel.dragArea.pressed
+                                                    ParentChange {
+                                                        target: itemDel
+                                                        parent: content.ListView.view
+                                                    }
+                                                }
+                                                
+                                                Drag.hotSpot.x: width / 2
+                                                Drag.hotSpot.y: height / 2
+                                                Drag.source: content
+                                                Drag.active: itemDel.dragArea.pressed
+                                                
+                                                anchors {
+                                                    left: parent.left
+                                                    right: parent.right
+                                                }
+                                                height: 50
+                                                
+                                                customItem: model.name
+                                                customValue: model.value
+                                                customDesc: model.desc
+                                                content: itemDel
+                                                checkState: DelegateModel.inSelected
+                                                color: checkState ? "lightsteelblue": "transparent"
+                                                Behavior on color { ColorAnimation { duration: 100 } }
+                                                
+                                                onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
+                                            }
+                                            DropArea {
+                                                anchors.fill: parent
+                                                
+                                                onEntered: (drag) => {
+                                                               //    itemModel.items.move(drag.source.index, content.index)
+                                                               window.manager.moveItem(drag.source.index, content.index)
+                                                           }
+                                            }
                                         }
                                     }
+                                    
                                     //footer
                                     footerPositioning: ListView.OverlayFooter
                                     footer: Rectangle{
@@ -545,8 +640,10 @@ Rectangle{
                     ListView{
                         Layout.fillHeight: true
                         Layout.fillWidth: true
+                        highlightMoveDuration: 500
                         clip: true
-                        model: historyList
+                        // model: historyList
+                        model: window.manager.historyModel
                         //header
                         header: Rectangle{
                             width: parent.width
@@ -568,19 +665,23 @@ Rectangle{
                         }
                         delegate: Text{
                             required property var model
-                            width: parent.width
-                            text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
+                            width: ListView.view.width
+                            // text: model.action + "(name: " + model.name + ", value: " + model.value + ", desc: "+model.desc+") on " + model.time
+                            text: model.history + "\n\n"
                             font.pixelSize: 15
                             font.family: "Montserrat Medium"
                             wrapMode: Text.WordWrap
+                        }
+                        onCountChanged: {
+                            currentIndex = count-1
                         }
                     }
                     Item{
                         implicitWidth: 90
                         implicitHeight: 28
-                        anchors.margins: 20
+                        Layout.margins: 10
                         MyText2{
-                            id: selectAllBtn2
+                            id: clearAllBtn
                             
                             anchors.fill: parent
                             
@@ -595,6 +696,10 @@ Rectangle{
                             HoverHandler {
                                 acceptedDevices: PointerDevice.Mouse
                                 cursorShape: Qt.PointingHandCursor
+                            }
+
+                            onClicked: {
+                                window.manager.historyModel.clear()
                             }
                         }
                     }
