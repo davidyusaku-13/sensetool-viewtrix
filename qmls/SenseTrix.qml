@@ -8,14 +8,14 @@ Rectangle{
     width: 1920
     height: 1080
     //title: "Sense Trix"
-
+    
     property int buttonSize: 50
     property int buttonMargin: 7
     property string buttonColor: "#ffffff"
     property string buttonHover: "#d6d6d6"
     property var firstSelected: selectedGroup.count > 0 ? selectedGroup.get(0) : ""
     property int i: firstSelected !== "" ? firstSelected.itemsIndex : 0
-
+    
     function history(status, object){
         var temp = {
             "status": status,
@@ -36,7 +36,7 @@ Rectangle{
             id: header
             Layout.fillWidth: true
             implicitHeight: 50
-
+            
             layer.enabled: true
             layer.effect: DropShadow{
                 horizontalOffset: 0
@@ -57,7 +57,7 @@ Rectangle{
                         anchors.margins: root.buttonMargin
                         customColor: root.buttonColor
                         customHoveredColor: root.buttonHover
-
+                        
                         onClicked: {
                             sidebar.folded = !sidebar.folded
                         }
@@ -77,12 +77,12 @@ Rectangle{
                         customColor: root.buttonColor
                         customHoveredColor: root.buttonHover
                         customImage: "images/notification"
-
+                        
                         onClicked: {
                             notif.visible = !notif.visible
                             for(let i=0; i<historyList.count; i++){
-                                    print(JSON.stringify(historyList.get(i)))
-                                }
+                                print(JSON.stringify(historyList.get(i)))
+                            }
                         }
                     }
                 }
@@ -97,9 +97,9 @@ Rectangle{
                         customColor: root.buttonColor
                         customHoveredColor: root.buttonHover
                         customImage: "images/setting"
-
+                        
                         onClicked: {
-
+                            
                         }
                     }
                 }
@@ -115,7 +115,7 @@ Rectangle{
                 implicitWidth: 50
                 Layout.fillHeight: true
                 color: "#ffffff"
-
+                
                 layer.enabled: true
                 layer.effect: DropShadow{
                     horizontalOffset: 0
@@ -158,7 +158,7 @@ Rectangle{
                         customColor: workspace1.visible === false ? root.buttonColor: root.buttonHover
                         customHoveredColor: workspace1.visible === false ? root.buttonHover: "#C2C2C2"
                         customImage: "images/import"
-
+                        
                         onClicked: {
                             workspace1.visible === true ? workspace1.visible = false: workspace1.visible = true
                         }
@@ -174,10 +174,11 @@ Rectangle{
                 //workspace1
                 Rectangle{
                     id: workspace1
-                    anchors.fill: parent
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
                     color: "#00000000"
                     visible: true
-
+                    
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
@@ -213,7 +214,7 @@ Rectangle{
                                     MyText2{
                                         id: importBtn
                                         anchors.fill: parent
-
+                                        
                                         customRadius: 5
                                         customText: "Import"
                                         customHAlignment: "Center"
@@ -221,7 +222,7 @@ Rectangle{
                                         customColor: "#000000"
                                         customHoveredColor: "#332C2B"
                                         customTextColor: "#ffffff"
-
+                                        
                                         HoverHandler {
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
@@ -235,7 +236,7 @@ Rectangle{
                                     MyText2{
                                         id: exportBtn
                                         anchors.fill: parent
-
+                                        
                                         customRadius: 5
                                         customText: "Export"
                                         customHAlignment: "Center"
@@ -243,7 +244,7 @@ Rectangle{
                                         customColor: "#000000"
                                         customHoveredColor: "#332C2B"
                                         customTextColor: "#ffffff"
-
+                                        
                                         HoverHandler {
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
@@ -257,7 +258,7 @@ Rectangle{
                                     MyText2{
                                         id: addButton
                                         anchors.fill: parent
-
+                                        
                                         customRadius: 5
                                         customText: "Add"
                                         customHAlignment: "Center"
@@ -265,12 +266,12 @@ Rectangle{
                                         customColor: "#000000"
                                         customHoveredColor: "#332C2B"
                                         customTextColor: "#ffffff"
-
+                                        
                                         HoverHandler {
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
                                         }
-
+                                        
                                         onClicked: {
                                             //window.manager.add("item", "value", "desc", "false")
                                             prjSetWindow.manage(-1,null)
@@ -291,14 +292,14 @@ Rectangle{
                                         customColor: selectedGroup.count === 1 ? "#000000" : "#8B8B8C"
                                         customHoveredColor: selectedGroup.count === 1 ? "#332C2B" : customColor
                                         customTextColor: "#ffffff"
-
+                                        
                                         HoverHandler {
                                             id: cursorHovered
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
                                             enabled: selectedGroup.count === 1 ? true : false
                                         }
-
+                                        
                                         onClicked: {
                                             //window.manager.add("item", "value", "desc", "false")
                                             if(selectedGroup.count === 1){
@@ -321,21 +322,21 @@ Rectangle{
                                         customColor: selectedGroup.count > 0 ? "#000000" : "#8B8B8C"
                                         customHoveredColor: selectedGroup.count > 0 ? "#332C2B" : customColor
                                         customTextColor: "#ffffff"
-
+                                        
                                         HoverHandler {
                                             // id: cursorHovered
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
                                         }
-
+                                        
                                         onClicked: {
                                             //window.manager.add("item", "value", "desc", "false")
                                             print(selectedGroup.count)
                                             for(let i = selectedGroup.count-1; i>=0; i--){
-                                                    let itemSelected = selectedGroup.get(i)
-                                                    var object = itemList.get(itemSelected.itemsIndex)
-                                                    root.history("Deleted", object)
-                                                    itemList.remove(itemSelected.itemsIndex)
+                                                let itemSelected = selectedGroup.get(i)
+                                                var object = itemList.get(itemSelected.itemsIndex)
+                                                root.history("Deleted", object)
+                                                itemList.remove(itemSelected.itemsIndex)
                                             }
                                         }
                                     }
@@ -351,9 +352,9 @@ Rectangle{
                                     implicitHeight: 28
                                     MyText2{
                                         id: deselectAllBtn
-
+                                        
                                         anchors.fill: parent
-
+                                        
                                         customRadius: 5
                                         customText: "Deselect All"
                                         customHAlignment: "Center"
@@ -361,13 +362,13 @@ Rectangle{
                                         customColor: "#000000"
                                         customHoveredColor: "#332C2B"
                                         customTextColor: "#ffffff"
-
+                                        
                                         HoverHandler {
                                             // id: cursorHovered
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
                                         }
-
+                                        
                                         onClicked: {
                                             //window.manager.add("item", "value", "desc", "false")
                                             for(var i=0; i< itemModel.items.count; i++){
@@ -384,9 +385,9 @@ Rectangle{
                                     implicitHeight: 28
                                     MyText2{
                                         id: selectAllBtn
-
+                                        
                                         anchors.fill: parent
-
+                                        
                                         customRadius: 5
                                         customText: "Select All"
                                         customHAlignment: "Center"
@@ -394,13 +395,13 @@ Rectangle{
                                         customColor: "#000000"
                                         customHoveredColor: "#332C2B"
                                         customTextColor: "#ffffff"
-
+                                        
                                         HoverHandler {
                                             // id: cursorHovered
                                             acceptedDevices: PointerDevice.Mouse
                                             cursorShape: Qt.PointingHandCursor
                                         }
-
+                                        
                                         onClicked: {
                                             //window.manager.add("item", "value", "desc", "false")
                                             for(var i=0; i< itemModel.items.count; i++){
@@ -419,7 +420,7 @@ Rectangle{
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             color: "#ffffff"
-
+                            
                             layer.enabled: true
                             layer.effect: DropShadow{
                                 horizontalOffset: 0
@@ -455,7 +456,7 @@ Rectangle{
                                                 Layout.fillWidth: modelData === "Description" ? false : true
                                                 implicitWidth: modelData === "Description" ? 500 : 0
                                                 color: "#d6d6d6"
-
+                                                
                                                 // layer.enabled: true
                                                 // layer.effect: DropShadow{
                                                 //     horizontalOffset: 2
@@ -496,7 +497,7 @@ Rectangle{
                                             customDesc: model.desc
                                             customWidth: ListView.view.width
                                             checkState: itemDel.DelegateModel.inSelected
-
+                                            
                                             onChecked: (checkState) => {
                                                            itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
                                                        }
@@ -522,7 +523,7 @@ Rectangle{
                         }
                     }
                 }
-
+                
             }
             //notif pop-up
             Rectangle{
@@ -531,7 +532,7 @@ Rectangle{
                 Layout.fillHeight: true
                 color: "#ffffff"
                 visible: false
-
+                
                 layer.enabled: true
                 layer.effect: DropShadow{
                     horizontalOffset: 0
@@ -557,13 +558,13 @@ Rectangle{
                                 font.family: "Montserrat Medium"
                                 anchors.centerIn: parent
                             }
-
-                            onClicked: {
-                                for(var i=0; i< itemModel.items.count; i++){
-                                if(itemModel.items.get(i).inSelected)
-                            {
-                                itemModel.items.get(i).inSelected = false}}
-                            }
+                            
+                            // onClicked: {
+                            //     for(var i=0; i< itemModel.items.count; i++){
+                            //         if(itemModel.items.get(i).inSelected)
+                            //         {
+                            //             itemModel.items.get(i).inSelected = false}}
+                            // }
                         }
                         delegate: Text{
                             required property var model
@@ -579,10 +580,10 @@ Rectangle{
                         implicitHeight: 28
                         anchors.margins: 20
                         MyText2{
-                            id: selectAllBtn
-
+                            id: selectAllBtn2
+                            
                             anchors.fill: parent
-
+                            
                             customRadius: 5
                             customText: "Clear All"
                             customHAlignment: "Center"
@@ -590,7 +591,7 @@ Rectangle{
                             customColor: "transparent"
                             customHoveredColor: "#332C2B"
                             customTextColor: "#000000"
-
+                            
                             HoverHandler {
                                 acceptedDevices: PointerDevice.Mouse
                                 cursorShape: Qt.PointingHandCursor
@@ -600,203 +601,5 @@ Rectangle{
                 }
             }
         }
-        //content
-        Rectangle{
-            id: content
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: "#ffffff"
-
-            layer.enabled: true
-            layer.effect: DropShadow{
-                horizontalOffset: 0
-                verticalOffset: 0
-                radius: 3.0
-                color: "#80000000"
-            }
-            ColumnLayout{
-                anchors.fill: parent
-                ListView{
-                    id: view
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    highlightMoveDuration: 500
-                    interactive: true
-                    clip: true
-                    //header
-                    headerPositioning: ListView.OverlayHeader
-                    header: RowLayout{
-                        id: workspace1Header
-                        width: parent.width
-                        height: 50
-                        spacing: 0
-                        z: 2
-                        Rectangle{
-                            implicitWidth: 50
-                            Layout.fillHeight: true
-                            color: "#d6d6d6"
-                        }
-                        Repeater{
-                            model: ["Item", "Value", "Description"]
-                            Rectangle{
-                                required property string modelData
-                                Layout.fillHeight: true
-                                Layout.fillWidth: modelData === "Description" ? false: true
-                                implicitWidth: modelData === "Description" ? 500: 0
-                                color: "#d6d6d6"
-
-                                // layer.enabled: true
-                                // layer.effect: DropShadow{
-                                //     horizontalOffset: 2
-                                //     verticalOffset: 0
-                                //     radius: 2.0
-                                //     color: "#80767676"
-                                // }
-                                Text {
-                                    text: parent.modelData
-                                    anchors.centerIn: parent
-                                    font.pointSize: 15
-                                    font.family: "Montserrat SemiBold"
-                                }
-                            }
-                        }
-                        Rectangle{
-                            implicitWidth: 50
-                            Layout.fillHeight: true
-                            color: "#d6d6d6"
-                        }
-                    }
-                    //item list
-                    model: DelegateModel{
-                        id: itemModel
-                        // model: ListModel{
-                        //     id: itemList
-                        // }
-                        model: window.manager.prjSetModel
-                        groups: [
-                            DelegateModelGroup {
-                                id: selectedGroup
-                                name: "selected"
-                            }
-                        ]
-                        // delegate: MyItem{
-                        //     id: itemDel
-                        //     required property var model
-                        //     customItem: model.name
-                        //     customValue: model.value
-                        //     customDesc: model.desc
-                        //     customWidth: ListView.view.width
-                        //     checkState: DelegateModel.inSelected
-                        //     color: DelegateModel.inSelected ? "lightsteelblue": "transparent"
-                        //     Behavior on color { ColorAnimation { duration: 100 } }
-
-                        //     onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
-                        // }
-                        delegate: dragDelegate
-                    }
-                    onCountChanged: {
-                        currentIndex = count-1
-                    }
-                    //footer
-                    footerPositioning: ListView.OverlayFooter
-                    footer: Rectangle{
-                        id: workspace1Footer
-                        width: parent.width
-                        height: 50
-                        color: "#d6d6d6"
-                        z: 2
-                        Text{
-                            anchors.centerIn: parent
-                            text: selectedGroup.count + " of " + itemModel.count + " items selected"
-                            font.pointSize: 12
-                            font.family: "Montserrat SemiBold"
-                        }
-                    }
-                }
-                Component {
-                    id: dragDelegate
-
-                    Rectangle {
-                        id: content
-                        required property var model
-                        required property int index
-                        // Drag.active: dragArea.held
-                        // Drag.source: dragArea
-                        // Drag.hotSpot.x: width / 2
-                        // Drag.hotSpot.y: height / 2
-                        // anchors {
-                        //     horizontalCenter: parent.horizontalCenter
-                        //     verticalCenter: parent.verticalCenter
-                        // }
-                        // width: dragArea.width
-                        width: ListView.view.width
-                        height: itemDel.height
-
-                        color: itemDel.dragArea.held ? "#d6d6d6": "white"
-                        Behavior on color { ColorAnimation { duration: 100 } }
-                        radius: 2
-                        // states: State {
-                        //     when: dragArea.held
-
-                        //     ParentChange {
-                        //         target: content
-                        //         parent: root
-                        //     }
-                        //     AnchorChanges {
-                        //         target: content
-                        //         anchors {
-                        //             horizontalCenter: undefined
-                        //             verticalCenter: undefined
-                        //         }
-                        //     }
-                        // }
-
-                        MyItem{
-                            id: itemDel
-
-                            states: State {
-                                when: itemDel.dragArea.pressed
-                                ParentChange {
-                                    target: itemDel
-                                    parent: content.ListView.view
-                                }
-                            }
-
-                            Drag.hotSpot.x: width / 2
-                            Drag.hotSpot.y: height / 2
-                            Drag.source: content
-                            Drag.active: itemDel.dragArea.pressed
-
-                            anchors {
-                                left: parent.left
-                                right: parent.right
-                            }
-                            height: 50
-
-                            customItem: model.name
-                            customValue: model.value
-                            customDesc: model.desc
-                            // customWidth: content.width
-                            content: itemDel
-                            checkState: DelegateModel.inSelected
-                            color: checkState ? "lightsteelblue": "transparent"
-                            Behavior on color { ColorAnimation { duration: 100 } }
-
-                            onChecked: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
-                        }
-                        DropArea {
-                            anchors.fill: parent
-
-                            onEntered: (drag) => {
-                            // itemModel.items.move(
-                            //     drag.source.DelegateModel.itemsIndex,
-                            //     dragArea.DelegateModel.itemsIndex)
-                            window.manager.moveItem(drag.source.index, content.index)
-                        }
-                    }
-                }
-            }
-        }
-    }
+    }   
 }
-

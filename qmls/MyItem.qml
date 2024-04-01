@@ -9,8 +9,8 @@ Item{
     height: name.lineCount>1 ? name.lineCount*(customHeight/2) :
                                value.lineCount>1 ? value.lineCount*(customHeight/2) :
                                                    desc.lineCount ? desc.lineCount*(customHeight/2) : customHeight
-
-
+    
+    
     property int customWidth: 1000
     property int customHeight: 50
     property string customItem: "OS_EVENT_QUEUE"
@@ -19,7 +19,7 @@ Item{
     property bool checkState: false
     property alias dragArea: dragArea
     required property var content
-
+    
     signal checked(bool status)
     RowLayout{
         anchors.fill: parent
@@ -34,12 +34,8 @@ Item{
                 implicitHeight: 25
                 anchors.centerIn: parent
                 background: Rectangle{
-<<<<<<< HEAD
-                    color: root.checkState ? "#000000" : "#ffffff"
-=======
                     color: root.checkState ? "#000000": "#ffffff"
                     Behavior on color { ColorAnimation { duration: 100 } }
->>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                     radius: 3
                     layer.enabled: true
                     layer.effect: DropShadow{
@@ -104,12 +100,12 @@ Item{
                 source: "images/drag"
                 MouseArea {
                     id: dragArea
-
+                    
                     anchors.fill: parent
-
+                    
                     drag.target: pressed ? root.content: undefined
                     drag.axis: Drag.YAxis
-
+                    
                     cursorShape: Qt.OpenHandCursor
                     hoverEnabled: true
                 }
