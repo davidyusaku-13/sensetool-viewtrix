@@ -3,10 +3,13 @@ import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 
-Rectangle{
+Item{
     id: root
     width: customWidth
-    height: customHeight
+    height: name.lineCount>1 ? name.lineCount*(customHeight/2) :
+                               value.lineCount>1 ? value.lineCount*(customHeight/2) :
+                                                   desc.lineCount ? desc.lineCount*(customHeight/2) : customHeight
+
 
     property int customWidth: 1000
     property int customHeight: 50
@@ -27,11 +30,16 @@ Rectangle{
             Layout.fillHeight: true
             Button{
                 id: btn
-                anchors.fill: parent
-                anchors.margins: 15
+                implicitWidth: 25
+                implicitHeight: 25
+                anchors.centerIn: parent
                 background: Rectangle{
+<<<<<<< HEAD
+                    color: root.checkState ? "#000000" : "#ffffff"
+=======
                     color: root.checkState ? "#000000": "#ffffff"
                     Behavior on color { ColorAnimation { duration: 100 } }
+>>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
                     radius: 3
                     layer.enabled: true
                     layer.effect: DropShadow{
@@ -52,9 +60,10 @@ Rectangle{
         }
         //item
         Item{
-            Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.fillWidth: true
             MyText{
+                id: name
                 anchors.fill: parent
                 customSize: 15
                 customText: root.customItem
@@ -66,6 +75,7 @@ Rectangle{
             Layout.fillWidth: true
             Layout.fillHeight: true
             MyText{
+                id: value
                 anchors.fill: parent
                 customSize: 15
                 customText: root.customValue
@@ -74,7 +84,7 @@ Rectangle{
         }
         //desc
         Item{
-            //Layout.fillWidth: true
+            id: desc
             implicitWidth: 500
             Layout.fillHeight: true
             MyText{
