@@ -6,9 +6,7 @@ import QtQuick.Layouts
 Rectangle{
     id: root
     width: customWidth
-    height: name.lineCount>1 ? name.lineCount*(customHeight/2) :
-                               value.lineCount>1 ? value.lineCount*(customHeight/2) :
-                                                   desc.lineCount ? desc.lineCount*(customHeight/2) : customHeight
+    height: name.lineCount>1 ? name.lineCount*(customHeight/2) : value.lineCount>1 ? value.lineCount*(customHeight/2) : desc.lineCount ? desc.lineCount*(customHeight/2) : customHeight
     
     
     property int customWidth: 1000
@@ -113,5 +111,3 @@ Rectangle{
         }
     }
 }
-
-

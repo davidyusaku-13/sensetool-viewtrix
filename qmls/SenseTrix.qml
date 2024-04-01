@@ -697,7 +697,7 @@ Rectangle{
                                 acceptedDevices: PointerDevice.Mouse
                                 cursorShape: Qt.PointingHandCursor
                             }
-
+                            
                             onClicked: {
                                 window.manager.historyModel.clear()
                             }

@@ -10,4 +10,3 @@ QtObject {
   property string customName: ""
   property var customWorkspace: workspace1
 }
-
