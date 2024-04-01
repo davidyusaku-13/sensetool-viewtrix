@@ -188,10 +188,11 @@ class PrjSetModel(QAbstractListModel):
         }
         items_data = self.itemsData
         for item_data in items_data:
+            pName, pVal, pDesc, pState = item_data
             yaml_item = {
-                'name': item_data[0],
-                'value': item_data[1],
-                'desc': item_data[2]
+                'name': pName,
+                'value': pVal,
+                'desc': pDesc if pDesc != "" else None
             }
             yaml_data['data'].append(yaml_item)
         with open(file_name, 'w') as file:
@@ -206,7 +207,7 @@ class PrjSetModel(QAbstractListModel):
                 if isinstance(yaml_data['data'], list):
                     for item in yaml_data['data']:
                         pName = item['name']
-                        pVal = str(item['value'])
+                        pVal = item['value']
                         pDesc = item['desc'] if item['desc'] != None else ""
                         pState = "false"
                         self.addItem(pName, pVal, pDesc, pState)
