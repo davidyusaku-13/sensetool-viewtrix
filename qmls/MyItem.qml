@@ -14,6 +14,8 @@ Rectangle{
     property string customValue: "8"
     property string customDesc: "Queue deep value"
     property bool checkState: false
+    property alias dragArea: dragArea
+    required property var content
 
     signal checked(bool status)
     RowLayout{
@@ -90,10 +92,16 @@ Rectangle{
                 anchors.fill: parent
                 anchors.margins: 13
                 source: "images/drag"
-                HoverHandler {
-                    id: dragPointer
-                    acceptedDevices: PointerDevice.Mouse
+                MouseArea {
+                    id: dragArea
+
+                    anchors.fill: parent
+
+                    drag.target: pressed ? root.content: undefined
+                    drag.axis: Drag.YAxis
+
                     cursorShape: Qt.OpenHandCursor
+                    hoverEnabled: true
                 }
             }
         }

@@ -18,6 +18,10 @@ QtObject {
     {
         prjSetModel.edit(index, name, value, desc)
     }
+
+    function moveItem(source, dest){
+        prjSetModel.move(source, dest)
+    }
     
     function editState(index, state)
     {
