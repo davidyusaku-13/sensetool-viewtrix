@@ -12,20 +12,21 @@ Rectangle{
     property string customItem: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
     property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
     property string customDesc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
+    property alias dragArea: dragArea
+    property alias checkBox: checkBox
     required property var content
-    property alias checkState: checkBox.checked
-    signal selected(bool status)
+    // signal selected(bool status)
     RowLayout{
         anchors.fill: parent
         spacing: 0
         CheckBox{
             id: checkBox
+            Layout.margins: 7
             implicitWidth: 35
             implicitHeight: 35
-            Layout.margins: 7
-            onCheckedChanged: {
-                root.selected(checked)
-            }
+            // onCheckedChanged: {
+            //     root.selected(checked)
+            // }
         }
         //item
         ShadowRect{

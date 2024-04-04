@@ -262,14 +262,13 @@ StackLayout{
                                 customValue: model.value
                                 customDesc: model.desc
                                 content: itemDel
-                                checkState: DelegateModel.inSelected
-                                color: checkState ? "lightsteelblue": "transparent"
+                                checkBox.checked: DelegateModel.inSelected
+                                color: checkBox.checked ? "lightsteelblue": "transparent"
                                 Behavior on color { ColorAnimation { duration: 100 } }
-                                onSelected: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
                             }
                             DropArea {
                                 anchors.fill: parent
-                                onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index);print(drag.source.index, content.index)}
+                                onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
                             }
                         }
                     }
