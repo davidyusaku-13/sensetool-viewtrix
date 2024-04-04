@@ -32,8 +32,8 @@ Window {
             spacing: 10
             //yes
             Item{
-                width: 60
-                height: 30
+                implicitWidth: 60
+                implicitHeight: 30
                 MyText{
                     anchors.fill: parent
                     customText: "YES"
@@ -49,8 +49,8 @@ Window {
             }
             //no
             Item{
-                width: 60
-                height: 30
+                implicitWidth: 60
+                implicitHeight: 30
                 MyText{
                     anchors.fill: parent
                     customText: "NO"

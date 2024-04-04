@@ -5,106 +5,85 @@ import QtQuick.Layouts
 
 Item{
     id: root
-    width: customWidth
-    height: name.lineCount>1 ? name.lineCount*(customHeight/2) :
-                               value.lineCount>1 ? value.lineCount*(customHeight/2) :
-                                                   desc.lineCount ? desc.lineCount*(customHeight/2) : customHeight
-
-
-    property int customWidth: 1000
-    property int customHeight: 50
-    property string customItem: "OS_EVENT_QUEUE"
-    property string customValue: "8"
-    property string customDesc: "Queue deep value"
-    property bool checkState: false
-
-    signal checked(bool status)
+    width: 1000
+    height: name.lineCount>1 ? name.lineCount*(50/2) :
+    value.lineCount>1 ? value.lineCount*(50/2) :
+    desc.lineCount>1 ? desc.lineCount*(50/2) : 50
+    property string customItem: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
+    property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
+    property string customDesc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
+    signal selected(bool status)
     RowLayout{
         anchors.fill: parent
         spacing: 0
-        //checklist box
-        Item{
-            implicitWidth: 50
-            Layout.fillHeight: true
-            Button{
-                id: btn
-                implicitWidth: 25
-                implicitHeight: 25
-                anchors.centerIn: parent
-                background: Rectangle{
-<<<<<<< HEAD
-                    color: root.checkState ? "#000000" : "#ffffff"
-=======
-                    color: root.checkState ? "#000000": "#ffffff"
-                    Behavior on color { ColorAnimation { duration: 100 } }
->>>>>>> 14d5063a4139e7e57e33f7311424053db9c8f633
-                    radius: 3
-                    layer.enabled: true
-                    layer.effect: DropShadow{
-                        horizontalOffset: 0
-                        verticalOffset: 0
-                        radius: 3
-                        color: "#80000000"
-                    }
-                }
-                HoverHandler {
-                    acceptedDevices: PointerDevice.Mouse
-                    cursorShape: Qt.PointingHandCursor
-                }
-                onClicked: {
-                    root.checked(root.checkState)
-                }
+        CheckBox{
+            id: checkBox
+            implicitWidth: 35
+            implicitHeight: 35
+            Layout.margins: 7
+            onCheckedChanged: {
+                root.selected(checked)
             }
         }
         //item
-        Item{
+        ShadowRect{
             Layout.fillHeight: true
             Layout.fillWidth: true
-            MyText{
+            Text{
                 id: name
                 anchors.fill: parent
-                customSize: 15
-                customText: root.customItem
-                customRadius: 0
+                anchors.margins: 10
+                text: root.customItem
+                font.pixelSize: 15
+                font.family: "Montserrat Medium"
+                wrapMode: Text.Wrap
+                verticalAlignment: Text.AlignVCenter
             }
         }
         //value
-        Item{
-            Layout.fillWidth: true
+        ShadowRect{
             Layout.fillHeight: true
-            MyText{
+            Layout.fillWidth: true
+            Text{
                 id: value
                 anchors.fill: parent
-                customSize: 15
-                customText: root.customValue
-                customRadius: 0
+                anchors.margins: 10
+                text: root.customValue
+                font.pixelSize: 15
+                font.family: "Montserrat Medium"
+                wrapMode: Text.Wrap
+                verticalAlignment: Text.AlignVCenter
             }
         }
         //desc
-        Item{
-            id: desc
-            implicitWidth: 500
+        ShadowRect{
             Layout.fillHeight: true
-            MyText{
+            implicitWidth: parent.width*3/7
+            Text{
+                id: desc
                 anchors.fill: parent
-                customSize: 15
-                customText: root.customDesc
-                customRadius: 0
+                anchors.margins: 10
+                text: root.customDesc
+                font.pixelSize: 15
+                font.family: "Montserrat Medium"
+                wrapMode: Text.Wrap
+                verticalAlignment: Text.AlignVCenter
             }
         }
         //drag
-        Item{
-            implicitWidth: 50
-            Layout.fillHeight: true
-            Image{
-                anchors.fill: parent
-                anchors.margins: 13
-                source: "images/drag"
-                HoverHandler {
-                    id: dragPointer
-                    acceptedDevices: PointerDevice.Mouse
-                    cursorShape: Qt.OpenHandCursor
-                }
+        Button{
+            id: drag
+            Layout.margins: 7
+            flat: true
+            icon.source: "images/drag"
+            icon.color: "#d6d6d6"
+            padding: 0
+            background: Rectangle{
+                color: "transparent"
+            }
+            HoverHandler {
+                id: dragPointer
+                cursorShape: Qt.OpenHandCursor
             }
         }
     }

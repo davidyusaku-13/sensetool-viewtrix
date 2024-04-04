@@ -11,22 +11,37 @@ Window {
     maximumHeight: 500
 
     signal create(var object)
-    signal modify(var object)
+    signal modify(int index, var object)
 
-    property PrjSetItem object: PrjSetItem{}
+    property var object: ({
+                              name: "",
+                              value: "",
+                              desc: ""
+                          })
     property int index: -1
     property bool isEdit: false
+    property HoverHandler cursor: HoverHandler{
+        cursorShape: Qt.IBeamCursor
+    }
+    function reset(){
+        object = {
+            name: "",
+            value: "",
+            desc: ""
+        }
+    }
 
     function manage(i: int, model: var){
         if(i !== -1){
             isEdit = true
-            object.name = model.name
-            object.value = model.value
-            object.desc = model.desc
-
+            object = {
+                name: model.name,
+                value: model.value,
+                desc: model.desc
+            }
         }else {
             isEdit = false
-            object.reset()
+            root.reset()
         }
         index = i
         root.show()
@@ -35,7 +50,7 @@ Window {
         id: confirmWindow
         onSaved: (state) => {
                      if(state === true){
-                         root.modify(root.object)
+                         root.modify(root.index, root.object)
                          root.close()
                      }
                  }
@@ -61,6 +76,7 @@ Window {
                     anchors.fill: parent
                     text: root.object.name
                     onTextChanged: root.object.name = text
+
                     font.family: "Montserrat"
                     font.pixelSize: 17
                     wrapMode: Text.Wrap
@@ -133,19 +149,21 @@ Window {
                 implicitHeight: 30
                 enabled: (customText == "Add" && root.object.name === "") ? false : true
                 customRadius: 5
-                customText: root.isEdit === false ? "Add" : "Save"
+                customText: root.isEdit ? "Save" : "Add"
                 customTextColor: "#ffffff"
                 customSize: 15
                 customHAlignment: "Center"
                 customColor: ((isEdit === false && root.object.name !== "") || isEdit === true) ? "#000000" : "#8B8B8C"
                 customHoveredColor: ((isEdit === false && root.object.name !== "") || isEdit === true)  ? "#332C2B" : customColor
-
+                HoverHandler{
+                    cursorShape: Qt.PointingHandCursor
+                }
                 onClicked: {
                     if(root.isEdit == true){
                         confirmWindow.show()
                     }else{
                         root.create(root.object)
-                        root.object.reset()
+                        root.reset()
                         root.close()
                     }
                 }
@@ -161,7 +179,9 @@ Window {
                 customHAlignment: "Center"
                 customColor: "#000000"
                 customHoveredColor: "#332C2B"
-
+                HoverHandler{
+                    cursorShape: Qt.PointingHandCursor
+                }
                 onClicked: {
                     root.object.reset()
                     root.close()
