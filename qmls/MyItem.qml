@@ -13,6 +13,7 @@ Rectangle{
     property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
     property string customDesc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
     required property var content
+    property alias checkState: checkBox.checked
     signal selected(bool status)
     RowLayout{
         anchors.fill: parent
@@ -87,10 +88,10 @@ Rectangle{
                 }
             }
             MouseArea {
+                id: dragArea
                 anchors.fill: parent
                 drag.target: pressed ? root.content: undefined
                 drag.axis: Drag.YAxis
-                id: dragArea
                 cursorShape: Qt.OpenHandCursor
                 hoverEnabled: true
             }

@@ -198,19 +198,20 @@ StackLayout{
                                 id: selectedGroup
                                 name: "selected"}
                         ]
-                        delegate: MyItem{
-                            id: itemDel
-                            required property var model
-                            customItem: model.name
-                            customValue: model.value
-                            customDesc: model.desc
-                            width: ListView.view.width
-                            color: itemDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
-                            // status: itemDel.DelegateModel.inSelected
-                            onSelected: {
-                                itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
-                            }
-                        }
+                        // delegate: MyItem{
+                        //     id: itemDel
+                        //     required property var model
+                        //     customItem: model.name
+                        //     customValue: model.value
+                        //     customDesc: model.desc
+                        //     width: ListView.view.width
+                        //     color: itemDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
+                        //     // status: itemDel.DelegateModel.inSelected
+                        //     onSelected: {
+                        //         itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                        //     }
+                        // }
+                        delegate: dragDelegate
                     }
                     //footer
                     footerPositioning: ListView.OverlayFooter
@@ -225,6 +226,51 @@ StackLayout{
                             text: selectedGroup.count + " of " + itemModel.count + " selected"
                             font.pointSize: 12
                             font.family: "Montserrat SemiBold"
+                        }
+                    }
+                    Component {
+                        id: dragDelegate
+                        Rectangle {
+                            id: content
+                            required property var model
+                            required property int index
+                            width: ListView.view.width
+                            height: itemDel.height
+                            color: itemDel.dragArea.held ? "#d6d6d6": "white"
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            radius: 2
+                            MyItem{
+                                id: itemDel
+                                states: State {
+                                    when: itemDel.dragArea.pressed
+                                    ParentChange {
+                                        target: itemDel
+                                        parent: content.ListView.view
+                                    }
+                                }
+                                Drag.hotSpot.x: width / 2
+                                Drag.hotSpot.y: height / 2
+                                Drag.source: content
+                                Drag.active: itemDel.dragArea.pressed
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                }
+                                height: 50
+                                width: parent.width
+                                customItem: model.name
+                                customValue: model.value
+                                customDesc: model.desc
+                                content: itemDel
+                                checkState: DelegateModel.inSelected
+                                color: checkState ? "lightsteelblue": "transparent"
+                                Behavior on color { ColorAnimation { duration: 100 } }
+                                onSelected: (checkState) => {DelegateModel.inSelected = !DelegateModel.inSelected}
+                            }
+                            DropArea {
+                                anchors.fill: parent
+                                onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index);print(drag.source.index, content.index)}
+                            }
                         }
                     }
                 }
