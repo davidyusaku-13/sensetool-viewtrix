@@ -33,8 +33,24 @@ Rectangle{
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 //content
-                PrjSetPage{
+                StackLayout{
+                    id: layout
+                    function history(status, object){
+                        var temp = {
+                            "status": status,
+                            "name": object["name"],
+                            "value": object["value"],
+                            "desc": object["desc"]
+                        }
+                        historyList.append(temp)
+                    }
+                    SplitView.fillHeight: true
+                    SplitView.fillWidth: true
                     currentIndex: sidebar.index
+                    //project set workspace
+                    PrjSetPage{
+                    }
+                    ScanArrPage{}
                 }
                 //pop-up
                 PopUpPage{
