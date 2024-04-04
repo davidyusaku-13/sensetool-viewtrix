@@ -1,6 +1,6 @@
 import QtQuick
 import PrjSetModel
-import AppLogic
+import HistoryModel
 
 QtObject {
     id: manager

@@ -13,22 +13,11 @@ Window {
     signal create(var object)
     signal modify(int index, var object)
 
-    property var object: ({
-                              name: "",
-                              value: "",
-                              desc: ""
-                          })
+    property var object: PrjSetItem{}
     property int index: -1
     property bool isEdit: false
     property HoverHandler cursor: HoverHandler{
         cursorShape: Qt.IBeamCursor
-    }
-    function reset(){
-        object = {
-            name: "",
-            value: "",
-            desc: ""
-        }
     }
 
     function manage(i: int, model: var){
@@ -39,9 +28,10 @@ Window {
                 value: model.value,
                 desc: model.desc
             }
+            // window.manager.add(object.name, object.value, object.state, "false")
         }else {
             isEdit = false
-            root.reset()
+            root.object.reset()
         }
         index = i
         root.show()
@@ -147,7 +137,7 @@ Window {
             MyText2{
                 implicitWidth: root.isEdit === false ? 50 : 55
                 implicitHeight: 30
-                enabled: (customText == "Add" && root.object.name === "") ? false : true
+                // enabled: (customText == "Add" && root.object.name === "") ? false : true
                 customRadius: 5
                 customText: root.isEdit ? "Save" : "Add"
                 customTextColor: "#ffffff"
@@ -163,7 +153,7 @@ Window {
                         confirmWindow.show()
                     }else{
                         root.create(root.object)
-                        root.reset()
+                        root.object.reset()
                         root.close()
                     }
                 }
