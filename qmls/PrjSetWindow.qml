@@ -9,7 +9,7 @@ Window {
     minimumHeight: 500
     maximumWidth: 500
     maximumHeight: 500
-
+    
     signal create(var object)
     signal modify(int index, var object)
 

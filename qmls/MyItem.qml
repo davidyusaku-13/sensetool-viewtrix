@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 
-Item{
+Rectangle{
     id: root
     width: 1000
     height: name.lineCount>1 ? name.lineCount*(50/2) :
@@ -80,6 +80,13 @@ Item{
             padding: 0
             background: Rectangle{
                 color: "transparent"
+                MouseArea {
+                    anchors.fill: parent
+                    drag.target: pressed ? root.content: undefined
+                    drag.axis: Drag.YAxis
+                    id: dragArea
+                    cursorShape: Qt.OpenHandCursor
+                    hoverEnabled: true
             }
             HoverHandler {
                 id: dragPointer
@@ -88,5 +95,3 @@ Item{
         }
     }
 }
-
-

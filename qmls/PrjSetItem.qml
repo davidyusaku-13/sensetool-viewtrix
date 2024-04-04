@@ -6,7 +6,7 @@ QtObject{
     property string name
     property string value
     property string desc
-
+    
     function reset(){
         name = ""
         value = ""

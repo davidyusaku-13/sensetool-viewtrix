@@ -6,4 +6,3 @@ QtObject {
     property string customImage
     property string customName: ""
 }
-

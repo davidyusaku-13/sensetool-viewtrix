@@ -77,6 +77,52 @@ class PrjSetModel(QAbstractListModel):
             return self._items[index]
         return None
 
+    @Slot(int, int, result=bool)
+    def move(self, source: int, target: int):
+        """Slot to move a single row from source to target"""
+        return self.moveRow(QModelIndex(), source, QModelIndex(), target)
+
+    def moveRow(self, sourceParent, sourceRow, dstParent, dstChild):
+        """Move a single row"""
+        return self.moveRows(sourceParent, sourceRow, 0, dstParent, dstChild)
+
+    def moveRows(self, sourceParent, sourceRow, count, dstParent, dstChild):
+        """Move n rows (n=1+ count)  from sourceRow to dstChild"""
+
+        if sourceRow == dstChild:
+            return False
+
+        elif sourceRow > dstChild:
+            end = dstChild
+
+        else:
+            end = dstChild + 1
+
+        self.beginMoveRows(QModelIndex(), sourceRow,
+                           sourceRow + count, QModelIndex(), end)
+
+        pops = self._items[sourceRow: sourceRow + count + 1]
+        if sourceRow > dstChild:
+            self._items = (
+                self._items[:dstChild]
+                + pops
+                + self._items[dstChild:sourceRow]
+                + self._items[sourceRow + count + 1:]
+            )
+        else:
+            start = self._items[:sourceRow]
+            middle = self._items[dstChild: dstChild + 1]
+            endlist = self._items[dstChild + count + 1:]
+            self._items = start + middle + pops + endlist
+
+        self.endMoveRows()
+        return True
+
+    def flags(self) -> Qt.ItemFlag:
+        flag = super().flags()
+        flag |= Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
+        return flag
+
     @Slot(str, str, str, str)
     def addItem(self, name, value, desc, selectState):
         logger.log(f"Added item: {name} - {value} - {desc}", level)
@@ -142,14 +188,15 @@ class PrjSetModel(QAbstractListModel):
         }
         items_data = self.itemsData
         for item_data in items_data:
+            pName, pVal, pDesc, pState = item_data
             yaml_item = {
-                'name': item_data[0],
-                'value': item_data[1],
-                'desc': item_data[2]
+                'name': pName,
+                'value': pVal,
+                'desc': pDesc if pDesc != "" else None
             }
             yaml_data['data'].append(yaml_item)
         with open(file_name, 'w') as file:
-            yaml.dump(yaml_data, file)
+            yaml.dump(yaml_data, file, sort_keys=False)
 
     @Slot(QUrl)
     def importYAML(self, file: QUrl):
@@ -160,7 +207,7 @@ class PrjSetModel(QAbstractListModel):
                 if isinstance(yaml_data['data'], list):
                     for item in yaml_data['data']:
                         pName = item['name']
-                        pVal = str(item['value'])
+                        pVal = item['value']
                         pDesc = item['desc'] if item['desc'] != None else ""
                         pState = "false"
                         self.addItem(pName, pVal, pDesc, pState)

@@ -7,11 +7,11 @@ Window {
     width: 400
     height: 100
     title: "Warning"
-
+    
     signal saved(var state)
-
+    
     property bool state
-
+    
     ColumnLayout{
         anchors.fill: parent
         spacing: 10
