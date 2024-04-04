@@ -1,12 +1,13 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
+import QtQuick.Dialogs
 
 StackLayout{
     id: layout
-
-
-
+    
+    
+    
     function history(status, object){
         var temp = {
             "status": status,
@@ -16,7 +17,7 @@ StackLayout{
         }
         historyList.append(temp)
     }
-
+    
     SplitView.fillHeight: true
     SplitView.fillWidth: true
     //project set workspace
@@ -39,9 +40,35 @@ StackLayout{
                 implicitHeight: 25
                 ToolbarBtn{
                     text: "Import"
+                    onClicked: {
+                        dialogImport.open()
+                    }
+                }
+                FileDialog {
+                    id: dialogImport
+                    selectedNameFilter.index: 1
+                    fileMode: FileDialog.OpenFile
+                    nameFilters: ["YAML files (*.yaml *.yml)"]
+                    onAccepted: {
+                        window.manager.importYAML(selectedFile)
+                        window.manager.addHistory("Imported", selectedFile)
+                    }
                 }
                 ToolbarBtn{
                     text: "Export"
+                    onClicked: {
+                        dialogExport.open()
+                    }
+                }
+                FileDialog {
+                    id: dialogExport
+                    selectedNameFilter.index: 1
+                    fileMode: FileDialog.SaveFile
+                    nameFilters: ["YAML files (*.yaml *.yml)"]
+                    onAccepted: {
+                        window.manager.exportYAML(selectedFile)
+                        window.manager.addHistory("Exported", selectedFile)
+                    }
                 }
                 ToolbarBtn{
                     text: "Add"
@@ -65,9 +92,12 @@ StackLayout{
                     onClicked: {
                         for(let i = selectedGroup.count-1; i>=0; i--){
                             let itemSelected = selectedGroup.get(i)
-                            var object = itemList.get(itemSelected.itemsIndex)
-                            layout.history("Deleted", object)
-                            itemList.remove(itemSelected.itemsIndex)
+                            // var object = itemList.get(itemSelected.itemsIndex)
+                            // layout.history("Deleted", object)
+                            // itemList.remove(itemSelected.itemsIndex)
+                            var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
+                            window.manager.addHistory("Deleted", object.name, object.value, object.desc)
+                            window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
                         }
                     }
                 }
@@ -97,12 +127,17 @@ StackLayout{
                 PrjSetWindow{
                     id: prjSetWindow
                     onCreate: (object) => {
-                                  itemList.append(object);
-                                  layout.history("Added", object)
+                                  //   itemList.append(object);
+                                  //   layout.history("Added", object)
+                                  window.manager.add(object.name, object.value, object.desc)
+                                  window.manager.addHistory("Added", object.name, object.value, object.desc)
                               }
                     onModify: (index, object) => {
-                                  itemList.set(index, object);
-                                  layout.history("Modified", object)
+                                  //   itemList.set(index, object);
+                                  //   layout.history("Modified", object)
+                                  let i = selectedGroup.get(0).itemsIndex
+                                  window.manager.edit(root.i, object.name, object.value, object.desc)
+                                  window.manager.addHistory("Modified", object.name, object.value, object.desc)
                               }
                 }
             }
@@ -154,9 +189,10 @@ StackLayout{
                     //item list
                     model: DelegateModel{
                         id: itemModel
-                        model: ListModel{
-                            id: itemList
-                        }
+                        // model: ListModel{
+                        //     id: itemList
+                        // }
+                        model: window.manager.prjSetModel
                         groups: [
                             DelegateModelGroup {
                                 id: selectedGroup
@@ -169,6 +205,7 @@ StackLayout{
                             customValue: model.value
                             customDesc: model.desc
                             width: ListView.view.width
+                            color: itemDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
                             // status: itemDel.DelegateModel.inSelected
                             onSelected: {
                                 itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected

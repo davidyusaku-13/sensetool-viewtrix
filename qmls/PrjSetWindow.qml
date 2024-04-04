@@ -28,7 +28,6 @@ Window {
                 value: model.value,
                 desc: model.desc
             }
-            // window.manager.add(object.name, object.value, object.state, "false")
         }else {
             isEdit = false
             root.object.reset()

@@ -18,7 +18,8 @@ StackLayout{
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 clip: true
-                model: historyList
+                // model: historyList
+                model: window.manager.historyModel
                 //header
                 headerPositioning: ListView.OverlayHeader
                 header: Rectangle{
@@ -35,7 +36,8 @@ StackLayout{
                 delegate: Text{
                     required property var model
                     width: parent.width
-                    text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
+                    // text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
+                    text: model.history + "\n\n"
                     font.pixelSize: 15
                     font.family: "Montserrat Medium"
                     wrapMode: Text.WordWrap
