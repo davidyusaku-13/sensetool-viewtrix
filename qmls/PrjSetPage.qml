@@ -109,14 +109,14 @@ Item{
             PrjSetWindow{
                 id: prjSetWindow
                 onCreate: (object) => {
-                              //   itemList.append(object);
-                              //   layout.history("Added", object)
+                                // itemList.append(object);
+                                // layout.history("Added", object)
                               window.manager.add(object.name, object.value, object.desc)
                               window.manager.addHistory("Added", object.name, object.value, object.desc)
                           }
                 onModify: (index, object) => {
-                              //   itemList.set(index, object);
-                              //   layout.history("Modified", object)
+                                // itemList.set(index, object);
+                                // layout.history("Modified", object)
                               let i = selectedGroup.get(0).itemsIndex
                               window.manager.edit(i, object.name, object.value, object.desc)
                               window.manager.addHistory("Modified", object.name, object.value, object.desc)
@@ -134,7 +134,6 @@ Item{
                 interactive: true
                 clip: true
                 highlightMoveDuration: 1000
-                // highlightMoveVelocity: 1600
                 onCountChanged: {
                     currentIndex = count-1
                 }
@@ -176,28 +175,15 @@ Item{
                 //item list
                 model: DelegateModel{
                     id: itemModel
-                    // model: ListModel{
-                    //     id: itemList
-                    // }
-                    model: window.manager.prjSetModel
+                    model: ListModel{
+                        id: itemList
+                    }
+                    // model: window.manager.prjSetModel
                     groups: [
                         DelegateModelGroup {
                             id: selectedGroup
                             name: "selected"}
                     ]
-                    // delegate: MyItem{
-                    //     id: itemDel
-                    //     required property var model
-                    //     customItem: model.name
-                    //     customValue: model.value
-                    //     customDesc: model.desc
-                    //     width: ListView.view.width
-                    //     color: itemDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
-                    //     // status: itemDel.DelegateModel.inSelected
-                    //     onSelected: {
-                    //         itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
-                    //     }
-                    // }
                     delegate: dragDelegate
                 }
                 //footer
@@ -226,7 +212,7 @@ Item{
                         color: itemDel.dragArea.held ? "#d6d6d6": "white"
                         Behavior on color { ColorAnimation { duration: 100 } }
                         radius: 2
-                        MyItem{
+                        PrjSetItem{
                             id: itemDel
                             states: State {
                                 when: itemDel.dragArea.pressed

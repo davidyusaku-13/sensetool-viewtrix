@@ -109,7 +109,7 @@ class PrjSetModel(QAbstractListModel):
         flag |= Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
         return flag
 
-    @Slot(str, str, str, str)
+    @Slot(str, str, str)
     def addItem(self, name, value, desc):
         logger.log(f"Added item: {name} - {value} - {desc}", level)
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
@@ -156,7 +156,7 @@ class PrjSetModel(QAbstractListModel):
         }
         items_data = self.itemsData
         for item_data in items_data:
-            pName, pVal, pDesc, pState = item_data
+            pName, pVal, pDesc = item_data
             yaml_item = {
                 'name': pName,
                 'value': pVal,
@@ -177,19 +177,10 @@ class PrjSetModel(QAbstractListModel):
                         pName = item['name']
                         pVal = item['value']
                         pDesc = item['desc'] if item['desc'] != None else ""
-                        pState = "false"
-                        self.addItem(pName, pVal, pDesc, pState)
+                        self.addItem(pName, pVal, pDesc)
                 else:
                     print("Invalid YAML format. Expected a list.")
         except FileNotFoundError:
             print("File not found:", file)
         except yaml.YAMLError as e:
             print("Error loading YAML:", e)
-
-    @Property(QObject, constant=True)
-    def items(self):
-        return self
-
-    @Property(list, constant=True)
-    def itemsData(self):
-        return [(item.name, item.value, item.desc) for item in self._items]

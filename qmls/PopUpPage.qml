@@ -18,8 +18,8 @@ StackLayout{
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 clip: true
-                // model: historyList
-                model: window.manager.historyModel
+                model: historyList
+                // model: window.manager.historyModel
                 //header
                 headerPositioning: ListView.OverlayHeader
                 header: Rectangle{

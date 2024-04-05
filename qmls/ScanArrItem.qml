@@ -7,14 +7,6 @@ Rectangle{
     id: root
     width: 1000
     height: 75
-    // height: name.lineCount>1 ? name.lineCount*(50/2) :
-    //         value.lineCount>1 ? value.lineCount*(50/2) :
-    //         desc.lineCount>1 ? desc.lineCount*(50/2) : 50
-    // height: {
-    //     let lines = [name.lineCount, value.lineCount, desc.lineCount]
-    //     let maxLineCount = Math.max.apply(null, lines)
-    //     return maxLineCount > 1 ? maxLineCount * 25 : 50
-    // }
     Behavior on color { ColorAnimation { duration: 100 } }
     property string customItem: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
     property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"

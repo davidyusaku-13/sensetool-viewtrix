@@ -226,7 +226,7 @@ SplitView{
                             color: itemDel.dragArea.held ? "#d6d6d6": "white"
                             Behavior on color { ColorAnimation { duration: 100 } }
                             radius: 2
-                            MyItem{
+                            ScanArrItem{
                                 id: itemDel
                                 states: State {
                                     when: itemDel.dragArea.pressed
@@ -483,7 +483,7 @@ SplitView{
                             color: itemDel.dragArea.held ? "#d6d6d6": "white"
                             Behavior on color { ColorAnimation { duration: 100 } }
                             radius: 2
-                            MyItem{
+                            ScanArrItem{
                                 id: itemDel
                                 states: State {
                                     when: itemDel.dragArea.pressed
