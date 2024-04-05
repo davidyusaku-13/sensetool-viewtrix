@@ -15,7 +15,7 @@ Rectangle{
     property alias dragArea: dragArea
     property alias checkBox: checkBox
     required property var content
-    // signal selected(bool status)
+    signal selected(bool status)
     RowLayout{
         anchors.fill: parent
         spacing: 0
@@ -24,9 +24,9 @@ Rectangle{
             Layout.margins: 7
             implicitWidth: 35
             implicitHeight: 35
-            // onCheckedChanged: {
-            //     root.selected(checked)
-            // }
+            onClicked: {
+                root.selected(checked)
+            }
         }
         //item
         ShadowRect{

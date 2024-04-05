@@ -133,6 +133,11 @@ Item{
                 anchors.fill: parent
                 interactive: true
                 clip: true
+                // highlightMoveDuration: 1000
+                highlightMoveVelocity: 1600
+                onCountChanged: {
+                    currentIndex = count-1
+                }
                 //header
                 headerPositioning: ListView.OverlayHeader
                 header: RowLayout{
@@ -247,6 +252,9 @@ Item{
                             checkBox.checked: DelegateModel.inSelected
                             color: checkBox.checked ? "lightsteelblue": "transparent"
                             Behavior on color { ColorAnimation { duration: 100 } }
+                            onSelected: {
+                                DelegateModel.inSelected = !DelegateModel.inSelected
+                            }
                         }
                         DropArea {
                             anchors.fill: parent
