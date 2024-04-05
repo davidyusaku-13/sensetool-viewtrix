@@ -4,7 +4,7 @@ import HistoryModel
 
 QtObject {
     id: manager
-
+    
     required property PrjSetModel prjSetModel
     required property HistoryModel historyModel
     
@@ -42,7 +42,7 @@ QtObject {
     function importYAML(file){
         prjSetModel.importYAML(file)
     }
-
+    
     function clearHistory(){
         historyModel.clear()
     }

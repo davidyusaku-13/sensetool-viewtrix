@@ -7,8 +7,8 @@ Rectangle{
     id: root
     width: 1000
     height: name.lineCount>1 ? name.lineCount*(50/2) :
-            value.lineCount>1 ? value.lineCount*(50/2) :
-            desc.lineCount>1 ? desc.lineCount*(50/2) : 50
+                               value.lineCount>1 ? value.lineCount*(50/2) :
+                                                   desc.lineCount>1 ? desc.lineCount*(50/2) : 50
     property string customItem: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
     property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
     property string customDesc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"

@@ -12,7 +12,7 @@ Rectangle{
     ListModel{
         id: historyList
     }
-
+    
     ColumnLayout{
         anchors.fill: parent
         spacing: 1
@@ -35,21 +35,20 @@ Rectangle{
                 //content
                 StackLayout{
                     id: layout
-                    function history(status, object){
-                        var temp = {
-                            "status": status,
-                            "name": object["name"],
-                            "value": object["value"],
-                            "desc": object["desc"]
-                        }
-                        historyList.append(temp)
-                    }
+                    // function history(status, object){
+                    //     var temp = {
+                    //         "status": status,
+                    //         "name": object["name"],
+                    //         "value": object["value"],
+                    //         "desc": object["desc"]
+                    //     }
+                    //     historyList.append(temp)
+                    // }
                     SplitView.fillHeight: true
                     SplitView.fillWidth: true
                     currentIndex: sidebar.index
                     //project set workspace
-                    PrjSetPage{
-                    }
+                    PrjSetPage{}
                     ScanArrPage{}
                 }
                 //pop-up

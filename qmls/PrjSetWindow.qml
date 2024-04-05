@@ -12,14 +12,14 @@ Window {
     
     signal create(var object)
     signal modify(int index, var object)
-
+    
     property var object: PrjSetItem{}
     property int index: -1
     property bool isEdit: false
     property HoverHandler cursor: HoverHandler{
         cursorShape: Qt.IBeamCursor
     }
-
+    
     function manage(i: int, model: var){
         if(i !== -1){
             isEdit = true
@@ -65,7 +65,7 @@ Window {
                     anchors.fill: parent
                     text: root.object.name
                     onTextChanged: root.object.name = text
-
+                    
                     font.family: "Montserrat"
                     font.pixelSize: 17
                     wrapMode: Text.Wrap
