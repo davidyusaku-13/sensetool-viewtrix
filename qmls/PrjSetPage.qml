@@ -118,7 +118,7 @@ Item{
                               //   itemList.set(index, object);
                               //   layout.history("Modified", object)
                               let i = selectedGroup.get(0).itemsIndex
-                              window.manager.edit(root.i, object.name, object.value, object.desc)
+                              window.manager.edit(i, object.name, object.value, object.desc)
                               window.manager.addHistory("Modified", object.name, object.value, object.desc)
                           }
             }
@@ -243,7 +243,6 @@ Item{
                                 left: parent.left
                                 right: parent.right
                             }
-                            height: 50
                             width: parent.width
                             customItem: model.name
                             customValue: model.value

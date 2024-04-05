@@ -13,7 +13,7 @@ Window {
     signal create(var object)
     signal modify(int index, var object)
     
-    property var object: PrjSetItem{}
+    property PrjSetItem object: PrjSetItem{}
     property int index: -1
     property bool isEdit: false
     property HoverHandler cursor: HoverHandler{
@@ -23,11 +23,14 @@ Window {
     function manage(i: int, model: var){
         if(i !== -1){
             isEdit = true
-            object = {
-                name: model.name,
-                value: model.value,
-                desc: model.desc
-            }
+            // object = {
+            //     name: model.name,
+            //     value: model.value,
+            //     desc: model.desc
+            // }
+            object.name = model.name
+            object.value = model.value
+            object.desc = model.desc
         }else {
             isEdit = false
             root.object.reset()
@@ -40,6 +43,7 @@ Window {
         onSaved: (state) => {
                      if(state === true){
                          root.modify(root.index, root.object)
+                         root.object.reset()
                          root.close()
                      }
                  }

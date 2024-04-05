@@ -6,9 +6,14 @@ import QtQuick.Layouts
 Rectangle{
     id: root
     width: 1000
-    height: name.lineCount>1 ? name.lineCount*(50/2) :
-                               value.lineCount>1 ? value.lineCount*(50/2) :
-                                                   desc.lineCount>1 ? desc.lineCount*(50/2) : 50
+    // height: name.lineCount>1 ? name.lineCount*(50/2) :
+    //         value.lineCount>1 ? value.lineCount*(50/2) :
+    //         desc.lineCount>1 ? desc.lineCount*(50/2) : 50
+    height: {
+        let lines = [name.lineCount, value.lineCount, desc.lineCount]
+        let maxLineCount = Math.max.apply(null, lines)
+        return maxLineCount > 1 ? maxLineCount * 25 : 50
+    }
     property string customItem: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
     property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
     property string customDesc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
@@ -26,6 +31,9 @@ Rectangle{
             implicitHeight: 35
             onClicked: {
                 root.selected(checked)
+                print(name.lineCount)
+                print(value.lineCount)
+                print(desc.lineCount)
             }
         }
         //item
@@ -84,7 +92,6 @@ Rectangle{
             background: Rectangle{
                 color: "transparent"
                 HoverHandler {
-                    id: dragPointer
                     cursorShape: Qt.OpenHandCursor
                 }
             }
