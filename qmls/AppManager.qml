@@ -42,4 +42,8 @@ QtObject {
     function importYAML(file){
         prjSetModel.importYAML(file)
     }
+
+    function clearHistory(){
+        historyModel.clear()
+    }
 }

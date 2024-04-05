@@ -35,7 +35,7 @@ StackLayout{
                 }
                 delegate: Text{
                     required property var model
-                    width: parent.width
+                    width: ListView.view.width
                     // text: model.status+"(name: "+model.name+", value: "+model.value+", desc: "+model.desc+")"
                     text: model.history + "\n\n"
                     font.pixelSize: 15
@@ -47,7 +47,8 @@ StackLayout{
                 text: "Clear History"
                 Layout.margins: 10
                 onClicked: {
-                    historyList.clear()
+                    // historyList.clear()
+                    window.manager.clearHistory()
                 }
             }
         }
