@@ -77,7 +77,7 @@ Item{
                         // var object = itemList.get(itemSelected.itemsIndex)
                         // layout.history("Deleted", object)
                         // itemList.remove(itemSelected.itemsIndex)
-                        var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
+                        var object = itemSelected.model
                         window.manager.addHistory("Deleted", object.name, object.value, object.desc)
                         window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
                     }
@@ -133,8 +133,8 @@ Item{
                 anchors.fill: parent
                 interactive: true
                 clip: true
-                // highlightMoveDuration: 1000
-                highlightMoveVelocity: 1600
+                highlightMoveDuration: 1000
+                // highlightMoveVelocity: 1600
                 onCountChanged: {
                     currentIndex = count-1
                 }
@@ -250,7 +250,6 @@ Item{
                             content: itemDel
                             checkBox.checked: DelegateModel.inSelected
                             color: checkBox.checked ? "lightsteelblue": "transparent"
-                            Behavior on color { ColorAnimation { duration: 100 } }
                             onSelected: {
                                 DelegateModel.inSelected = !DelegateModel.inSelected
                             }

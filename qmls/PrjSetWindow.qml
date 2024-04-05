@@ -141,13 +141,14 @@ Window {
                 implicitWidth: root.isEdit === false ? 50 : 55
                 implicitHeight: 30
                 // enabled: (customText == "Add" && root.object.name === "") ? false : true
+                enabled: itemInput.acceptableInput && valueInput.acceptableInput
                 customRadius: 5
                 customText: root.isEdit ? "Save" : "Add"
                 customTextColor: "#ffffff"
                 customSize: 15
                 customHAlignment: "Center"
-                customColor: ((isEdit === false && root.object.name !== "") || isEdit === true) ? "#000000" : "#8B8B8C"
-                customHoveredColor: ((isEdit === false && root.object.name !== "") || isEdit === true)  ? "#332C2B" : customColor
+                customColor: enabled ? "#000000" : "#8B8B8C"
+                customHoveredColor: enabled  ? "#332C2B" : customColor
                 HoverHandler{
                     cursorShape: Qt.PointingHandCursor
                 }

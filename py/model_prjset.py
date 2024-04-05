@@ -14,12 +14,11 @@ level = logger.level("INFO")
 
 @QmlElement
 class PrjSetModelItem(QObject):
-    def __init__(self, name, value, desc, selectState, parent=None):
+    def __init__(self, name, value, desc, parent=None):
         super().__init__(parent)
         self._name = name
         self._value = value
         self._desc = desc
-        self._selectState = selectState
 
     @Property(str)
     def name(self):
@@ -33,14 +32,9 @@ class PrjSetModelItem(QObject):
     def desc(self):
         return self._desc
 
-    @Property(str)
-    def selectState(self):
-        return self._selectState
-
 
 @QmlElement
 class PrjSetModel(QAbstractListModel):
-    dataChanged = Signal(QModelIndex, QModelIndex)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -52,30 +46,22 @@ class PrjSetModel(QAbstractListModel):
     def data(self, index, role=Qt.DisplayRole):
         if not (0 <= index.row() < len(self._items)):
             return
+        row = self._items[index.row()]
         if role == Qt.DisplayRole:
-            return self._items[index.row()].name
+            return row.name
         elif role == Qt.UserRole + 1:
-            return self._items[index.row()].value
+            return row.value
         elif role == Qt.UserRole + 2:
-            return self._items[index.row()].desc
-        elif role == Qt.UserRole + 3:
-            return self._items[index.row()].selectState
+            return row.desc
 
     def roleNames(self):
         roles = super().roleNames()
         roles.update({
             Qt.DisplayRole: b"name",
             Qt.UserRole + 1: b"value",
-            Qt.UserRole + 2: b"desc",
-            Qt.UserRole + 3: b"selectState"
+            Qt.UserRole + 2: b"desc"
         })
         return roles
-
-    @Slot(int, result=QObject)
-    def get(self, index):
-        if 0 <= index < len(self._items):
-            return self._items[index]
-        return None
 
     @Slot(int, int, result=bool)
     def move(self, source: int, target: int):
@@ -124,10 +110,10 @@ class PrjSetModel(QAbstractListModel):
         return flag
 
     @Slot(str, str, str, str)
-    def addItem(self, name, value, desc, selectState):
+    def addItem(self, name, value, desc):
         logger.log(f"Added item: {name} - {value} - {desc}", level)
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
-        item = PrjSetModelItem(name, value, desc, selectState, self)
+        item = PrjSetModelItem(name, value, desc, self)
         self._items.append(item)
         self.endInsertRows()
 
@@ -150,24 +136,6 @@ class PrjSetModel(QAbstractListModel):
             self.beginRemoveRows(QModelIndex(), index, index)
             del self._items[index]
             self.endRemoveRows()
-
-    @Slot(int, str)
-    def editState(self, index, new_state):
-        if 0 <= index < len(self._items):
-            self._items[index]._selectState = new_state
-            self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
-
-    @Slot()
-    def deselectAll(self):
-        for i, item in enumerate(self._items):
-            item._selectState = "false"
-            self.dataChanged.emit(self.index(i, 0), self.index(i, 0))
-
-    @Slot()
-    def selectAll(self):
-        for i, item in enumerate(self._items):
-            item._selectState = "true"
-            self.dataChanged.emit(self.index(i, 0), self.index(i, 0))
 
     @Slot()
     def clear(self):
@@ -224,4 +192,4 @@ class PrjSetModel(QAbstractListModel):
 
     @Property(list, constant=True)
     def itemsData(self):
-        return [(item.name, item.value, item.desc, item.selectState) for item in self._items]
+        return [(item.name, item.value, item.desc) for item in self._items]
