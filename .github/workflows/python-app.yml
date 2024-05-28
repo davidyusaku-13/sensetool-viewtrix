@@ -6,29 +6,57 @@ name: Python application
 on:
   push:
     branches: ["develop"]
-  pull_request:
-    branches: ["develop"]
 
 permissions:
   contents: read
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
         with:
-          python-version: "3.10"
+          version: "6.7.0"
+          host: "windows"
+          target: "desktop"
+          arch: "win64_mingw"
+          modules: "debug_information qt3d debug_information qtactiveqt debug_information qtcharts debug_information qtconnectivity debug_information qtdatavis3d debug_information qtgraphs debug_information qtgrpc debug_information qthttpserver debug_information qtimageformats debug_information qtlanguageserver debug_information qtlocation debug_information qtlottie debug_information qtmultimedia debug_information qtnetworkauth qtpdf debug_information qtpositioning debug_information qtquick3dphysics debug_information qtquickeffectmaker debug_information qtremoteobjects debug_information qtscxml debug_information qtsensors debug_information qtserialbus debug_information qtserialport debug_information qtspeech debug_information qtvirtualkeyboard debug_information qtwebchannel debug_information qtwebsockets debug_information qtwebview debug_info debug_information qt5compat debug_information qtquick3d debug_information qtquicktimeline debug_information qtshadertools"
+          dir: "${{ github.workspace }}/Qt/"
+          install-deps: "true"
+
+      - name: Add qmltestrunner to path
+        run: |
+          echo ${{ github.workspace }}/Qt/6.7.0/win64_mingw/bin >> ${{ github.path }}
+
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
           pip install invoke
-          python -m venv env
-          source env/bin/activate
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Test with pytest
+          pip install -r requirements.txt
+
+      - name: Invoke Test
         run: |
           invoke test
+
+      - name: Deploy App
+        run: |
+          invoke deploy
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
