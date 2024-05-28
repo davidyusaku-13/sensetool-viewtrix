@@ -6,7 +6,7 @@ def build(c):
 @task
 def test(c):
     c.run("python -m unittest -v")
-    c.run("qmltestrunner")
+    c.run("qmltestrunner.exe")
 @task
 def run(c):
     build(c)
@@ -19,4 +19,4 @@ def clean(c, bytecode=False, extra=''):
 @task
 def deploy(c):
     build(c)
-    c.run("pyside6-deploy")
+    c.run("pyside6-deploy -f")

@@ -5,27 +5,35 @@ import "../components"
 
 ShadowRect{
     id: sidebar
-    implicitWidth: 50
+    Layout.preferredWidth: 50
     Layout.fillHeight: true
     transitions: [
         Transition {
             NumberAnimation {
-                properties: "width,opacity"
+                properties: "x,visible"
                 duration: 200
             }
         }
     ]
     readonly property alias index: sidebarList.currentIndex
     property bool folded: false
-    state: !folded ? "Visible" : "Invisible"
+    state: folded ? "Invisible" : "Visible"
     states: [
         State{
             name: "Visible"
-            PropertyChanges{target: sidebar; width: 50; visible: true}
+            PropertyChanges{
+                target: sidebar
+                x: 0
+                visible: true
+            }
         },
         State{
             name:"Invisible"
-            PropertyChanges{target: sidebar; width: 0.0; visible: false}
+            PropertyChanges{
+                target: sidebar
+                x: -sidebar.width
+                visible: false
+            }
         }
     ]
     SideBarList{
