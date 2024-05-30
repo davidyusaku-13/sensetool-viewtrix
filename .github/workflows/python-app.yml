@@ -26,7 +26,7 @@ jobs:
           host: "windows"
           target: "desktop"
           arch: "win64_mingw"
-          modules: "debug_information qt3d debug_information qtactiveqt debug_information qtcharts debug_information qtconnectivity debug_information qtdatavis3d debug_information qtgraphs debug_information qtgrpc debug_information qthttpserver debug_information qtimageformats debug_information qtlanguageserver debug_information qtlocation debug_information qtlottie debug_information qtmultimedia debug_information qtnetworkauth qtpdf debug_information qtpositioning debug_information qtquick3dphysics debug_information qtquickeffectmaker debug_information qtremoteobjects debug_information qtscxml debug_information qtsensors debug_information qtserialbus debug_information qtserialport debug_information qtspeech debug_information qtvirtualkeyboard debug_information qtwebchannel debug_information qtwebsockets debug_information qtwebview debug_info debug_information qt5compat debug_information qtquick3d debug_information qtquicktimeline debug_information qtshadertools"
+          modules: "qt3d qtcharts qtconnectivity qtdatavis3d qtgraphs qtgrpc qthttpserver qtimageformats qtlanguageserver qtlocation qtlottie qtmultimedia qtnetworkauth qtpdf qtpositioning qtquick3dphysics qtquickeffectmaker qtremoteobjects qtscxml qtsensors qtserialbus qtserialport qtspeech qtvirtualkeyboard qtwebchannel qtwebsockets qtwebview debug_info qt5compat qtquick3d qtquicktimeline qtshadertools"
           dir: "${{ github.workspace }}/Qt/"
           install-deps: "true"
 
