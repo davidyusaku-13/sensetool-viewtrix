@@ -86,9 +86,12 @@ ShadowRect{
                 onClicked: {
                     for(let i = selectedGroup.count-1; i>=0; i--){
                         let itemSelected = selectedGroup.get(i)
-                        var object = itemList.get(itemSelected.itemsIndex)
-                        layout.history("Deleted", object)
-                        itemList.remove(itemSelected.itemsIndex)
+                        // var object = itemList.get(itemSelected.itemsIndex)
+                            // layout.history("Deleted", object)
+                            // itemList.remove(itemSelected.itemsIndex)
+                            var object = itemSelected.model
+                            window.manager.addHistory("Deleted", object.name, object.value, object.desc)
+                            window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
                     }
                 }
             }
@@ -118,13 +121,18 @@ ShadowRect{
             PrjSetWindow{
                 id: prjSetWindow
                 onCreate: (object) => {
-                              itemList.append(object);
-                              layout.history("Added", object)
+                              // itemList.append(object);
+                                  // layout.history("Added", object)
+                                  window.manager.add(object.name, object.value, object.desc)
+                                  window.manager.addHistory("Added", object.name, object.value, object.desc)
                           }
                 onModify: (index, object) => {
-                              itemList.set(index, object);
-                              layout.history("Modified", object)
-                          }
+                                // itemList.set(index, object);
+                                // layout.history("Modified", object)
+                                let i = selectedGroup.get(0).itemsIndex
+                                window.manager.edit(i, object.name, object.value, object.desc)
+                                window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                              }
             }
         }
         //project set rect
@@ -136,9 +144,14 @@ ShadowRect{
                 anchors.fill: parent
                 interactive: true
                 clip: true
+                highlightMoveDuration: 1000
+                    onCountChanged: {
+                        currentIndex = count-1
+                    }
                 //header
                 headerPositioning: ListView.OverlayHeader
                 header: RowLayout{
+                        id: workspace1Header
                     width: parent.width
                     height: 35
                     spacing: 0
@@ -174,9 +187,10 @@ ShadowRect{
                 //item list
                 model: DelegateModel{
                     id: itemModel
-                    model: ListModel{
-                        id: itemList
-                    }
+                    // model: ListModel{
+                        //     id: itemList
+                        // }
+                        model: window.manager.prjSetModel
                     groups: [
                         DelegateModelGroup {
                             id: selectedGroup
@@ -195,7 +209,25 @@ ShadowRect{
                     //     }
                     // }
                     delegate: dragDelegate
-                    Component {
+                    
+                }
+                //footer
+                footerPositioning: ListView.OverlayFooter
+                footer: ShadowRect{
+                        id: workspace1Footer
+                    width: parent.width
+                    height: 35
+                    color: Material.accent
+                    z: 2
+                    Text{
+                        anchors.centerIn: parent
+                        text: selectedGroup.count + " of " + itemModel.count + " selected"
+                        font.pointSize: 12
+                        font.family: "Montserrat SemiBold"
+                        color: Material.foreground
+                    }
+                }
+                Component {
                         id: dragDelegate
                         Rectangle {
                             id: content
@@ -224,9 +256,9 @@ ShadowRect{
                                     right: parent.right
                                 }
                                 width: parent.width
-                                customItem: model.name
-                                customValue: model.value
-                                customDesc: model.desc
+                                name: model.name
+                                value: model.value
+                                desc: model.desc
                                 content: itemDel
                                 checkBox.checked: DelegateModel.inSelected
                                 onSelected: {
@@ -239,22 +271,6 @@ ShadowRect{
                             }
                         }
                     }
-                }
-                //footer
-                footerPositioning: ListView.OverlayFooter
-                footer: ShadowRect{
-                    width: parent.width
-                    height: 35
-                    color: Material.accent
-                    z: 2
-                    Text{
-                        anchors.centerIn: parent
-                        text: selectedGroup.count + " of " + itemModel.count + " selected"
-                        font.pointSize: 12
-                        font.family: "Montserrat SemiBold"
-                        color: Material.foreground
-                    }
-                }
             }
         }
     }

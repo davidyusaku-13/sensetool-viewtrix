@@ -71,6 +71,9 @@ Window {
                     autoScroll: false
                     selectByMouse: true
                     validator: RegularExpressionValidator {regularExpression: /[0-9A-Z_]+/}
+                    HoverHandler {
+                        cursorShape: Qt.IBeamCursor
+                    }
                 }
             }
         }
@@ -98,6 +101,9 @@ Window {
                     autoScroll: false
                     selectByMouse: true
                     validator: RegularExpressionValidator {regularExpression: /[0-9a-zA-Z*()_" "<>+-/:?]+/}
+                    HoverHandler {
+                        cursorShape: Qt.IBeamCursor
+                    }
                 }
             }
         }

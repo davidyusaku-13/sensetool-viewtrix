@@ -6,14 +6,15 @@ def build(c):
 @task
 def test(c):
     c.run("python -m unittest -v")
-    c.run("qmltestrunner.exe")
+    c.run("qmltestrunner.exe -o qmltestres.txt")
+    c.run("cat qmltestres.txt")
 @task
 def run(c):
     build(c)
     c.run("python main.py")
 @task
 def clean(c, bytecode=False, extra=''):
-    patterns = ['deployed']
+    patterns = ['main.exe']
     for pattern in patterns:
         c.run("del {}".format(pattern))
 @task
