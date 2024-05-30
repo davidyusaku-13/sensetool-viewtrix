@@ -5,7 +5,7 @@ import QtQuick.Dialogs
 import "../../components"
 
 //project set workspace
-Item{
+ShadowRect{
     id: layout
     Layout.fillHeight: true
     Layout.fillWidth: true
@@ -182,16 +182,61 @@ Item{
                             id: selectedGroup
                             name: "selected"}
                     ]
-                    delegate: PrjSetItem{
-                        id: itemDel
-                        required property var model
-                        name: model.name
-                        value: model.value
-                        desc: model.desc
-                        width: ListView.view.width
-                        checkBox.checked: DelegateModel.inSelected
-                        onSelected: {
-                            DelegateModel.inSelected = !DelegateModel.inSelected
+                    // delegate: PrjSetItem{
+                    //     id: itemDel
+                    //     required property var model
+                    //     name: model.name
+                    //     value: model.value
+                    //     desc: model.desc
+                    //     width: ListView.view.width
+                    //     checkBox.checked: DelegateModel.inSelected
+                    //     onSelected: {
+                    //         DelegateModel.inSelected = !DelegateModel.inSelected
+                    //     }
+                    // }
+                    delegate: dragDelegate
+                    Component {
+                        id: dragDelegate
+                        Rectangle {
+                            id: content
+                            required property var model
+                            required property int index
+                            width: ListView.view.width
+                            height: itemDel.height
+                            color: itemDel.dragArea.held ? Material.foreground : Material.background
+                            Behavior on color { ColorAnimation { duration: 100 } }
+                            radius: 2
+                            PrjSetItem{
+                                id: itemDel
+                                states: State {
+                                    when: itemDel.dragArea.pressed
+                                    ParentChange {
+                                        target: itemDel
+                                        parent: content.ListView.view
+                                    }
+                                }
+                                Drag.hotSpot.x: width / 2
+                                Drag.hotSpot.y: height / 2
+                                Drag.source: content
+                                Drag.active: itemDel.dragArea.pressed
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                }
+                                width: parent.width
+                                customItem: model.name
+                                customValue: model.value
+                                customDesc: model.desc
+                                content: itemDel
+                                checkBox.checked: DelegateModel.inSelected
+                                onSelected: {
+                                    DelegateModel.inSelected = !DelegateModel.inSelected
+                                }
+                            }
+                            DropArea {
+                                anchors.fill: parent
+                                onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
+                            }
                         }
                     }
                 }
