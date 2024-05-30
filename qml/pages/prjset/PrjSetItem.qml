@@ -1,20 +1,19 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import Qt5Compat.GraphicalEffects
+//import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 import "../../components"
 
-Rectangle{
+Item{
     id: root
     width: 1000
-    height: 75
-    Behavior on color { ColorAnimation { duration: 100 } }
-    property string customItem: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
-    property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
-    property string customDesc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
-    property alias dragArea: dragArea
+    height: name.lineCount>1 ? name.lineCount*(35/2) :
+    value.lineCount>1 ? value.lineCount*35 :
+    desc.lineCount>1 ? desc.lineCount*(35/2) : 35
+    property string name: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
+    property string value: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
+    property string desc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
     property alias checkBox: checkBox
-    required property var content
     signal selected(bool status)
     RowLayout{
         anchors.fill: parent
@@ -25,9 +24,6 @@ Rectangle{
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             CheckBox{
                 id: checkBox
-                // Layout.margins: 7
-                // implicitWidth: 35
-                // implicitHeight: 35
                 anchors.centerIn: parent
                 onClicked: {
                     root.selected(checked)
@@ -42,7 +38,7 @@ Rectangle{
                 id: name
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.customItem
+                text: root.name
                 color: Material.foreground
                 font.pixelSize: 15
                 font.family: "Montserrat Medium"
@@ -58,7 +54,7 @@ Rectangle{
                 id: value
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.customValue
+                text: root.value
                 color: Material.foreground
                 font.pixelSize: 15
                 font.family: "Montserrat Medium"
@@ -74,7 +70,7 @@ Rectangle{
                 id: desc
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.customDesc
+                text: root.desc
                 color: Material.foreground
                 font.pixelSize: 15
                 font.family: "Montserrat Medium"
@@ -92,18 +88,15 @@ Rectangle{
                 anchors.centerIn: parent
                 // Layout.margins: 7
                 flat: true
-                icon.source: "qrc:/images/drag"
-                icon.color: "#d6d6d6"
+                icon.source: "../../images/drag"
+                icon.color: Material.foreground
                 padding: 0
-                MouseArea {
-                    id: dragArea
-                    anchors.fill: parent
-                    drag.target: pressed ? root.content: undefined
-                    drag.axis: Drag.YAxis
-                    cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-                    hoverEnabled: true
+                HoverHandler {
+                    cursorShape: Qt.OpenHandCursor
                 }
             }
         }
     }
 }
+
+
