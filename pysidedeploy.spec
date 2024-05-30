@@ -5,15 +5,17 @@ title = SenseTool
 # of input_file
 project_dir = .
 # source file path
-input_file = D:\Kuliah\Viewtrix\app-viewtrix\main.py
+# input_file = D:/Kuliah/Viewtrix/app-viewtrix/main.py
+input_file = ./main.py
 # directory where exec is stored
-exec_directory = .\deployed\
+exec_directory = ./deployed/
 # application icon
-icon = D:\Kuliah\Viewtrix\app-viewtrix\env\Lib\site-packages\PySide6\scripts\deploy_lib\pyside_icon.ico
+icon = ./env/Lib/site-packages/PySide6/scripts/deploy_lib/pyside_icon.ico
 
 [python]
 # python path
-python_path = D:\Kuliah\Viewtrix\app-viewtrix\env\Scripts\python.exe
+# python_path = ./env/Scripts/python.exe
+python_path = ./env/Scripts/python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization
@@ -26,7 +28,7 @@ qml_files = qml/AppManager.qml,qml/main.qml,qml/sensetrix.qml,qml/pages/hwutil/c
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated
-modules = QmlModels,Network,QuickTemplates2,Widgets,Quick,Core,QuickControls2,OpenGL,Gui,Qml
+modules = QuickControls2,QmlModels,Qml,Gui,OpenGL,Widgets,QuickTemplates2,Quick,Core,Network
 # qt plugins used by the application
 plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmltooling,egldeviceintegrations,xcbglintegrations,iconengines,networkinformation,scenegraph,styles,networkaccess,platforms,generic,platforminputcontexts
 
