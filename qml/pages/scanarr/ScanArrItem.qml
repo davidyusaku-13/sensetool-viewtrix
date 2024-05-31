@@ -9,9 +9,9 @@ Rectangle{
     width: 1000
     height: 75
     Behavior on color { ColorAnimation { duration: 100 } }
-    property string customItem: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
-    property string customValue: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
-    property string customDesc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
+    property string name: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
+    property string value: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
+    property string desc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
     property alias dragArea: dragArea
     property alias checkBox: checkBox
     required property var content
@@ -36,7 +36,7 @@ Rectangle{
                 id: name
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.customItem
+                text: root.name
                 font.pixelSize: 15
                 font.family: "Montserrat Medium"
                 wrapMode: Text.Wrap
@@ -51,7 +51,7 @@ Rectangle{
                 id: value
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.customValue
+                text: root.value
                 font.pixelSize: 15
                 font.family: "Montserrat Medium"
                 wrapMode: Text.Wrap
@@ -66,7 +66,7 @@ Rectangle{
                 id: desc
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.customDesc
+                text: root.desc
                 font.pixelSize: 15
                 font.family: "Montserrat Medium"
                 wrapMode: Text.Wrap

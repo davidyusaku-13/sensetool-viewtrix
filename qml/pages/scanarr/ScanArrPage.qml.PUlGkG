@@ -1,0 +1,276 @@
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts
+import "components"
+import "pages"
+
+SplitView{
+    Layout.fillHeight: true
+    Layout.fillWidth: true
+    //project set workspace 1
+    Item{
+        SplitView.fillHeight: true
+        SplitView.fillWidth: true
+        MouseArea{
+            anchors.fill: parent
+            onClicked:{
+                sidebar.folded = true
+            }
+        }
+        ColumnLayout{
+            anchors.fill: parent
+            anchors.margins: 20
+            spacing: 10
+            //toolbar
+            RowLayout{
+                Layout.fillWidth: true
+                implicitHeight: 25
+                ToolbarBtn{
+                    text: "Import"
+                }
+                ToolbarBtn{
+                    text: "Export"
+                }
+                ToolbarBtn{
+                    text: "Add"
+                    onClicked: {
+                        prjSetWindow.manage(-1,null)
+                    }
+                }
+                ToolbarBtn{
+                    text: "Edit"
+                    enabled: selectedGroup.count === 1
+                    onClicked: {
+                        if(selectedGroup.count === 1){
+                            var selected = selectedGroup.get(0)
+                            prjSetWindow.manage(selected.itemsIndex, selected.model)
+                        }
+                    }
+                }
+                ToolbarBtn{
+                    text: "Delete"
+                    enabled: selectedGroup.count > 0
+                    onClicked: {
+                        for(let i = selectedGroup.count-1; i>=0; i--){
+                            let itemSelected = selectedGroup.get(i)
+                            var object = itemList.get(itemSelected.itemsIndex)
+                            layout.history("Deleted", object)
+                            itemList.remove(itemSelected.itemsIndex)
+                        }
+                    }
+                }
+                Item{
+                    Layout.fillWidth: true
+                }
+                ToolbarBtn{
+                    text: "Select All"
+                    onClicked: {
+                        for(var i=0; i< itemModel.items.count; i++){
+                            if(!itemModel.items.get(i).inSelected){
+                                itemModel.items.get(i).inSelected = true
+                            }
+                        }
+                    }
+                }
+                ToolbarBtn{
+                    text: "Deselect All"
+                    onClicked: {
+                        for(var i=0; i< itemModel.items.count; i++){
+                            if(itemModel.items.get(i).inSelected){
+                                itemModel.items.get(i).inSelected = false
+                            }
+                        }
+                    }
+                }
+                PrjSetWindow{
+                    id: prjSetWindow
+                    onCreate: (object) => {
+                                  itemList.append(object);
+                                  layout.history("Added", object)
+                              }
+                    onModify: (index, object) => {
+                                  itemList.set(index, object);
+                                  layout.history("Modified", object)
+                              }
+                }
+            }
+            //scan arr rect
+            ShadowRect{
+                id: scanArrContent
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: "white"
+                ListView{
+                    anchors.fill: parent
+                    interactive: true
+                    clip: true
+                    //header
+                    headerPositioning: ListView.OverlayHeader
+                    header: RowLayout{
+                        width: parent.width
+                        height: 50
+                        spacing: 0
+                        z: 2
+                        Rectangle{
+                            implicitWidth: 50
+                            Layout.fillHeight: true
+                            color: "#d6d6d6"
+                        }
+                        Repeater{
+                            model: ["Scan Name", "Description"]
+                            Rectangle{
+                                required property string modelData
+                                Layout.fillHeight: true
+                                Layout.fillWidth: modelData === "Scan Name" ? false : true
+                                implicitWidth: modelData === "Scan Name" ? parent.width*2/7 : 0
+                                color: "#d6d6d6"
+                                Text {
+                                    text: parent.modelData
+                                    anchors.centerIn: parent
+                                    font.pointSize: 15
+                                    font.family: "Montserrat SemiBold"
+                                }
+                            }
+                        }
+                        Rectangle{
+                            implicitWidth: 50
+                            Layout.fillHeight: true
+                            color: "#d6d6d6"
+                        }
+                    }
+                    //item list
+                    model: DelegateModel{
+                        id: itemModel
+                        model: ListModel{
+                            id: itemList
+                        }
+                        groups: [
+                            DelegateModelGroup {
+                                id: selectedGroup
+                                name: "selected"}
+                        ]
+                        delegate: ScanArrItem{
+                            id: itemDel
+                            required property var model
+                            scanName: model.name
+                            desc: model.desc
+                            width: ListView.view.width
+                            // status: itemDel.DelegateModel.inSelected
+                            onSelected: {
+                                itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                            }
+                        }
+                    }
+                    //footer
+                    footerPositioning: ListView.OverlayFooter
+                    footer: Rectangle{
+                        width: parent.width
+                        height: 35
+                        color: "#d6d6d6"
+                        z: 2
+                        Text{
+                            anchors.centerIn: parent
+                            text: selectedGroup.count + " of " + itemModel.count + " selected"
+                            font.pointSize: 12
+                            font.family: "Montserrat SemiBold"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //project set workspace 2
+    Item{
+        SplitView.fillHeight: true
+        SplitView.fillWidth: true
+        MouseArea{
+            anchors.fill: parent
+            onClicked:{
+                sidebar.folded = true
+            }
+        }
+        //scan arr rect
+        ShadowRect{
+            id: scanArrNumber
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            color: "white"
+            ListView{
+                anchors.fill: parent
+                interactive: true
+                clip: true
+                //header
+                headerPositioning: ListView.OverlayHeader
+                header: RowLayout{
+                    width: parent.width
+                    height: 50
+                    spacing: 0
+                    z: 2
+                    Rectangle{
+                        implicitWidth: 50
+                        Layout.fillHeight: true
+                        color: "#d6d6d6"
+                    }
+                    Repeater{
+                        model: ["Scan Name", "Description"]
+                        Rectangle{
+                            required property string modelData
+                            Layout.fillHeight: true
+                            Layout.fillWidth: modelData === "Scan Name" ? false : true
+                            implicitWidth: modelData === "Scan Name" ? parent.width*2/7 : 0
+                            color: "#d6d6d6"
+                            Text {
+                                text: parent.modelData
+                                anchors.centerIn: parent
+                                font.pointSize: 15
+                                font.family: "Montserrat SemiBold"
+                            }
+                        }
+                    }
+                    Rectangle{
+                        implicitWidth: 50
+                        Layout.fillHeight: true
+                        color: "#d6d6d6"
+                    }
+                }
+                //item list
+                model: DelegateModel{
+                    id: itemModelscan
+                    model: ListModel{
+                        id: itemListscan
+                    }
+                    groups: [
+                        DelegateModelGroup {
+                            id: selectedGroupscan
+                            name: "selected"}
+                    ]
+                    delegate: ScanArrItem{
+                        id: itemDelscan
+                        required property var model
+                        scanName: model.name
+                        desc: model.desc
+                        width: ListView.view.width
+                        // status: itemDelscan.DelegateModel.inSelected
+                        onSelected: {
+                            itemDelscan.DelegateModel.inSelected = !itemDelscan.DelegateModel.inSelected
+                        }
+                    }
+                }
+                //footer
+                footerPositioning: ListView.OverlayFooter
+                footer: Rectangle{
+                    width: parent.width
+                    height: 35
+                    color: "#d6d6d6"
+                    z: 2
+                    Text{
+                        anchors.centerIn: parent
+                        text: selectedGroup.count + " of " + itemModel.count + " selected"
+                        font.pointSize: 12
+                        font.family: "Montserrat SemiBold"
+                    }
+                }
+            }
+        }
+    }
+}
