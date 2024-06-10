@@ -19,10 +19,12 @@ ShadowRect{
             ToolbarBtn{
                 Layout.fillWidth: true
                 text: "Import"
+                Material.background: Material.accent
             }
             ToolbarBtn{
                 Layout.fillWidth: true
                 text: "Export"
+                Material.background: Material.accent
             }
         }
         SplitView{
@@ -31,7 +33,7 @@ ShadowRect{
             // Scan Items
             Item{
                 SplitView.fillHeight: true
-                SplitView.minimumWidth: parent.width * 2/7
+                SplitView.minimumWidth: popUp.visible ? parent.width * 6/15 : parent.width * 2/7
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
@@ -71,8 +73,8 @@ ShadowRect{
                             onClicked: {
                                 for(let i = selectedScanItem.count-1; i>=0; i--){
                                     let itemSelected = selectedScanItem.get(i)
-                                    var object = scanList.get(itemSelected.itemsIndex)
-                                    scanList.remove(itemSelected.itemsIndex)
+                                    var object = scanItemList.get(itemSelected.itemsIndex)
+                                    scanItemList.remove(itemSelected.itemsIndex)
                                 }
                             }
                         }
@@ -235,7 +237,7 @@ ShadowRect{
             // ScanArr Items
             Item{
                 SplitView.fillHeight: true
-                SplitView.minimumWidth: parent.width * 3/7
+                SplitView.minimumWidth: popUp.visible ? parent.width * 6/15  : parent.width * 3/7
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
@@ -377,6 +379,7 @@ ShadowRect{
                                     id: scanArrDel
                                     required property int index
                                     required property var model
+                                    list: scanArrListPopUp
                                     itemID: index+1
                                     name: model.name
                                     desc: model.desc
@@ -453,9 +456,9 @@ ShadowRect{
             }
             // ScanArr List
             Item{
+                id: scanArrListPopUp
                 SplitView.fillHeight: true
-                SplitView.minimumWidth: parent.width * 1/7
-                visible: selectedScanArr.count === 1
+                SplitView.minimumWidth: popUp.visible ? parent.width * 3/15  : parent.width * 1/7
                 //scan list rect
                 ShadowRect{
                     anchors.fill: parent
@@ -484,15 +487,56 @@ ShadowRect{
                                     anchors.centerIn: parent
                                     color: Material.foreground
                                 }
+                                Image{
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.rightMargin: 7
+                                    fillMode: Image.PreserveAspectFit
+                                    height: parent.height-12
+                                    source: "../../images/close"
+                                    MouseArea{
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: scanArrListPopUp.visible = false
+                                    }
+                                }
+                            }
+                            RowLayout{
+                                RoundButton{
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 35
+                                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                                    icon.source: "../../images/plus.png"
+                                    HoverHandler{
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
+                                RoundButton{
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 35
+                                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                                    icon.source: "../../images/checklist.png"
+                                    HoverHandler{
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
+                                RoundButton{
+                                    Layout.fillWidth: true
+                                    Layout.preferredHeight: 35
+                                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                                    icon.source: "../../images/trash.png"
+                                    HoverHandler{
+                                        cursorShape: Qt.PointingHandCursor
+                                    }
+                                }
                             }
                         }
                         // Scan List
                         model: DelegateModel{
                             id: scanArrChooseModel
-                            // model: ListModel{
-                            //     id: scanArrChoose
-                            // }
-                            model: scanItemList
+                            model: ListModel{
+                                id: scanArrChoose
+                            }
                             groups: [
                                 DelegateModelGroup {
                                     id: selectedChoose

@@ -66,7 +66,7 @@ Item{
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Button{
                 id: drag
-                anchors.fill: parent
+                anchors.centerIn: parent
                 flat: true
                 // icon.source: "qrc:/images/drag"
                 icon.source: "../../images/drag.png"
