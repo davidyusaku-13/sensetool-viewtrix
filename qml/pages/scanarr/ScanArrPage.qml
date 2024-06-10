@@ -3,7 +3,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import "../../components"
-import "../prjset"
 
 ShadowRect{
     Layout.fillWidth: true
@@ -26,15 +25,14 @@ ShadowRect{
                 text: "Export"
             }
         }
-        // ScanArr Row
         SplitView{
             Layout.fillWidth: true
             Layout.fillHeight: true
-            // ScanArr ITEMS
+            // Scan Items
             Item{
                 SplitView.fillHeight: true
                 SplitView.preferredWidth: parent.width/2
-                SplitView.minimumWidth: popUp.visible ? parent.width * 4/9 : parent.width/3
+                SplitView.minimumWidth: parent.width/4
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
@@ -53,33 +51,29 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Add"
                             onClicked: {
-                                prjSetWindow.manage(-1,null)
+                                scanWindow.manage(-1,null)
                             }
                         }
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Edit"
-                            enabled: selectedGroup.count === 1
+                            enabled: selectedScan.count === 1
                             onClicked: {
-                                if(selectedGroup.count === 1){
-                                    var selected = selectedGroup.get(0)
-                                    prjSetWindow.manage(selected.itemsIndex, selected.model)
+                                if(selectedScan.count === 1){
+                                    var selected = selectedScan.get(0)
+                                    scanWindow.manage(selected.itemsIndex, selected.model)
                                 }
                             }
                         }
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Delete"
-                            enabled: selectedGroup.count > 0
+                            enabled: selectedScan.count > 0
                             onClicked: {
-                                for(let i = selectedGroup.count-1; i>=0; i--){
-                                    let itemSelected = selectedGroup.get(i)
-                                    // var object = itemList.get(itemSelected.itemsIndex)
-                                    // layout.history("Deleted", object)
-                                    // itemList.remove(itemSelected.itemsIndex)
-                                    var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
-                                    window.manager.addHistory("Deleted", object.name, object.value, object.desc)
-                                    window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
+                                for(let i = selectedScan.count-1; i>=0; i--){
+                                    let itemSelected = selectedScan.get(i)
+                                    var object = scanList.get(itemSelected.itemsIndex)
+                                    scanList.remove(itemSelected.itemsIndex)
                                 }
                             }
                         }
@@ -87,9 +81,9 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Select All"
                             onClicked: {
-                                for(var i=0; i< itemModel.items.count; i++){
-                                    if(!itemModel.items.get(i).inSelected){
-                                        itemModel.items.get(i).inSelected = true
+                                for(var i=0; i< scanModel.items.count; i++){
+                                    if(!scanModel.items.get(i).inSelected){
+                                        scanModel.items.get(i).inSelected = true
                                     }
                                 }
                             }
@@ -98,33 +92,25 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Deselect All"
                             onClicked: {
-                                for(var i=0; i< itemModel.items.count; i++){
-                                    if(itemModel.items.get(i).inSelected){
-                                        itemModel.items.get(i).inSelected = false
+                                for(var i=0; i< scanModel.items.count; i++){
+                                    if(scanModel.items.get(i).inSelected){
+                                        scanModel.items.get(i).inSelected = false
                                     }
                                 }
                             }
                         }
-                        PrjSetWindow{
-                            id: prjSetWindow
+                        ScanWindow{
+                            id: scanWindow
                             onCreate: (object) => {
-                                        //   itemList.append(object);
-                                        //   layout.history("Added", object)
-                                        window.manager.add(object.name, object.value, object.desc)
-                                        window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                          scanList.append(object);
                                     }
                             onModify: (index, object) => {
-                                        //   itemList.set(index, object);
-                                        //   layout.history("Modified", object)
-                                        let i = selectedGroup.get(0).itemsIndex
-                                        window.manager.edit(root.i, object.name, object.value, object.desc)
-                                        window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                          scanList.set(index, object);
                                     }
                         }
                     }
-                    //ScanArr rect
                     ShadowRect{
-                        id: scanArrContent
+                        id: scanContent
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         color: Material.background
@@ -135,7 +121,7 @@ ShadowRect{
                             //header
                             headerPositioning: ListView.OverlayHeader
                             header: RowLayout{
-                                id: workspace1Header
+                                id: scanHeader
                                 width: parent.width
                                 height: 35
                                 spacing: 0
@@ -160,14 +146,14 @@ ShadowRect{
                             }
                             //item list
                             model: DelegateModel{
-                                id: itemModel
+                                id: scanModel
                                 model: ListModel{
-                                    id: itemList
+                                    id: scanList
                                 }
                                 // model: window.manager.prjSetModel
                                 groups: [
                                     DelegateModelGroup {
-                                        id: selectedGroup
+                                        id: selectedScan
                                         name: "selected"}
                                 ]
                                 // delegate: MyItem{
@@ -183,77 +169,76 @@ ShadowRect{
                                 //         itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
                                 //     }
                                 // }
-                                delegate: dragDelegate
+                                // delegate: dragDelegate
                             }
                             //footer
                             footerPositioning: ListView.OverlayFooter
                             footer: Rectangle{
-                                id: workspace1Footer
+                                id: scanFooter
                                 width: parent.width
                                 height: 35
                                 color: Material.accent
                                 z: 2
                                 Text{
                                     anchors.centerIn: parent
-                                    text: selectedGroup.count + " of " + itemModel.count + " selected"
+                                    text: selectedScan.count + " of " + scanModel.count + " selected"
                                     font.pointSize: 12
                                     font.family: "Montserrat SemiBold"
                                     color: Material.foreground
                                 }
                             }
-                            Component {
-                                id: dragDelegate
-                                Rectangle {
-                                    id: content
-                                    required property var model
-                                    required property int index
-                                    width: ListView.view.width
-                                    height: itemDel.height
-                                    color: itemDel.dragArea.held ? "#d6d6d6": "white"
-                                    Behavior on color { ColorAnimation { duration: 100 } }
-                                    radius: 2
-                                    ScanArrItem{
-                                        id: itemDel
-                                        states: State {
-                                            when: itemDel.dragArea.pressed
-                                            ParentChange {
-                                                target: itemDel
-                                                parent: content.ListView.view
-                                            }
-                                        }
-                                        Drag.hotSpot.x: width / 2
-                                        Drag.hotSpot.y: height / 2
-                                        Drag.source: content
-                                        Drag.active: itemDel.dragArea.pressed
-                                        anchors {
-                                            left: parent.left
-                                            right: parent.right
-                                        }
-                                        height: 35
-                                        width: parent.width
-                                        name: model.name
-                                        value: model.value
-                                        desc: model.desc
-                                        content: itemDel
-                                        checkBox.checked: DelegateModel.inSelected
-                                        color: checkBox.checked ? "lightsteelblue": "transparent"
-                                        Behavior on color { ColorAnimation { duration: 100 } }
-                                    }
-                                    DropArea {
-                                        anchors.fill: parent
-                                        onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
-                                    }
-                                }
-                            }
+                            // Component {
+                            //     id: dragDelegate
+                            //     Rectangle {
+                            //         id: content
+                            //         required property var model
+                            //         required property int index
+                            //         width: ListView.view.width
+                            //         height: itemDel.height
+                            //         color: itemDel.dragArea.held ? "#d6d6d6": "white"
+                            //         Behavior on color { ColorAnimation { duration: 100 } }
+                            //         radius: 2
+                            //         ScanArrItem{
+                            //             id: itemDel
+                            //             states: State {
+                            //                 when: itemDel.dragArea.pressed
+                            //                 ParentChange {
+                            //                     target: itemDel
+                            //                     parent: content.ListView.view
+                            //                 }
+                            //             }
+                            //             Drag.hotSpot.x: width / 2
+                            //             Drag.hotSpot.y: height / 2
+                            //             Drag.source: content
+                            //             Drag.active: itemDel.dragArea.pressed
+                            //             anchors {
+                            //                 left: parent.left
+                            //                 right: parent.right
+                            //             }
+                            //             height: 35
+                            //             width: parent.width
+                            //             name: model.name
+                            //             desc: model.desc
+                            //             content: itemDel
+                            //             checkBox.checked: DelegateModel.inSelected
+                            //             color: checkBox.checked ? "lightsteelblue": "transparent"
+                            //             Behavior on color { ColorAnimation { duration: 100 } }
+                            //         }
+                            //         DropArea {
+                            //             anchors.fill: parent
+                            //             onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
+                            //         }
+                            //     }
+                            // }
                         }
                     }
                 }
             }
-            // ScanArr CONFIG
+            // ScanArr Items
             Item{
                 SplitView.fillHeight: true
                 SplitView.preferredWidth: parent.width/2
-                SplitView.minimumWidth: popUp.visible ? parent.width * 5/9 : parent.width * 5/12
+                SplitView.minimumWidth: parent.width/2.5
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
@@ -272,33 +257,29 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Add"
                             onClicked: {
-                                prjSetWindow.manage(-1,null)
+                                scanArrWindow.manage(-1,null)
                             }
                         }
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Edit"
-                            enabled: selectedGroup.count === 1
+                            enabled: selectedArr.count === 1
                             onClicked: {
-                                if(selectedGroup.count === 1){
-                                    var selected = selectedGroup.get(0)
-                                    prjSetWindow.manage(selected.itemsIndex, selected.model)
+                                if(selectedArr.count === 1){
+                                    var selected = selectedArr.get(0)
+                                    scanArrWindow.manage(selected.itemsIndex, selected.model)
                                 }
                             }
                         }
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Delete"
-                            enabled: selectedGroup.count > 0
+                            enabled: selectedArr.count > 0
                             onClicked: {
-                                for(let i = selectedGroup.count-1; i>=0; i--){
-                                    let itemSelected = selectedGroup.get(i)
-                                    // var object = itemList.get(itemSelected.itemsIndex)
-                                    // layout.history("Deleted", object)
-                                    // itemList.remove(itemSelected.itemsIndex)
-                                    var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
-                                    window.manager.addHistory("Deleted", object.name, object.value, object.desc)
-                                    window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
+                                for(let i = selectedArr.count-1; i>=0; i--){
+                                    let itemSelected = selectedArr.get(i)
+                                    var object = scanArrList.get(itemSelected.itemsIndex)
+                                    scanArrList.remove(itemSelected.itemsIndex)
                                 }
                             }
                         }
@@ -309,9 +290,9 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Select All"
                             onClicked: {
-                                for(var i=0; i< itemModel.items.count; i++){
-                                    if(!itemModel.items.get(i).inSelected){
-                                        itemModel.items.get(i).inSelected = true
+                                for(var i=0; i< scanArrModel.items.count; i++){
+                                    if(!scanArrModel.items.get(i).inSelected){
+                                        scanArrModel.items.get(i).inSelected = true
                                     }
                                 }
                             }
@@ -320,33 +301,26 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Deselect All"
                             onClicked: {
-                                for(var i=0; i< itemModel.items.count; i++){
-                                    if(itemModel.items.get(i).inSelected){
-                                        itemModel.items.get(i).inSelected = false
+                                for(var i=0; i< scanArrModel.items.count; i++){
+                                    if(scanArrModel.items.get(i).inSelected){
+                                        scanArrModel.items.get(i).inSelected = false
                                     }
                                 }
                             }
                         }
-                        PrjSetWindow{
-                            id: prjSetWindow2
+                        ScanWindow{
+                            id: scanArrWindow
                             onCreate: (object) => {
-                                        //   itemList.append(object);
-                                        //   layout.history("Added", object)
-                                        window.manager.add(object.name, object.value, object.desc)
-                                        window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                          scanArrList.append(object);
                                     }
                             onModify: (index, object) => {
-                                        //   itemList.set(index, object);
-                                        //   layout.history("Modified", object)
-                                        let i = selectedGroup.get(0).itemsIndex
-                                        window.manager.edit(root.i, object.name, object.value, object.desc)
-                                        window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                          scanArrList.set(index, object);
                                     }
                         }
                     }
                     //ScanArr rect
                     ShadowRect{
-                        id: scanArrContent2
+                        id: scanArrContent
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         color: Material.background
@@ -357,18 +331,23 @@ ShadowRect{
                             //header
                             headerPositioning: ListView.OverlayHeader
                             header: RowLayout{
-                                id: workspace1Header2
+                                id: scanArrHeader
                                 width: parent.width
                                 height: 35
                                 spacing: 0
                                 z: 2
+                                Rectangle {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: 35
+                                    color: Material.accent
+                                }
                                 Repeater{
-                                    model: ["Description", "ID", "Scan Arrangement Name"]
+                                    model: ["ID", "Scan Arrangement Name", "Description"]
                                     Rectangle{
                                         required property string modelData
                                         Layout.fillHeight: true
                                         Layout.fillWidth: modelData === "ID" ? false : true
-                                        Layout.preferredWidth: modelData === "ID" ? parent.width/7 : 0
+                                        Layout.preferredWidth: modelData === "ID" ? parent.width/5 : 0
                                         color: Material.accent
                                         Text {
                                             text: parent.modelData
@@ -379,93 +358,139 @@ ShadowRect{
                                         }
                                     }
                                 }
+                                Rectangle {
+                                    Layout.fillHeight: true
+                                    Layout.preferredWidth: 35
+                                    color: Material.accent
+                                }
                             }
-                            //item list
+                            //scan arr item list
                             model: DelegateModel{
-                                id: itemModel2
-                                // model: ListModel{
-                                //     id: itemList
-                                // }
-                                model: window.manager.prjSetModel
+                                id: scanArrModel
+                                model: ListModel{
+                                    id: scanArrList
+                                }
                                 groups: [
                                     DelegateModelGroup {
-                                        id: selectedGroup2
+                                        id: selectedArr
                                         name: "selected"}
                                 ]
-                                // delegate: MyItem{
-                                //     id: itemDel
-                                //     required property var model
-                                //     customItem: model.name
-                                //     customValue: model.value
-                                //     customDesc: model.desc
-                                //     width: ListView.view.width
-                                //     color: itemDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
-                                //     // status: itemDel.DelegateModel.inSelected
-                                //     onSelected: {
-                                //         itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
-                                //     }
-                                // }
-                                delegate: dragDelegate
+                                delegate: ScanArrItem{
+                                    id: scanArrDel
+                                    required property var model
+                                    name: model.name
+                                    desc: model.desc
+                                    width: ListView.view.width
+                                    color: scanArrDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
+                                    // status: itemDel.DelegateModel.inSelected
+                                    onSelected: {
+                                        scanArrDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                                    }
+                                }
+                                //delegate: dragDelegate
                             }
                             //footer
                             footerPositioning: ListView.OverlayFooter
                             footer: Rectangle{
-                                id: workspace1Footer2
+                                id: scanArrFooter
                                 width: parent.width
                                 height: 35
                                 color: Material.accent
                                 z: 2
                                 Text{
                                     anchors.centerIn: parent
-                                    text: selectedGroup.count + " of " + itemModel.count + " selected"
+                                    text: selectedArr.count + " of " + scanArrModel.count + " selected"
                                     font.pointSize: 12
                                     font.family: "Montserrat SemiBold"
                                     color: Material.foreground
                                 }
                             }
-                            Component {
-                                id: dragDelegate2
-                                Rectangle {
-                                    id: content
-                                    required property var model
-                                    required property int index
-                                    width: ListView.view.width
-                                    height: itemDel.height
-                                    color: itemDel.dragArea.held ? "#d6d6d6": "white"
-                                    Behavior on color { ColorAnimation { duration: 100 } }
-                                    radius: 2
-                                    ScanArrItem{
-                                        id: itemDel
-                                        states: State {
-                                            when: itemDel.dragArea.pressed
-                                            ParentChange {
-                                                target: itemDel
-                                                parent: content.ListView.view
-                                            }
-                                        }
-                                        Drag.hotSpot.x: width / 2
-                                        Drag.hotSpot.y: height / 2
-                                        Drag.source: content
-                                        Drag.active: itemDel.dragArea.pressed
-                                        anchors {
-                                            left: parent.left
-                                            right: parent.right
-                                        }
-                                        height: 35
-                                        width: parent.width
-                                        name: model.name
-                                        value: model.value
-                                        desc: model.desc
-                                        content: itemDel
-                                        checkBox.checked: DelegateModel.inSelected
-                                        color: checkBox.checked ? "lightsteelblue": "transparent"
-                                        Behavior on color { ColorAnimation { duration: 100 } }
-                                    }
-                                    DropArea {
-                                        anchors.fill: parent
-                                        onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
-                                    }
+                            // Component {
+                            //     id: dragDelegate2
+                            //     Rectangle {
+                            //         id: content
+                            //         required property var model
+                            //         required property int index
+                            //         width: ListView.view.width
+                            //         height: itemDel.height
+                            //         color: itemDel.dragArea.held ? "#d6d6d6": "white"
+                            //         Behavior on color { ColorAnimation { duration: 100 } }
+                            //         radius: 2
+                            //         ScanArrItem{
+                            //             id: itemDel
+                            //             states: State {
+                            //                 when: itemDel.dragArea.pressed
+                            //                 ParentChange {
+                            //                     target: itemDel
+                            //                     parent: content.ListView.view
+                            //                 }
+                            //             }
+                            //             Drag.hotSpot.x: width / 2
+                            //             Drag.hotSpot.y: height / 2
+                            //             Drag.source: content
+                            //             Drag.active: itemDel.dragArea.pressed
+                            //             anchors {
+                            //                 left: parent.left
+                            //                 right: parent.right
+                            //             }
+                            //             height: 35
+                            //             width: parent.width
+                            //             name: model.name
+                            //             desc: model.desc
+                            //             content: itemDel
+                            //             checkBox.checked: DelegateModel.inSelected
+                            //             color: checkBox.checked ? "lightsteelblue": "transparent"
+                            //             Behavior on color { ColorAnimation { duration: 100 } }
+                            //         }
+                            //         DropArea {
+                            //             anchors.fill: parent
+                            //             onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
+                            //         }
+                            //     }
+                            // }
+                        }
+                    }
+                }
+            }
+            //Scan List
+            Item{
+                SplitView.fillHeight: true
+                SplitView.preferredWidth: parent.width/3
+                SplitView.maximumWidth: parent.width/5
+                SplitView.minimumWidth: parent.width/7
+                visible: false
+                //scan list rect
+                ShadowRect{
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    color: Material.background
+                    ListView{
+                        anchors.fill: parent
+                        interactive: true
+                        clip: true
+                        //header
+                        headerPositioning: ListView.OverlayHeader
+                        header: ColumnLayout{
+                            width: parent.width
+                            height: 70
+                            spacing: 0
+                            Rectangle{
+                                Layout.fillWidth: true
+                                implicitHeight: 35
+                                z: 2
+                                color: Material.accent
+                                Text {
+                                    text: "Scan List"
+                                    font.pointSize: 12
+                                    font.family: "Montserrat SemiBold"
+                                    anchors.centerIn: parent
+                                    color: Material.foreground
                                 }
+                            }
+                            Rectangle{
+                                Layout.fillWidth: true
+                                implicitHeight: 35
+                                color: "red"
                             }
                         }
                     }

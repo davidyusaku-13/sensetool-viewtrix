@@ -6,29 +6,45 @@ import "../../components"
 
 Rectangle{
     id: root
-    width: 1000
-    height: 75
-    Behavior on color { ColorAnimation { duration: 100 } }
-    property string name: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
-    property string value: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
-    property string desc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
+    Layout.fillWidth: true
+    implicitHeight: desc.lineCount > 1 ? desc.lineCount*25 : 35
+    // width: 1000
+    // height: 35
+    property int id: 1
+    property string name: "AFE_END"
+    property string desc: "To set a flag to indicate the end of a frame request"
     property alias dragArea: dragArea
     property alias checkBox: checkBox
-    required property var content
     signal selected(bool status)
     RowLayout{
         anchors.fill: parent
         spacing: 0
         CheckBox{
             id: checkBox
-            Layout.margins: 7
-            implicitWidth: 35
-            implicitHeight: 35
+            Layout.fillHeight: true
+            Layout.preferredWidth: 35
+            // Layout.margins: 7
             onClicked: {
                 root.selected(checked)
             }
         }
-        //item
+        //ID
+        ShadowRect{
+            Layout.fillHeight: true
+            // implicitWidth: (root.width/5)-70
+            Layout.preferredWidth: root.width/5
+            Text{
+                id: id
+                anchors.fill: parent
+                anchors.margins: 10
+                text: root.id
+                font.pixelSize: 15
+                font.family: "Montserrat Medium"
+                wrapMode: Text.Wrap
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
+        //scan arr name
         ShadowRect{
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -43,25 +59,11 @@ Rectangle{
                 verticalAlignment: Text.AlignVCenter
             }
         }
-        //value
-        ShadowRect{
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            Text{
-                id: value
-                anchors.fill: parent
-                anchors.margins: 10
-                text: root.value
-                font.pixelSize: 15
-                font.family: "Montserrat Medium"
-                wrapMode: Text.Wrap
-                verticalAlignment: Text.AlignVCenter
-            }
-        }
         //desc
         ShadowRect{
             Layout.fillHeight: true
-            implicitWidth: parent.width*3/7
+            // implicitWidth: parent.width*3/7
+            Layout.fillWidth: true
             Text{
                 id: desc
                 anchors.fill: parent
@@ -76,9 +78,11 @@ Rectangle{
         //drag
         Button{
             id: drag
-            Layout.margins: 7
+            Layout.preferredWidth: 35
+            // Layout.margins: 7
             flat: true
-            icon.source: "qrc:/images/drag"
+            // icon.source: "qrc:/images/drag"
+            icon.source: "../../images/drag.png"
             icon.color: "#d6d6d6"
             padding: 0
             background: Rectangle{
@@ -90,7 +94,7 @@ Rectangle{
             MouseArea {
                 id: dragArea
                 anchors.fill: parent
-                drag.target: pressed ? root.content: undefined
+                drag.target: pressed ? root.content : undefined
                 drag.axis: Drag.YAxis
                 cursorShape: Qt.OpenHandCursor
                 hoverEnabled: true
