@@ -14,7 +14,7 @@ Window {
 
     signal create(var object)
     signal modify(int index, var object)
-    property ScanObject object: ScanObject{}
+    property ScanArrObject object: ScanArrObject{}
     property int index: -1
     property bool isEdit: false
     property HoverHandler cursor: HoverHandler{

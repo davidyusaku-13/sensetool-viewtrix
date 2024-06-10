@@ -31,8 +31,7 @@ ShadowRect{
             // Scan Items
             Item{
                 SplitView.fillHeight: true
-                SplitView.preferredWidth: parent.width/2
-                SplitView.minimumWidth: parent.width/4
+                SplitView.minimumWidth: parent.width * 2/7
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
@@ -57,10 +56,10 @@ ShadowRect{
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Edit"
-                            enabled: selectedScan.count === 1
+                            enabled: selectedScanItem.count === 1
                             onClicked: {
-                                if(selectedScan.count === 1){
-                                    var selected = selectedScan.get(0)
+                                if(selectedScanItem.count === 1){
+                                    var selected = selectedScanItem.get(0)
                                     scanWindow.manage(selected.itemsIndex, selected.model)
                                 }
                             }
@@ -68,10 +67,10 @@ ShadowRect{
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Delete"
-                            enabled: selectedScan.count > 0
+                            enabled: selectedScanItem.count > 0
                             onClicked: {
-                                for(let i = selectedScan.count-1; i>=0; i--){
-                                    let itemSelected = selectedScan.get(i)
+                                for(let i = selectedScanItem.count-1; i>=0; i--){
+                                    let itemSelected = selectedScanItem.get(i)
                                     var object = scanList.get(itemSelected.itemsIndex)
                                     scanList.remove(itemSelected.itemsIndex)
                                 }
@@ -81,9 +80,9 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Select All"
                             onClicked: {
-                                for(var i=0; i< scanModel.items.count; i++){
-                                    if(!scanModel.items.get(i).inSelected){
-                                        scanModel.items.get(i).inSelected = true
+                                for(var i=0; i< scanItemModel.items.count; i++){
+                                    if(!scanItemModel.items.get(i).inSelected){
+                                        scanItemModel.items.get(i).inSelected = true
                                     }
                                 }
                             }
@@ -92,9 +91,9 @@ ShadowRect{
                             Layout.fillWidth: true
                             text: "Deselect All"
                             onClicked: {
-                                for(var i=0; i< scanModel.items.count; i++){
-                                    if(scanModel.items.get(i).inSelected){
-                                        scanModel.items.get(i).inSelected = false
+                                for(var i=0; i< scanItemModel.items.count; i++){
+                                    if(scanItemModel.items.get(i).inSelected){
+                                        scanItemModel.items.get(i).inSelected = false
                                     }
                                 }
                             }
@@ -102,10 +101,10 @@ ShadowRect{
                         ScanWindow{
                             id: scanWindow
                             onCreate: (object) => {
-                                          scanList.append(object);
+                                          scanItemList.append(object);
                                     }
                             onModify: (index, object) => {
-                                          scanList.set(index, object);
+                                          scanItemList.set(index, object);
                                     }
                         }
                     }
@@ -146,42 +145,41 @@ ShadowRect{
                             }
                             //item list
                             model: DelegateModel{
-                                id: scanModel
+                                id: scanItemModel
                                 model: ListModel{
-                                    id: scanList
+                                    id: scanItemList
                                 }
                                 // model: window.manager.prjSetModel
                                 groups: [
                                     DelegateModelGroup {
-                                        id: selectedScan
-                                        name: "selected"}
+                                        id: selectedScanItem
+                                        name: "selected"
+                                    }
                                 ]
-                                // delegate: MyItem{
-                                //     id: itemDel
-                                //     required property var model
-                                //     customItem: model.name
-                                //     customValue: model.value
-                                //     customDesc: model.desc
-                                //     width: ListView.view.width
-                                //     color: itemDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
-                                //     // status: itemDel.DelegateModel.inSelected
-                                //     onSelected: {
-                                //         itemDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
-                                //     }
-                                // }
+                                delegate: ScanItem{
+                                    id: scanItemDel
+                                    required property var model
+                                    name: model.name
+                                    desc: model.desc
+                                    width: ListView.view.width
+                                    checkBox.checked: scanItemDel.DelegateModel.inSelected
+                                    onSelected: {
+                                        scanItemDel.DelegateModel.inSelected = !scanItemDel.DelegateModel.inSelected
+                                    }
+                                }
                                 // delegate: dragDelegate
                             }
                             //footer
                             footerPositioning: ListView.OverlayFooter
                             footer: Rectangle{
-                                id: scanFooter
+                                id: scanItemFooter
                                 width: parent.width
                                 height: 35
                                 color: Material.accent
                                 z: 2
                                 Text{
                                     anchors.centerIn: parent
-                                    text: selectedScan.count + " of " + scanModel.count + " selected"
+                                    text: selectedScanItem.count + " of " + scanItemModel.count + " selected"
                                     font.pointSize: 12
                                     font.family: "Montserrat SemiBold"
                                     color: Material.foreground
@@ -237,8 +235,7 @@ ShadowRect{
             // ScanArr Items
             Item{
                 SplitView.fillHeight: true
-                SplitView.preferredWidth: parent.width/2
-                SplitView.minimumWidth: parent.width/2.5
+                SplitView.minimumWidth: parent.width * 3/7
                 MouseArea{
                     anchors.fill: parent
                     onClicked:{
@@ -263,10 +260,10 @@ ShadowRect{
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Edit"
-                            enabled: selectedArr.count === 1
+                            enabled: selectedScanArr.count === 1
                             onClicked: {
-                                if(selectedArr.count === 1){
-                                    var selected = selectedArr.get(0)
+                                if(selectedScanArr.count === 1){
+                                    var selected = selectedScanArr.get(0)
                                     scanArrWindow.manage(selected.itemsIndex, selected.model)
                                 }
                             }
@@ -274,10 +271,10 @@ ShadowRect{
                         ToolbarBtn{
                             Layout.fillWidth: true
                             text: "Delete"
-                            enabled: selectedArr.count > 0
+                            enabled: selectedScanArr.count > 0
                             onClicked: {
-                                for(let i = selectedArr.count-1; i>=0; i--){
-                                    let itemSelected = selectedArr.get(i)
+                                for(let i = selectedScanArr.count-1; i>=0; i--){
+                                    let itemSelected = selectedScanArr.get(i)
                                     var object = scanArrList.get(itemSelected.itemsIndex)
                                     scanArrList.remove(itemSelected.itemsIndex)
                                 }
@@ -372,19 +369,21 @@ ShadowRect{
                                 }
                                 groups: [
                                     DelegateModelGroup {
-                                        id: selectedArr
-                                        name: "selected"}
+                                        id: selectedScanArr
+                                        name: "selected"
+                                    }
                                 ]
                                 delegate: ScanArrItem{
                                     id: scanArrDel
+                                    required property int index
                                     required property var model
+                                    itemID: index+1
                                     name: model.name
                                     desc: model.desc
                                     width: ListView.view.width
-                                    color: scanArrDel.DelegateModel.inSelected ? "lightsteelblue" : "transparent"
-                                    // status: itemDel.DelegateModel.inSelected
+                                    checkBox.checked: scanArrDel.DelegateModel.inSelected
                                     onSelected: {
-                                        scanArrDel.DelegateModel.inSelected = !itemDel.DelegateModel.inSelected
+                                        scanArrDel.DelegateModel.inSelected = !scanArrDel.DelegateModel.inSelected
                                     }
                                 }
                                 //delegate: dragDelegate
@@ -399,7 +398,7 @@ ShadowRect{
                                 z: 2
                                 Text{
                                     anchors.centerIn: parent
-                                    text: selectedArr.count + " of " + scanArrModel.count + " selected"
+                                    text: selectedScanArr.count + " of " + scanArrModel.count + " selected"
                                     font.pointSize: 12
                                     font.family: "Montserrat SemiBold"
                                     color: Material.foreground
@@ -452,13 +451,11 @@ ShadowRect{
                     }
                 }
             }
-            //Scan List
+            // ScanArr List
             Item{
                 SplitView.fillHeight: true
-                SplitView.preferredWidth: parent.width/3
-                SplitView.maximumWidth: parent.width/5
-                SplitView.minimumWidth: parent.width/7
-                visible: false
+                SplitView.minimumWidth: parent.width * 1/7
+                visible: selectedScanArr.count === 1
                 //scan list rect
                 ShadowRect{
                     anchors.fill: parent
@@ -471,13 +468,14 @@ ShadowRect{
                         //header
                         headerPositioning: ListView.OverlayHeader
                         header: ColumnLayout{
+                            id: chooseHeader
                             width: parent.width
-                            height: 70
+                            height: 35
                             spacing: 0
+                            z: 2
                             Rectangle{
                                 Layout.fillWidth: true
                                 implicitHeight: 35
-                                z: 2
                                 color: Material.accent
                                 Text {
                                     text: "Scan List"
@@ -487,11 +485,32 @@ ShadowRect{
                                     color: Material.foreground
                                 }
                             }
-                            Rectangle{
-                                Layout.fillWidth: true
-                                implicitHeight: 35
-                                color: "red"
+                        }
+                        // Scan List
+                        model: DelegateModel{
+                            id: scanArrChooseModel
+                            // model: ListModel{
+                            //     id: scanArrChoose
+                            // }
+                            model: scanItemList
+                            groups: [
+                                DelegateModelGroup {
+                                    id: selectedChoose
+                                    name: "selected"
+                                }
+                            ]
+                            delegate: ScanItem{
+                                id: scanArrChooseDel
+                                required property var model
+                                name: model.name
+                                desc: model.desc
+                                width: ListView.view.width
+                                checkBox.checked: scanArrChooseDel.DelegateModel.inSelected
+                                onSelected: {
+                                    scanArrChooseDel.DelegateModel.inSelected = !scanArrChooseDel.DelegateModel.inSelected
+                                }
                             }
+                            //delegate: dragDelegate
                         }
                     }
                 }

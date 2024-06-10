@@ -7,7 +7,6 @@ import "../../components"
 Item{
     id: root
     height: desc.lineCount > 1 ? desc.lineCount*25 : 35
-    property int itemID: 1
     property string name: "AFE_END"
     property string desc: "To set a flag to indicate the end of a frame request"
     property alias dragArea: dragArea
@@ -26,22 +25,6 @@ Item{
                 onClicked: {
                     root.selected(checked)
                 }
-            }
-        }
-        //ID
-        ShadowRect{
-            Layout.fillHeight: true
-            Layout.preferredWidth: root.width/5
-            Text{
-                id: id
-                anchors.fill: parent
-                anchors.margins: 10
-                text: root.itemID
-                font.pixelSize: 15
-                font.family: "Montserrat Medium"
-                wrapMode: Text.Wrap
-                verticalAlignment: Text.AlignVCenter
-                color: Material.foreground
             }
         }
         //scan arr name
@@ -83,7 +66,7 @@ Item{
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             Button{
                 id: drag
-                anchors.centerIn: parent
+                anchors.fill: parent
                 flat: true
                 // icon.source: "qrc:/images/drag"
                 icon.source: "../../images/drag.png"
