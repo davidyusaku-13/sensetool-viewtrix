@@ -8,7 +8,7 @@ import QtCore
 
 ApplicationWindow {
     id: window
-    title: qsTr("Sense Trix")
+    title: manager.logic.getVersion()
     visible: true
     width: 1280
     height: 720
