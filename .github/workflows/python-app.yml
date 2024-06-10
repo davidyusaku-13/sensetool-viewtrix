@@ -2,7 +2,7 @@ name: SenseTool CI/CD
 
 on:
   push:
-    branches: ["develop"]
+    branches: ["release"]
 
 permissions:
   packages: write
@@ -65,6 +65,10 @@ jobs:
       - name: Save CHANGELOG.md to GITHUB_ENV
         run: |
           echo "RELEASE_BODY=$(cat CHANGELOG.md)" >> $env:GITHUB_ENV
+
+      - name: Get Version and save to VERSION.txt
+        run: |
+          echo "VERSION=${{ steps.version_step.outputs.GitVersion_FullSemVer }}" >> ./VERSION.txt
 
       - name: Create Release
         id: create_release
