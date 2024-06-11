@@ -1,14 +1,14 @@
+import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import PrjSetModel
 import HistoryModel
 import AppLogic
-import QtCore
 
 ApplicationWindow {
     id: window
-    title: manager.logic.getVersion()
+    title: "SenseTool v" + manager.logic.get_version()
     visible: true
     width: 1280
     height: 720
