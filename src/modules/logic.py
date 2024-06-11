@@ -1,8 +1,7 @@
 from PySide6.QtCore import Slot, QObject, QUrl
 from PySide6.QtQml import QmlElement
-from pathlib import Path
-import yaml
-import math
+from packaging.version import Version
+import yaml, math, requests
 
 QML_IMPORT_NAME = "AppLogic"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -13,10 +12,25 @@ class AppLogic(QObject):
         super().__init__()
     
     @Slot(result=str)
-    def getVersion(self):
-        version = Path("./VERSION.txt").read_text()
-        return "SenseTool " + version
-
+    def get_version(self):
+        try:
+            with open('VERSION.txt', 'r') as file:
+                version = file.read().strip()
+                return version
+        except FileNotFoundError:
+            return "Version file not found."
+        
+    @Slot(result=dict)
+    def check_update(self):
+        url = f"https://api.github.com/repos/davidyusaku-13/sensetool-viewtrix/releases/latest"
+        response = requests.get(url)
+        if response.status_code == 200:
+            latest_release = response.json()
+            latest_version = latest_release['tag_name']
+            if Version(latest_version) < Version(self.get_version()):
+                return {"status": True, "tag_name": latest_version, "changelog": latest_release['body']}
+        return {"status": False}
+        
     @Slot(list, result=list)
     def divideArray(self, array):
         evenArray = [array[i] for i in range(len(array)) if i % 2 == 0]
