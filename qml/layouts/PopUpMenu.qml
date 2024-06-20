@@ -32,7 +32,7 @@ Item{
                         height: 50
                         color: Material.accent
                         Text{
-                            text: "Notification"
+                            text: qsTr("Notification")
                             color: Material.foreground
                             font.pixelSize: 20
                             font.family: "Montserrat SemiBold"
