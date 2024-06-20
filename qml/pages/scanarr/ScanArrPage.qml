@@ -32,6 +32,7 @@ ShadowRect{
             Layout.fillHeight: true
             // Scan Items
             ScanItemColumn{
+                id: itemColumn
                 SplitView.fillHeight: true
                 SplitView.minimumWidth: popUp.visible ? parent.width * 6/15 : parent.width * 2/7
             }
@@ -39,6 +40,10 @@ ShadowRect{
             ScanArrColumn{
                 SplitView.fillHeight: true
                 SplitView.minimumWidth: popUp.visible ? parent.width * 6/15  : parent.width * 3/7
+                onFocusIndex: (index, model) => {
+                                  scanArrListColumn.index = index
+                                  scanArrListColumn.model = model
+                              }
             }
             // ScanArrList Column
             ScanArrListColumn{
