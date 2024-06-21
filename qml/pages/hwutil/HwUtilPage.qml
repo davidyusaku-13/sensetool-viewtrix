@@ -22,10 +22,10 @@ Item{
                 font.family: "Montserrat SemiBold"
                 font.pixelSize: 17
                 TabButton {
-                    text: "Window Coefficient Generator"
+                    text: qsTr("Window Coefficient Generator")
                 }
                 TabButton {
-                    text: "Demodulator Coefficient Generator"
+                    text: qsTr("Demodulator Coefficient Generator")
                 }
             }
             StackLayout{
@@ -40,7 +40,7 @@ Item{
                         Layout.preferredHeight: 4
                         ToolbarBtn{
                             Layout.fillWidth: true
-                            text: "Import"
+                            text: qsTr("Import")
                             onClicked: {
                                 importWinCoef.open()
                             }
@@ -62,7 +62,7 @@ Item{
                         }
                         ToolbarBtn{
                             Layout.fillWidth: true
-                            text: "Export"
+                            text: qsTr("Export")
                             onClicked: {
                                 exportWinCoef.open()
                             }
@@ -137,7 +137,7 @@ Item{
                     RowLayout{
                         Layout.preferredHeight: 4
                         ToolbarBtn{
-                            text: "Import"
+                            text: qsTr("Import")
                             Layout.fillWidth: true
                             onClicked: {
                                 importDemoCoef.open()
@@ -161,7 +161,7 @@ Item{
                             }
                         }
                         ToolbarBtn{
-                            text: "Export"
+                            text: qsTr("Export")
                             Layout.fillWidth: true
                             onClicked: {
                                 exportDemoCoef.open()
@@ -218,7 +218,7 @@ Item{
                         Button{
                             id: demoBtn
                             implicitWidth: 80
-                            text: "OK"
+                            text: qsTr("OK")
                             HoverHandler{
                                 cursorShape: Qt.PointingHandCursor
                             }

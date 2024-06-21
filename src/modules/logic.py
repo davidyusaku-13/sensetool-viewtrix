@@ -1,4 +1,5 @@
-from PySide6.QtCore import Slot, QObject, QUrl
+from PySide6.QtCore import Slot, QObject, QUrl, QTranslator
+from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QmlElement
 from pathlib import Path
 import yaml
@@ -6,11 +7,25 @@ import math
 
 QML_IMPORT_NAME = "AppLogic"
 QML_IMPORT_MAJOR_VERSION = 1
+QML_FILE = "../../qml/main.qml"
 
 @QmlElement
 class AppLogic(QObject):
     def __init__(self):
         super().__init__()
+        
+    @Slot(str)
+    def change_language(self, language_code):
+        translator = QTranslator()
+        translation_file = f"./translations/app_{language_code}.qm"
+
+        if translator.load(translation_file):
+            app = QApplication.instance()
+            app.installTranslator(translator)
+            app.setProperty("language", language_code)
+            app.retranslate()
+        else:
+            print(f"Failed to load translation file: {translation_file}")
     
     @Slot(result=str)
     def getVersion(self):

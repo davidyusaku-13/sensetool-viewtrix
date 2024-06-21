@@ -16,13 +16,13 @@ ShadowRect{
             id: menuBtn
             display: AbstractButton.IconOnly
             icon.source: "qrc:/images/menu-icon2"
-            text: "Menu"
+            text: qsTr("Menu")
             onClicked: {
                 sidebar.folded = !sidebar.folded
             }
         }
         Text{
-            text: "Sense Tool"
+            text: qsTr("Sense Tool")
             font.family: "Richard Clean Personal Use"
             font.pixelSize: 35
             color: "#F08519"

@@ -51,7 +51,7 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Text{
-                text: "Name"
+                text: qsTr("Name")
                 font.family: "Montserrat Medium"
                 font.pixelSize: 20
             }
@@ -82,7 +82,7 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Text{
-                text: "Value"
+                text: qsTr("Value")
                 font.family: "Montserrat Medium"
                 font.pixelSize: 20
             }
@@ -112,7 +112,7 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Text{
-                text: "Description"
+                text: qsTr("Description")
                 font.family: "Montserrat Medium"
                 font.pixelSize: 20
             }
@@ -139,9 +139,8 @@ Window {
             //add
             RoundButton {
                 implicitWidth: 80
-                text: root.isEdit ? "Save" : "Add"
-                enabled: (text === "Add"
-                          && root.object.name === "") ? false : true
+                text: root.isEdit ? qsTr("Save") : qsTr("Add")
+                enabled: (text === qsTr("Add") && root.object.name === "") ? false : true
                 HoverHandler {
                     cursorShape: Qt.PointingHandCursor
                 }
@@ -158,7 +157,7 @@ Window {
             //cancel
             RoundButton {
                 implicitWidth: 80
-                text: "Cancel"
+                text: qsTr("Cancel")
                 HoverHandler {
                     cursorShape: Qt.PointingHandCursor
                 }
