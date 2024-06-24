@@ -22,6 +22,14 @@ ApplicationWindow {
     
     SenseTrix{
         anchors.fill: parent
+        
+        UpdateWindow{
+            id: update_window
+        }
+
+        Component.onCompleted: {
+            update_window.show()
+        }
     }
     
     Settings{
