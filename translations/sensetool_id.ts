@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US">
+<TS version="2.1" language="id_ID">
 <context>
     <name>ConfirmWindow</name>
     <message>
         <location filename="../qml/pages/prjset/ConfirmWindow.qml" line="24"/>
         <source>Are you sure want to change this item?</source>
-        <translation></translation>
+        <translation>Apakah anda yakin akan mengganti item ini?</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/ConfirmWindow.qml" line="40"/>
         <source>YES</source>
-        <translation></translation>
+        <translation>YA</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/ConfirmWindow.qml" line="54"/>
         <source>NO</source>
-        <translation></translation>
+        <translation>TIDAK</translation>
     </message>
 </context>
 <context>
@@ -48,13 +48,13 @@
         <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="43"/>
         <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="140"/>
         <source>Import</source>
-        <translation></translation>
+        <translation>Impor</translation>
     </message>
     <message>
         <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="65"/>
         <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="164"/>
         <source>Export</source>
-        <translation></translation>
+        <translation>Ekspor</translation>
     </message>
     <message>
         <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="221"/>
@@ -65,40 +65,34 @@
 <context>
     <name>PopUpMenu</name>
     <message>
-        <location filename="../qml/layouts/PopUpMenu.qml" line="35"/>
-        <source>Notification</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="55"/>
         <source>Clear History</source>
-        <translation></translation>
+        <translation>Hapus Riwayat</translation>
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="73"/>
         <source>Setting</source>
-        <translation></translation>
+        <translation>Pengaturan</translation>
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="83"/>
         <source>Light Theme</source>
-        <translation></translation>
+        <translation>Tema Terang</translation>
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="83"/>
         <source>Dark Theme</source>
-        <translation></translation>
+        <translation>Tema Gelap</translation>
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="88"/>
-        <location filename="../qml/layouts/PopUpMenu.qml" line="90"/>
         <source>Indonesia</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="88"/>
         <source>English</source>
-        <translation></translation>
+        <translation>Inggris</translation>
     </message>
 </context>
 <context>
@@ -106,47 +100,47 @@
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="36"/>
         <source>Import</source>
-        <translation></translation>
+        <translation>Impor</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="52"/>
         <source>Export</source>
-        <translation></translation>
+        <translation>Ekspor</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="68"/>
         <source>Add</source>
-        <translation></translation>
+        <translation>Tambah</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="74"/>
         <source>Edit</source>
-        <translation></translation>
+        <translation>Ubah</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="84"/>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Hapus</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="102"/>
         <source>Select All</source>
-        <translation></translation>
+        <translation>Pilih Semua</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="112"/>
         <source>Deselect All</source>
-        <translation></translation>
+        <translation>Urungkan Pilihan</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="224"/>
         <source> of </source>
-        <translation></translation>
+        <translation> dari </translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetPage.qml" line="224"/>
         <source> selected</source>
-        <translation></translation>
+        <translation> terpilih</translation>
     </message>
 </context>
 <context>
@@ -169,26 +163,18 @@
     <message>
         <location filename="../qml/pages/prjset/PrjSetWindow.qml" line="142"/>
         <source>Save</source>
-        <translation></translation>
+        <translation>Simpan</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetWindow.qml" line="142"/>
         <location filename="../qml/pages/prjset/PrjSetWindow.qml" line="143"/>
         <source>Add</source>
-        <translation></translation>
+        <translation>Tambahkan</translation>
     </message>
     <message>
         <location filename="../qml/pages/prjset/PrjSetWindow.qml" line="160"/>
         <source>Cancel</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>main</name>
-    <message>
-        <location filename="../qml/main.qml" line="52"/>
-        <source>Download</source>
-        <translation></translation>
+        <translation>Batalkan</translation>
     </message>
 </context>
 </TS>

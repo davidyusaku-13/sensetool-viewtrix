@@ -88,7 +88,7 @@ Item{
                     text: checked ? qsTr("Indonesia") : qsTr("English")
                     onToggled: {
                         let lang = text === qsTr("Indonesia") ? "id" : "en"
-                        window.manager.logic.change_language(lang)
+                        translator.change_language(lang)
                     }
                 }
                 Item{
