@@ -5,7 +5,7 @@ import QtQuick.Dialogs
 
 Window {
   id: root
-  title: qsTr("New Version Available!!!")
+  title: qsTr("Update available!")
   minimumWidth: 300
   minimumHeight: 200
   ColumnLayout{
@@ -15,7 +15,7 @@ Window {
       Layout.fillHeight: true
       Text{
         anchors.centerIn: parent
-        text: qsTr("Update available!")
+        text: qsTr("v" + window.manager.logic.checkUpdate()["version"] + " is available")
       }
     }
     RowLayout{
@@ -33,6 +33,9 @@ Window {
         Layout.fillHeight: true
         Layout.margins: 10
         text: qsTr("Download")
+        onClicked: {
+          Qt.openUrlExternally(window.manager.logic.checkUpdate()["link"])
+        }
       }
     }
   }

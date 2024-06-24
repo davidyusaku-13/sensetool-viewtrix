@@ -15,7 +15,7 @@ ApplicationWindow {
         logic: AppLogic{}
     }
 
-    title: manager.logic.getVersion()
+    title: qsTr("SenseTool " + manager.logic.getVersion())
     visible: true
     width: 1280
     height: 720
@@ -28,7 +28,9 @@ ApplicationWindow {
         }
 
         Component.onCompleted: {
-            update_window.show()
+            if(manager.logic.checkUpdate()["status"]){
+                update_window.show()
+            }
         }
     }
     
