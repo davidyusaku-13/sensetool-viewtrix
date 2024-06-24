@@ -1,4 +1,5 @@
-from PySide6.QtCore import Slot, QObject, QUrl
+from PySide6.QtCore import Slot, QObject, QUrl, QTranslator
+from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QmlElement
 from pathlib import Path
 import yaml
@@ -6,12 +7,13 @@ import math
 
 QML_IMPORT_NAME = "AppLogic"
 QML_IMPORT_MAJOR_VERSION = 1
+QML_FILE = "../../qml/main.qml"
 
 @QmlElement
 class AppLogic(QObject):
     def __init__(self):
         super().__init__()
-    
+        
     @Slot(result=str)
     def getVersion(self):
         version = Path("./VERSION.txt").read_text()

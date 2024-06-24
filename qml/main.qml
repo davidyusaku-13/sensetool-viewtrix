@@ -8,18 +8,22 @@ import QtCore
 
 ApplicationWindow {
     id: window
-    title: manager.logic.getVersion()
-    visible: true
-    width: 1280
-    height: 720
+    
     property AppManager manager: AppManager{
         prjSetModel: PrjSetModel {}
         historyModel: HistoryModel{}
         logic: AppLogic{}
     }
+
+    title: manager.logic.getVersion()
+    visible: true
+    width: 1280
+    height: 720
+    
     SenseTrix{
         anchors.fill: parent
     }
+    
     Settings{
         property alias x: window.x
         property alias y: window.y

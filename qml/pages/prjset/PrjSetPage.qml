@@ -33,7 +33,7 @@ ShadowRect{
             Layout.fillWidth: true
             //implicitHeight: 25
             ToolbarBtn{
-                text: "Import"
+                text: qsTr("Import")
                 onClicked: {
                     dialogImport.open()
                 }
@@ -49,7 +49,7 @@ ShadowRect{
                 }
             }
             ToolbarBtn{
-                text: "Export"
+                text: qsTr("Export")
                 onClicked: {
                     dialogExport.open()
                 }
@@ -65,13 +65,13 @@ ShadowRect{
                 }
             }
             ToolbarBtn{
-                text: "Add"
+                text: qsTr("Add")
                 onClicked: {
                     prjSetWindow.manage(-1,null)
                 }
             }
             ToolbarBtn{
-                text: "Edit"
+                text: qsTr("Edit")
                 enabled: selectedGroup.count === 1
                 onClicked: {
                     if(selectedGroup.count === 1){
@@ -81,7 +81,7 @@ ShadowRect{
                 }
             }
             ToolbarBtn{
-                text: "Delete"
+                text: qsTr("Delete")
                 enabled: selectedGroup.count > 0
                 onClicked: {
                     for(let i = selectedGroup.count-1; i>=0; i--){
@@ -99,7 +99,7 @@ ShadowRect{
                 Layout.fillWidth: true
             }
             ToolbarBtn{
-                text: "Select All"
+                text: qsTr("Select All")
                 onClicked: {
                     for(var i=0; i< itemModel.items.count; i++){
                         if(!itemModel.items.get(i).inSelected){
@@ -109,7 +109,7 @@ ShadowRect{
                 }
             }
             ToolbarBtn{
-                text: "Deselect All"
+                text: qsTr("Deselect All")
                 onClicked: {
                     for(var i=0; i< itemModel.items.count; i++){
                         if(itemModel.items.get(i).inSelected){
@@ -221,7 +221,7 @@ ShadowRect{
                     z: 2
                     Text{
                         anchors.centerIn: parent
-                        text: selectedGroup.count + " of " + itemModel.count + " selected"
+                        text: selectedGroup.count + qsTr(" of ") + itemModel.count + qsTr(" selected")
                         font.pointSize: 12
                         font.family: "Montserrat SemiBold"
                         color: Material.foreground

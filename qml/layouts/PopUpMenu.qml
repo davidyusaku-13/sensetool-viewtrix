@@ -52,7 +52,7 @@ Item{
                     }
                 }
                 ToolbarBtn{
-                    text: "Clear History"
+                    text: qsTr("Clear History")
                     Layout.margins: 10
                     onClicked: {
                         // historyList.clear()
@@ -70,7 +70,7 @@ Item{
                     Layout.preferredHeight: 50
                     color: Material.accent
                     Text{
-                        text: "Setting"
+                        text: qsTr("Setting")
                         font.pixelSize: 20
                         font.family: "Montserrat SemiBold"
                         color: Material.foreground
@@ -80,7 +80,16 @@ Item{
                 Switch{
                     id: themeToggle
                     display: AbstractButton.TextBesideIcon
-                    text: "Theme"
+                    text: checked ? qsTr("Light Theme") : qsTr("Dark Theme")
+                }
+                Switch{
+                    id: langToggle
+                    display: AbstractButton.TextBesideIcon
+                    text: checked ? qsTr("Indonesia") : qsTr("English")
+                    onToggled: {
+                        let lang = text === qsTr("Indonesia") ? "id" : "en"
+                        translator.change_language(lang)
+                    }
                 }
                 Item{
                     Layout.fillWidth: true
