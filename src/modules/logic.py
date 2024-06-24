@@ -1,23 +1,42 @@
-from PySide6.QtCore import Slot, QObject, QUrl, QTranslator
-from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import Slot, QObject, QUrl, Property
 from PySide6.QtQml import QmlElement
 from pathlib import Path
 import yaml
 import math
+import requests
 
 QML_IMPORT_NAME = "AppLogic"
 QML_IMPORT_MAJOR_VERSION = 1
-QML_FILE = "../../qml/main.qml"
 
 @QmlElement
 class AppLogic(QObject):
     def __init__(self):
         super().__init__()
+
+    @Slot(result=dict)
+    def checkUpdate(self):
+        current_version = self.getVersion()
+        url = f"https://api.github.com/repos/davidyusaku-13/sensetool-viewtrix/releases/latest"
+        response = requests.get(url)
+        if response.status_code == 200:
+            latest_release = response.json()
+            latest_version = latest_release['tag_name']
+            if latest_version >= current_version:
+                status = True
+                release_notes = latest_release['body']
+                download_url = latest_release['assets'][0]['browser_download_url'] if latest_release['assets'] else latest_release['zipball_url']
+            else:
+                status = False
+                release_notes = ""
+                download_url = ""
+        else:
+            print(f"Failed to fetch the latest release information. Status code: {response.status_code}")
+        return {"status": status, "version": latest_version, "changelog": release_notes, "link": download_url}
         
     @Slot(result=str)
     def getVersion(self):
         version = Path("./VERSION.txt").read_text()
-        return "SenseTool " + version
+        return str(version)
 
     @Slot(list, result=list)
     def divideArray(self, array):
