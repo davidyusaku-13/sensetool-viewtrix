@@ -2,7 +2,7 @@ name: SenseTool CI/CD
 
 on:
   push:
-    branches: ["release"]
+    branches: ["release/*"]
 
 permissions:
   packages: write
