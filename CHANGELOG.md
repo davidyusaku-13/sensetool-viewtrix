@@ -1,9 +1,8 @@
-First Release of SenseTool App\n
+Second Release of SenseTool App
+\n
 \n
 
-1. Finished PrjSet Workspace\n
-   - CRUD + Import + Export is available & working\n
-2. Finished HardwareUtility Workspace\n
-   - CRUD + Import + Export is available & working\n
-3. On-going ScanArrangement Workspace\n
-   - Currently designing the layout of ScanArr Workspace\n
+1. Finished App Updater\n
+   - Autocheck update on startup\n
+   - Check for update button\n
+   - Restart prompt after update complete\n

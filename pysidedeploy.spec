@@ -5,15 +5,15 @@ title = SenseTool
 # of input_file
 project_dir = .
 # source file path
-input_file = D:\Kuliah\Viewtrix\sensetool-viewtrix\main.py
+input_file = .\main.py
 # directory where exec is stored
 exec_directory = .
 # application icon
-icon = D:\Kuliah\Viewtrix\sensetool-viewtrix\icon.ico
+icon = .\icon.ico
 
 [python]
 # python path
-python_path = D:\Kuliah\Viewtrix\sensetool-viewtrix\env\Scripts\python.exe
+python_path = .\env\Scripts\python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization
