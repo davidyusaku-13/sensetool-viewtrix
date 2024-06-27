@@ -13,7 +13,7 @@ icon = .\icon.ico
 
 [python]
 # python path
-python_path = C:\Users\davidyusaku\AppData\Local\Programs\Python\Python311\python.exe
+python_path = .\env\Scripts\python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization
@@ -22,11 +22,11 @@ packages = Nuitka==2.1
 [qt]
 # comma separated path to qml files required
 # normally all the qml files required by the project are added automatically
-qml_files = qml\AppManager.qml,qml\main.qml,qml\sensetrix.qml,qml\pages\hwutil\coefgenchart.qml,qml\pages\hwutil\hwutilpage.qml,qml\pages\prjset\confirmwindow.qml,qml\pages\prjset\prjsetitem.qml,qml\pages\prjset\prjsetobject.qml,qml\pages\prjset\prjsetpage.qml,qml\pages\prjset\prjsetwindow.qml,qml\pages\scanarr\scanarritem.qml,qml\pages\scanarr\scanarrpage.qml,qml\components\mybutton.qml,qml\components\shadowrect.qml,qml\components\toolbarbtn.qml,qml\layouts\header.qml,qml\layouts\headerlist.qml,qml\layouts\popupmenu.qml,qml\layouts\sidebar.qml,qml\layouts\sidebarlist.qml
+qml_files = qml\main.qml,qml\sensetrix.qml,qml\pages\hwutil\coefgenchart.qml,qml\pages\hwutil\hwutilpage.qml,qml\pages\prjset\confirmwindow.qml,qml\pages\prjset\prjsetitem.qml,qml\pages\prjset\prjsetobject.qml,qml\pages\prjset\prjsetpage.qml,qml\pages\prjset\prjsetwindow.qml,qml\pages\scanarr\scanarritem.qml,qml\pages\scanarr\scanarrpage.qml,qml\components\mybutton.qml,qml\components\shadowrect.qml,qml\components\toolbarbtn.qml,qml\layouts\header.qml,qml\layouts\headerlist.qml,qml\layouts\popupmenu.qml,qml\layouts\sidebar.qml,qml\layouts\sidebarlist.qml
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated
-modules = Core,QmlModels,Network,Qml,Gui,QuickTemplates2,OpenGL,Quick,QuickControls2,Widgets
+modules = Core,QuickControls2,OpenGL,Qml,Widgets,QuickTemplates2,Network,QmlModels,Gui,Quick
 # qt plugins used by the application
 plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmltooling,egldeviceintegrations,xcbglintegrations,iconengines,networkinformation,scenegraph,styles,networkaccess,platforms,generic,platforminputcontexts
 
@@ -36,3 +36,4 @@ plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmlt
 # eg = extra_args = --show-modules --follow-stdlib
 # (str) specify any extra nuitka arguments
 extra_args = --quiet --noinclude-qt-translations --disable-console --assume-yes-for-downloads
+
