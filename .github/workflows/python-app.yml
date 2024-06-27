@@ -43,11 +43,15 @@ jobs:
           pip install invoke
           pip install -r requirements.txt
 
+      - name: Install 7-Zip with Chocolatey
+        run: |
+          choco install 7zip -y
+
       - name: get Dumpbin & add to path
         run: |
           curl -Lo dumpbin.zip https://github.com/Delphier/dumpbin/releases/download/v14.40.33811/dumpbin-14.40.33811-x64.zip
-          tar -xf dumpbin.zip
-          echo "${{ github.workspace }}\x64" >> $env:GITHUB_PATH
+          7z x dumpbin.zip -odumpbin
+          echo "${{ github.workspace }}\dumpbin" >> $env:GITHUB_PATH
 
       - name: add qmltestrunner to path
         run: |
