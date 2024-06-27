@@ -22,11 +22,11 @@ packages = Nuitka==2.1
 [qt]
 # comma separated path to qml files required
 # normally all the qml files required by the project are added automatically
-qml_files = qml\main.qml,qml\sensetrix.qml,qml\pages\hwutil\coefgenchart.qml,qml\pages\hwutil\hwutilpage.qml,qml\pages\prjset\confirmwindow.qml,qml\pages\prjset\prjsetitem.qml,qml\pages\prjset\prjsetobject.qml,qml\pages\prjset\prjsetpage.qml,qml\pages\prjset\prjsetwindow.qml,qml\pages\scanarr\scanarritem.qml,qml\pages\scanarr\scanarrpage.qml,qml\components\mybutton.qml,qml\components\shadowrect.qml,qml\components\toolbarbtn.qml,qml\layouts\header.qml,qml\layouts\headerlist.qml,qml\layouts\popupmenu.qml,qml\layouts\sidebar.qml,qml\layouts\sidebarlist.qml
+qml_files = qml\main.qml,qml\sensetrix.qml,qml\updatewindow.qml,qml\pages\hwutil\coefgenchart.qml,qml\pages\hwutil\hwutilpage.qml,qml\pages\prjset\confirmwindow.qml,qml\pages\prjset\prjsetitem.qml,qml\pages\prjset\prjsetobject.qml,qml\pages\prjset\prjsetpage.qml,qml\pages\prjset\prjsetwindow.qml,qml\pages\scanarr\scanarritem.qml,qml\pages\scanarr\scanarrpage.qml,qml\components\mybutton.qml,qml\components\shadowrect.qml,qml\components\toolbarbtn.qml,qml\layouts\header.qml,qml\layouts\headerlist.qml,qml\layouts\popupmenu.qml,qml\layouts\sidebar.qml,qml\layouts\sidebarlist.qml
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated
-modules = QuickControls2,Gui,Quick,QuickTemplates2,QmlModels,Qml,Network,Core,OpenGL,Widgets
+modules = Core,Widgets,Quick,OpenGL,Network,Gui,QuickTemplates2,QuickControls2,QmlModels,Qml
 # qt plugins used by the application
 plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmltooling,egldeviceintegrations,xcbglintegrations,iconengines,networkinformation,scenegraph,styles,networkaccess,platforms,generic,platforminputcontexts
 
