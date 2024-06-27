@@ -13,6 +13,8 @@
         <file alias="setting">./qml/images/setting.png</file>
         <file alias="trash">./qml/images/trash.png</file>
         <file alias="upload">./qml/images/upload.png</file>
+        <file alias="graph">./qml/images/graph.png</file>
+        <file alias="scanarr">./qml/images/scanarr.png</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Lato-Black">./qml/fonts/Lato-Black.ttf</file>

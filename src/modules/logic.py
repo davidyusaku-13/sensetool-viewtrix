@@ -1,9 +1,6 @@
 from PySide6.QtCore import Signal, Slot, QObject, QUrl, Property
 from PySide6.QtQml import QmlElement
-from pathlib import Path
-import yaml
-import math
-import requests
+import yaml, math, requests, os
 
 QML_IMPORT_NAME = "AppLogic"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -46,8 +43,11 @@ class AppLogic(QObject):
         
     @Slot(result=str)
     def getVersion(self):
-        version = Path("./VERSION.txt").read_text()
-        return str(version)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        versionpath = os.path.join(script_dir, '../../VERSION.txt')
+        with open(versionpath, 'r') as f:
+            version = f.read().strip()
+        return version
 
     @Slot(list, result=list)
     def divideArray(self, array):
