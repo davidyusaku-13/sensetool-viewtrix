@@ -77,9 +77,9 @@ ShadowRect{
                                     // var object = itemList.get(itemSelected.itemsIndex)
                                     // layout.history("Deleted", object)
                                     // itemList.remove(itemSelected.itemsIndex)
-                                    var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
-                                    window.manager.addHistory("Deleted", object.name, object.value, object.desc)
-                                    window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
+                                    var object = window.prjSetModel.get(itemSelected.itemsIndex)
+                                    window.addHistory("Deleted", object.name, object.value, object.desc)
+                                    window.prjSetModel.removeItem(itemSelected.itemsIndex)
                                 }
                             }
                         }
@@ -110,15 +110,15 @@ ShadowRect{
                             onCreate: (object) => {
                                         //   itemList.append(object);
                                         //   layout.history("Added", object)
-                                        window.manager.add(object.name, object.value, object.desc)
-                                        window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                        window.add(object.name, object.value, object.desc)
+                                        window.addHistory("Added", object.name, object.value, object.desc)
                                     }
                             onModify: (index, object) => {
                                         //   itemList.set(index, object);
                                         //   layout.history("Modified", object)
                                         let i = selectedGroup.get(0).itemsIndex
-                                        window.manager.edit(root.i, object.name, object.value, object.desc)
-                                        window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                        window.edit(root.i, object.name, object.value, object.desc)
+                                        window.addHistory("Modified", object.name, object.value, object.desc)
                                     }
                         }
                     }
@@ -164,7 +164,7 @@ ShadowRect{
                                 model: ListModel{
                                     id: itemList
                                 }
-                                // model: window.manager.prjSetModel
+                                // model: window.prjSetModel
                                 groups: [
                                     DelegateModelGroup {
                                         id: selectedGroup
@@ -241,7 +241,7 @@ ShadowRect{
                                     }
                                     DropArea {
                                         anchors.fill: parent
-                                        onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
+                                        onEntered: (drag) => {window.moveItem(drag.source.index, content.index)}
                                     }
                                 }
                             }
@@ -296,9 +296,9 @@ ShadowRect{
                                     // var object = itemList.get(itemSelected.itemsIndex)
                                     // layout.history("Deleted", object)
                                     // itemList.remove(itemSelected.itemsIndex)
-                                    var object = window.manager.prjSetModel.get(itemSelected.itemsIndex)
-                                    window.manager.addHistory("Deleted", object.name, object.value, object.desc)
-                                    window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
+                                    var object = window.prjSetModel.get(itemSelected.itemsIndex)
+                                    window.addHistory("Deleted", object.name, object.value, object.desc)
+                                    window.prjSetModel.removeItem(itemSelected.itemsIndex)
                                 }
                             }
                         }
@@ -332,15 +332,15 @@ ShadowRect{
                             onCreate: (object) => {
                                         //   itemList.append(object);
                                         //   layout.history("Added", object)
-                                        window.manager.add(object.name, object.value, object.desc)
-                                        window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                        window.add(object.name, object.value, object.desc)
+                                        window.addHistory("Added", object.name, object.value, object.desc)
                                     }
                             onModify: (index, object) => {
                                         //   itemList.set(index, object);
                                         //   layout.history("Modified", object)
                                         let i = selectedGroup.get(0).itemsIndex
-                                        window.manager.edit(root.i, object.name, object.value, object.desc)
-                                        window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                        window.edit(root.i, object.name, object.value, object.desc)
+                                        window.addHistory("Modified", object.name, object.value, object.desc)
                                     }
                         }
                     }
@@ -386,7 +386,7 @@ ShadowRect{
                                 // model: ListModel{
                                 //     id: itemList
                                 // }
-                                model: window.manager.prjSetModel
+                                model: window.prjSetModel
                                 groups: [
                                     DelegateModelGroup {
                                         id: selectedGroup2
@@ -463,7 +463,7 @@ ShadowRect{
                                     }
                                     DropArea {
                                         anchors.fill: parent
-                                        onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
+                                        onEntered: (drag) => {window.moveItem(drag.source.index, content.index)}
                                     }
                                 }
                             }

@@ -51,13 +51,13 @@ Item{
                             fileMode: FileDialog.OpenFile
                             nameFilters: ["YAML files (*.yaml *.yml)"]
                             onAccepted: {
-                                let importRes = window.manager.logic.importWinCoef(selectedFile)
+                                let importRes = window.logic.importWinCoef(selectedFile)
                                 win.clear()
                                 win.drawWin(importRes[0])
                                 winFields.itemAt(0).text = importRes[1]
                                 winFields.itemAt(1).text = importRes[2]
                                 winLength.currentIndex = winLength.find(importRes[3])
-                                window.manager.addHistory("Imported", selectedFile)
+                                window.historyModel.addHistory("Imported", selectedFile, "", "")
                             }
                         }
                         ToolbarBtn{
@@ -75,8 +75,8 @@ Item{
                             onAccepted: {
                                 win.clear()
                                 let y = win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, winFields.itemAt(2).text)
-                                window.manager.logic.exportWinCoef(selectedFile, y, winFields.itemAt(0).text, winFields.itemAt(1).text, winFields.itemAt(2).text)
-                                window.manager.addHistory("Exported", selectedFile)
+                                window.logic.exportWinCoef(selectedFile, y, winFields.itemAt(0).text, winFields.itemAt(1).text, winFields.itemAt(2).text)
+                                window.historyModel.addHistory("Exported", selectedFile)
                             }
                         }
                     }
@@ -149,7 +149,7 @@ Item{
                             fileMode: FileDialog.OpenFile
                             nameFilters: ["YAML files (*.yaml *.yml)"]
                             onAccepted: {
-                                let importRes = window.manager.logic.importDemoCoef(selectedFile)
+                                let importRes = window.logic.importDemoCoef(selectedFile)
                                 let y = importRes[0]
                                 demo.clear()
                                 demo.drawDemo(y[0], y[1])
@@ -157,7 +157,7 @@ Item{
                                 demoFields.itemAt(1).text = importRes[2]
                                 demoFields.itemAt(2).text = importRes[3]
                                 demoFields.itemAt(3).text = importRes[4]
-                                window.manager.addHistory("Imported", selectedFile)
+                                window.historyModel.addHistory("Imported", selectedFile, "", "")
                             }
                         }
                         ToolbarBtn{
@@ -175,8 +175,8 @@ Item{
                             onAccepted: {
                                 demo.clear()
                                 let y = demo.createDemo(demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
-                                window.manager.logic.exportDemoCoef(selectedFile, y, demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
-                                window.manager.addHistory("Exported", selectedFile)
+                                window.logic.exportDemoCoef(selectedFile, y, demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
+                                window.historyModel.addHistory("Exported", selectedFile)
                             }
                         }
                     }

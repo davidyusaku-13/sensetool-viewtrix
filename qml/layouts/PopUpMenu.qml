@@ -24,7 +24,7 @@ Item{
                     Layout.fillWidth: true
                     clip: true
                     // model: historyList
-                    model: window.manager.historyModel
+                    model: window.historyModel
                     //header
                     headerPositioning: ListView.OverlayHeader
                     header: Rectangle{
