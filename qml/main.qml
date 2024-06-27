@@ -15,7 +15,7 @@ ApplicationWindow {
         parent: window
     }
 
-    title: qsTr("SenseTool " + logic.getVersion())
+    title: qsTr("SenseTool-v" + logic.getVersion())
     visible: true
     width: 1280
     height: 720

@@ -26,7 +26,7 @@ qml_files = qml\main.qml,qml\sensetrix.qml,qml\updatewindow.qml,qml\pages\hwutil
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated
-modules = Gui,QuickControls2,Core,QuickTemplates2,Qml,QmlModels,Network,Quick,OpenGL,Widgets
+modules = Widgets,QuickControls2,Qml,Gui,QmlModels,OpenGL,Quick,QuickTemplates2,Network,Core
 # qt plugins used by the application
 plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmltooling,egldeviceintegrations,xcbglintegrations,iconengines,networkinformation,scenegraph,styles,networkaccess,platforms,generic,platforminputcontexts
 
@@ -35,5 +35,5 @@ plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmlt
 # of the app bundle
 # eg = extra_args = --show-modules --follow-stdlib
 # (str) specify any extra nuitka arguments
-# extra_args = --quiet --noinclude-qt-translations --disable-console --assume-yes-for-downloads --include-data-files=.\VERSION.txt=./VERSION.txt
-extra_args = --quiet --noinclude-qt-translations --assume-yes-for-downloads --include-data-files=.\VERSION.txt=./VERSION.txt
+extra_args = --quiet --noinclude-qt-translations --disable-console --assume-yes-for-downloads --include-data-files=VERSION.txt=VERSION.txt
+
