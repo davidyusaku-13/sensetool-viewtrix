@@ -67,7 +67,7 @@ jobs:
 
       - name: Get Version and save to VERSION.txt
         run: |
-          echo "VERSION=${{ steps.version_step.outputs.GitVersion_FullSemVer }}" >> ./VERSION.txt
+          echo "${{ steps.version_step.outputs.GitVersion_FullSemVer }}" >> ./VERSION.txt
 
       - name: Deploy App
         run: |
