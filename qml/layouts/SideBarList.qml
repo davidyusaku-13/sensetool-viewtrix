@@ -26,11 +26,11 @@ ListView {
         }
         ListElement {
             name: "Scan Arrangement"
-            icon: "qrc:/images/plus"
+            icon: "qrc:/images/scanarr"
         }
         ListElement {
             name: "Hardware Utilities"
-            icon: "qrc:/images/plus"
+            icon: "qrc:/images/graph"
         }
     }
 }

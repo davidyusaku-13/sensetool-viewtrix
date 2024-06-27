@@ -77,18 +77,56 @@ Item{
                         anchors.centerIn: parent
                     }
                 }
-                Switch{
-                    id: themeToggle
-                    display: AbstractButton.TextBesideIcon
-                    text: checked ? qsTr("Light Theme") : qsTr("Dark Theme")
+                RowLayout{
+                    Layout.fillWidth: true
+                    implicitHeight: 50
+                    Layout.margins: 10
+                    Text{
+                        text: "Theme"
+                        font.family: "Montserrat"
+                        font.pixelSize: 15
+                        Layout.fillWidth: true
+                        color: Material.foreground
+                    }
+                    Switch{
+                        id: themeToggle
+                        display: AbstractButton.TextBesideIcon
+                        text: checked ? qsTr("Light Theme") : qsTr("Dark Theme")
+                    }
                 }
-                Switch{
-                    id: langToggle
-                    display: AbstractButton.TextBesideIcon
-                    text: checked ? qsTr("Indonesia") : qsTr("English")
-                    onToggled: {
-                        let lang = text === qsTr("Indonesia") ? "id" : "en"
-                        translator.change_language(lang)
+                RowLayout{
+                    Layout.fillWidth: true
+                    implicitHeight: 50
+                    Layout.margins: 10
+                    Text{
+                        text: "Language"
+                        font.family: "Montserrat"
+                        font.pixelSize: 15
+                        Layout.fillWidth: true
+                        color: Material.foreground
+                    }
+                    Switch{
+                        id: langToggle
+                        display: AbstractButton.TextBesideIcon
+                        text: checked ? qsTr("Indonesia") : qsTr("English")
+                        onToggled: {
+                            let lang = text === qsTr("Indonesia") ? "id" : "en"
+                            translator.change_language(lang)
+                        }
+                    }
+                }
+                Button{
+                    Layout.fillWidth: true
+                    Layout.margins: 10
+                    text: qsTr("Check for updates")
+                    font.family: "Montserrat"
+                    HoverHandler{
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    onClicked: {
+                        if(logic.checkUpdate()["status"]){
+                            update_window.show()
+                        }
                     }
                 }
                 Item{

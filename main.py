@@ -38,7 +38,7 @@ if __name__ == "__main__":
     engine = QQmlApplicationEngine()
     QQuickStyle.setStyle("Material")
     qml_file = Path(__file__).resolve().parent / "./qml/main.qml"
-
+    
     translator = Translator(app, engine)
     engine.rootContext().setContextProperty("translator", translator)
     
