@@ -9,26 +9,24 @@ import QtCore
 ApplicationWindow {
     id: window
     
-    property AppManager manager: AppManager{
-        prjSetModel: PrjSetModel {}
-        historyModel: HistoryModel{}
-        logic: AppLogic{}
+    property PrjSetModel prjSetModel: PrjSetModel {}
+    property HistoryModel historyModel: HistoryModel{}
+    property AppLogic logic: AppLogic{
+        parent: window
     }
 
-    title: qsTr("SenseTool " + manager.logic.getVersion())
+    title: qsTr("SenseTool " + logic.getVersion())
     visible: true
     width: 1280
     height: 720
     
     SenseTrix{
         anchors.fill: parent
-        
         UpdateWindow{
             id: update_window
         }
-
         Component.onCompleted: {
-            if(manager.logic.checkUpdate()["status"]){
+            if(logic.checkUpdate()["status"]){
                 update_window.show()
             }
         }
@@ -39,5 +37,18 @@ ApplicationWindow {
         property alias y: window.y
         property alias width: window.width
         property alias height: window.height
+    }
+
+    Connections {
+        target: updateManager
+        function onProgressChanged() {
+            update_window.progressBar.visible = true
+            update_window.progressBar.value = updateManager.getProgress()
+            update_window.progressText.visible = true
+            update_window.progressText.text = updateManager.getProgress() + qsTr("% completed")
+            if (updateManager.getProgress() === 100) {
+                update_window.restartDialog.open()
+            }
+        }
     }
 }

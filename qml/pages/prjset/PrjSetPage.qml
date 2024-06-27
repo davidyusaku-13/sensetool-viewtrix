@@ -44,8 +44,8 @@ ShadowRect{
                 fileMode: FileDialog.OpenFile
                 nameFilters: ["YAML files (*.yaml *.yml)"]
                 onAccepted: {
-                    window.manager.importYAML(selectedFile)
-                    window.manager.addHistory("Imported", selectedFile)
+                    window.prjSetModel.importYAML(selectedFile)
+                    window.historyModel.addHistory("Imported", selectedFile, "", "")
                 }
             }
             ToolbarBtn{
@@ -60,8 +60,8 @@ ShadowRect{
                 fileMode: FileDialog.SaveFile
                 nameFilters: ["YAML files (*.yaml *.yml)"]
                 onAccepted: {
-                    window.manager.exportYAML(selectedFile)
-                    window.manager.addHistory("Exported", selectedFile)
+                    window.prjSetModel.exportYAML(selectedFile)
+                    window.historyModel.addHistory("Exported", selectedFile, "", "")
                 }
             }
             ToolbarBtn{
@@ -90,8 +90,8 @@ ShadowRect{
                             // layout.history("Deleted", object)
                             // itemList.remove(itemSelected.itemsIndex)
                             var object = itemSelected.model
-                            window.manager.addHistory("Deleted", object.name, object.value, object.desc)
-                            window.manager.prjSetModel.removeItem(itemSelected.itemsIndex)
+                            window.historyModel.addHistory("Deleted", object.name, object.value, object.desc)
+                            window.prjSetModel.removeItem(itemSelected.itemsIndex)
                     }
                 }
             }
@@ -123,15 +123,15 @@ ShadowRect{
                 onCreate: (object) => {
                               // itemList.append(object);
                                   // layout.history("Added", object)
-                                  window.manager.add(object.name, object.value, object.desc)
-                                  window.manager.addHistory("Added", object.name, object.value, object.desc)
+                                  window.prjSetModel.addItem(object.name, object.value, object.desc)
+                                  window.historyModel.addHistory("Added", object.name, object.value, object.desc)
                           }
                 onModify: (index, object) => {
                                 // itemList.set(index, object);
                                 // layout.history("Modified", object)
                                 let i = selectedGroup.get(0).itemsIndex
-                                window.manager.edit(i, object.name, object.value, object.desc)
-                                window.manager.addHistory("Modified", object.name, object.value, object.desc)
+                                window.prjSetModel.edit(i, object.name, object.value, object.desc)
+                                window.historyModel.addHistory("Modified", object.name, object.value, object.desc)
                               }
             }
         }
@@ -190,7 +190,7 @@ ShadowRect{
                     // model: ListModel{
                         //     id: itemList
                         // }
-                        model: window.manager.prjSetModel
+                        model: window.prjSetModel
                     groups: [
                         DelegateModelGroup {
                             id: selectedGroup
@@ -267,7 +267,7 @@ ShadowRect{
                             }
                             DropArea {
                                 anchors.fill: parent
-                                onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
+                                onEntered: (drag) => {window.moveItem(drag.source.index, content.index)}
                             }
                         }
                     }

@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot, QObject, QUrl, Property
+from PySide6.QtCore import Signal, Slot, QObject, QUrl, Property
 from PySide6.QtQml import QmlElement
 from pathlib import Path
 import yaml
@@ -10,8 +10,19 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 @QmlElement
 class AppLogic(QObject):
+    parentChanged = Signal(QObject)
+    
     def __init__(self):
         super().__init__()
+        
+    @Property(QObject)
+    def parent(self) -> QObject:
+        return super().parent()
+    
+    @parent.setter
+    def parent(self, parent: QObject):
+        super().setParent(parent)
+        self.parentChanged.emit(parent)
 
     @Slot(result=dict)
     def checkUpdate(self):

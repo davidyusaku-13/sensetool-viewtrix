@@ -36,5 +36,6 @@
         <file alias="Montserrat-Thin">./qml/fonts/Montserrat-Thin.ttf</file>
         <file alias="Montserrat-ThinItalic">./qml/fonts/Montserrat-ThinItalic.ttf</file>
         <file alias="Montserrat-VariableFont_wght">./qml/fonts/Montserrat-VariableFont_wght.ttf</file>
+        <file alias="Richard Clean Personal Use">./qml/fonts/RichardCleanPersonalUseRegular-MV54p.ttf</file>
     </qresource>
 </RCC>
