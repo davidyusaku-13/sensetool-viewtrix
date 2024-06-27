@@ -2,7 +2,7 @@ name: SenseTool CI/CD
 
 on:
   push:
-    branches: ["release/*"]
+    branches: ["main"]
 
 permissions:
   packages: write
@@ -45,7 +45,7 @@ jobs:
 
       - name: get Dumpbin & add to path
         run: |
-          curl -Lo dumpbin.zip https://github.com/Delphier/dumpbin/releases/download/v2022/dumpbin-2022.zip
+          curl -Lo dumpbin.zip https://github.com/Delphier/dumpbin/releases/download/v14.40.33811/dumpbin-14.40.33811-x64.zip
           tar -xf dumpbin.zip
           echo "${{ github.workspace }}\x64" >> $env:GITHUB_PATH
 
