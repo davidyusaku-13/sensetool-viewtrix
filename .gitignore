@@ -1,4 +1,9 @@
 __pycache__
-qmls/temp.qml
-app.log
-todo
+.vscode
+deployment
+env
+logs
+py_cmd_builder_v1
+test_logic_export_demo_coef.yaml
+test_logic_export_win_coef.yaml
+src/modules/tes.py

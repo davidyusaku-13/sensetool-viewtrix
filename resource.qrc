@@ -1,0 +1,41 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qtquickcontrols2.conf</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="checklist">./qml/images/checklist.png</file>
+        <file alias="drag">./qml/images/drag.png</file>
+        <file alias="import">./qml/images/import.png</file>
+        <file alias="menu-icon">./qml/images/menu-icon.png</file>
+        <file alias="menu-icon2">./qml/images/menu-icon2.png</file>
+        <file alias="notification">./qml/images/notification.png</file>
+        <file alias="plus">./qml/images/plus.png</file>
+        <file alias="setting">./qml/images/setting.png</file>
+        <file alias="trash">./qml/images/trash.png</file>
+        <file alias="upload">./qml/images/upload.png</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file alias="Lato-Black">./qml/fonts/Lato-Black.ttf</file>
+        <file alias="Montserrat-Black">./qml/fonts/Montserrat-Black.ttf</file>
+        <file alias="Montserrat-BlackItalic">./qml/fonts/Montserrat-BlackItalic.ttf</file>
+        <file alias="Montserrat-Bold">./qml/fonts/Montserrat-Bold.ttf</file>
+        <file alias="Montserrat-BoldItalic">./qml/fonts/Montserrat-BoldItalic.ttf</file>
+        <file alias="Montserrat-ExtraBold">./qml/fonts/Montserrat-ExtraBold.ttf</file>
+        <file alias="Montserrat-ExtraBoldItalic">./qml/fonts/Montserrat-ExtraBoldItalic.ttf</file>
+        <file alias="Montserrat-ExtraLight">./qml/fonts/Montserrat-ExtraLight.ttf</file>
+        <file alias="Montserrat-ExtraLightItalic">./qml/fonts/Montserrat-ExtraLightItalic.ttf</file>
+        <file alias="Montserrat-Italic-VariableFont_wght">./qml/fonts/Montserrat-Italic-VariableFont_wght.ttf</file>
+        <file alias="Montserrat-Italic">./qml/fonts/Montserrat-Italic.ttf</file>
+        <file alias="Montserrat-Light">./qml/fonts/Montserrat-Light.ttf</file>
+        <file alias="Montserrat-LightItalic">./qml/fonts/Montserrat-LightItalic.ttf</file>
+        <file alias="Montserrat-Medium">./qml/fonts/Montserrat-Medium.ttf</file>
+        <file alias="Montserrat-MediumItalic">./qml/fonts/Montserrat-MediumItalic.ttf</file>
+        <file alias="Montserrat-Regular">./qml/fonts/Montserrat-Regular.ttf</file>
+        <file alias="Montserrat-SemiBold">./qml/fonts/Montserrat-SemiBold.ttf</file>
+        <file alias="Montserrat-SemiBoldItalic">./qml/fonts/Montserrat-SemiBoldItalic.ttf</file>
+        <file alias="Montserrat-Thin">./qml/fonts/Montserrat-Thin.ttf</file>
+        <file alias="Montserrat-ThinItalic">./qml/fonts/Montserrat-ThinItalic.ttf</file>
+        <file alias="Montserrat-VariableFont_wght">./qml/fonts/Montserrat-VariableFont_wght.ttf</file>
+        <file alias="Richard Clean Personal Use">./qml/fonts/RichardCleanPersonalUseRegular-MV54p.ttf</file>
+    </qresource>
+</RCC>
