@@ -35,4 +35,4 @@ plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmlt
 # of the app bundle
 # eg = extra_args = --show-modules --follow-stdlib
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --disable-console --assume-yes-for-downloads --include-data-files=.\qml\VERSION.txt=./qml\VERSION.txt
+extra_args = --quiet --noinclude-qt-translations --disable-console --assume-yes-for-downloads --include-data-files=.\VERSION.txt=./VERSION.txt
