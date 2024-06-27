@@ -61,11 +61,6 @@ jobs:
         run: |
           invoke test
 
-      - name: Deploy App
-        run: |
-          invoke deploy
-          Rename-Item -Path "main.exe" -NewName "sensetool-${{ steps.version_step.outputs.GitVersion_FullSemVer }}.exe"
-
       - name: Save CHANGELOG.md to GITHUB_ENV
         run: |
           echo "RELEASE_BODY=$(cat CHANGELOG.md)" >> $env:GITHUB_ENV
@@ -73,6 +68,11 @@ jobs:
       - name: Get Version and save to VERSION.txt
         run: |
           echo "VERSION=${{ steps.version_step.outputs.GitVersion_FullSemVer }}" >> ./VERSION.txt
+
+      - name: Deploy App
+        run: |
+          invoke deploy
+          Rename-Item -Path "main.exe" -NewName "sensetool-${{ steps.version_step.outputs.GitVersion_FullSemVer }}.exe"
 
       - name: Create Release
         id: create_release

@@ -5,15 +5,15 @@ title = SenseTool
 # of input_file
 project_dir = .
 # source file path
-input_file = .\main.py
+input_file = D:\Kuliah\Viewtrix\sensetool-viewtrix\main.py
 # directory where exec is stored
 exec_directory = .
 # application icon
-icon = .\icon.ico
+icon = D:\Kuliah\Viewtrix\sensetool-viewtrix\icon.ico
 
 [python]
 # python path
-python_path = .\env\Scripts\python.exe
+python_path = D:\Kuliah\Viewtrix\sensetool-viewtrix\env\Scripts\python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization
@@ -26,7 +26,7 @@ qml_files = qml\main.qml,qml\sensetrix.qml,qml\pages\hwutil\coefgenchart.qml,qml
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated
-modules = Core,QuickControls2,OpenGL,Qml,Widgets,QuickTemplates2,Network,QmlModels,Gui,Quick
+modules = QuickControls2,Gui,Quick,QuickTemplates2,QmlModels,Qml,Network,Core,OpenGL,Widgets
 # qt plugins used by the application
 plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmltooling,egldeviceintegrations,xcbglintegrations,iconengines,networkinformation,scenegraph,styles,networkaccess,platforms,generic,platforminputcontexts
 
@@ -35,5 +35,4 @@ plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmlt
 # of the app bundle
 # eg = extra_args = --show-modules --follow-stdlib
 # (str) specify any extra nuitka arguments
-extra_args = --quiet --noinclude-qt-translations --disable-console --assume-yes-for-downloads
-
+extra_args = --quiet --noinclude-qt-translations --disable-console --assume-yes-for-downloads --include-data-files=.\qml\VERSION.txt=./qml\VERSION.txt
