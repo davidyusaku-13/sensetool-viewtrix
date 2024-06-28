@@ -1,8 +1,5 @@
-Second Release of SenseTool App
-\n
-\n
+Finalized release without Scan Arrangement Workspace
 
-1. Finished App Updater\n
-   - Autocheck update on startup\n
-   - Check for update button\n
-   - Restart prompt after update complete\n
+What's new in this update:
+
+- Fixed wrong update checker (it was always updating even when using latest version)
