@@ -9,8 +9,6 @@ QML_IMPORT_NAME = "PrjSetModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
 logger = AppLogger.get_instance()
-format = "[%(asctime)s] ___ %(levelname)s ___ %(message)s"
-level = logger.level("INFO")
 
 @QmlElement
 class PrjSetModel(QAbstractListModel):
@@ -92,8 +90,7 @@ class PrjSetModel(QAbstractListModel):
         if 0 <= index < len(self._items):
             return self._items[index]
         else:
-            logger.log(
-                f"Attempt to access item at invalid index {index}", logger.level("WARNING"))
+            logger.log(f"Attempt to access item at invalid index {index}", "WARNING")
             return None
 
     def flags(self) -> Qt.ItemFlag:
@@ -103,7 +100,7 @@ class PrjSetModel(QAbstractListModel):
 
     @Slot(str, str, str)
     def addItem(self, name, value, desc):
-        logger.log(f"Added item: {name} - {value} - {desc}", level)
+        logger.log(f"Added item: {name} - {value} - {desc}", "INFO")
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
         item = PrjSetModelItem(name, value, desc, self)
         self._items.append(item)
@@ -111,21 +108,21 @@ class PrjSetModel(QAbstractListModel):
 
     @Slot(int, str, str, str)
     def edit(self, index, name, value, desc):
+        logger.log(f"Edited item at index {index}: {name} - {value} - {desc}", "INFO")
         if 0 <= index < len(self._items):
             item = self._items[index]
             item._name = name
             item._value = value
             item._desc = desc
             self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
-            logger.log(
-                f"Edited item at index {index}: {name} - {value} - {desc}", level)
         else:
-            logger.log(f"Attempt to edit item at invalid index {index}", level)
+            logger.log(f"Attempt to edit item at invalid index {index}", "ERROR")
 
     @Slot(int)
     def removeItem(self, index):
         if 0 <= index < len(self._items):
             self.beginRemoveRows(QModelIndex(), index, index)
+            logger.log(f"Deleted item at index {index}", "INFO")
             del self._items[index]
             self.endRemoveRows()
 
@@ -138,7 +135,7 @@ class PrjSetModel(QAbstractListModel):
     @Slot(QUrl)
     def exportYAML(self, file: QUrl):
         file_name = file.toLocalFile()
-        logger.log(f"Exported file: {file_name}", level)
+        logger.log(f"Exported file: {file_name}", "INFO")
         yaml_data = {
             'title': 'Project Settings',
             'desc': "Project Setting includes the static information which is not be changed during runtime. "
@@ -161,6 +158,7 @@ class PrjSetModel(QAbstractListModel):
     @Slot(QUrl)
     def importYAML(self, file: QUrl):
         file = file.toLocalFile()
+        logger.log(f"Imported file: {file}", "INFO")
         try:
             with open(file, 'r') as yaml_file:
                 yaml_data = yaml.load(yaml_file, Loader=yaml.FullLoader)

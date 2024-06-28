@@ -267,7 +267,7 @@ ShadowRect{
                             }
                             DropArea {
                                 anchors.fill: parent
-                                onEntered: (drag) => {window.moveItem(drag.source.index, content.index)}
+                                onEntered: (drag) => {window.prjSetModel.move(drag.source.index, content.index)}
                             }
                         }
                     }

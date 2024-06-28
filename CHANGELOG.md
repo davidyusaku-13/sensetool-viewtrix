@@ -1,5 +1,8 @@
-Finalized release without Scan Arrangement Workspace
+Bugfixes
 
 What's new in this update:
 
-- Fixed wrong update checker (it was always updating even when using latest version)
+- Logger is fully functional (properly, it used to be functional but sometimes doesn't work)
+- Fixed drag n drop issue on PrjSet Workspace
+- Optimized code for downloading new app update
+- Fixed filename issue on download update function (restart after update is working now)
