@@ -74,25 +74,34 @@ jobs:
           invoke deploy
           Rename-Item -Path "main.exe" -NewName "sensetool.exe"
 
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
+      #     release_name: Release ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
+      #     body: ${{ env.RELEASE_BODY }}
+      #     draft: false
+      #     prerelease: false
+
+      # - name: Upload Release Asset
+      #   id: upload-release-asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ${{ github.workspace }}\sensetool.exe
+      #     asset_name: sensetool.exe
+      #     asset_content_type: application/exe
+
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: elgohr/Github-Release-Action@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
-          release_name: Release ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
-          body: ${{ env.RELEASE_BODY }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}\sensetool.exe
-          asset_name: sensetool.exe
-          asset_content_type: application/exe
+          title: Release ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
+          workdir: ${{ github.workspace }}\
