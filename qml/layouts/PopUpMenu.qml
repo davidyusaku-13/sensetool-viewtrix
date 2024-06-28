@@ -55,8 +55,7 @@ Item{
                     text: qsTr("Clear History")
                     Layout.margins: 10
                     onClicked: {
-                        // historyList.clear()
-                        window.manager.clearHistory()
+                        window.historyModel.clear()
                     }
                 }
             }

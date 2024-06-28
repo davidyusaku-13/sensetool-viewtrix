@@ -9,8 +9,6 @@ QML_IMPORT_NAME = "HistoryModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
 logger = AppLogger.get_instance()
-format = "[%(asctime)s] ___ %(levelname)s ___ %(message)s"
-level = logger.level("INFO")
 
 current_time = datetime.datetime.now().strftime("%A, %d-%m-%Y %H:%M:%S")
 
@@ -60,8 +58,6 @@ class HistoryModel(QAbstractListModel):
         value = value if value != None else ""
         desc = desc if desc != None else ""
         tmp = f"{action}: {name} - {value} - {desc} on {current_time}"
-        logger.log(
-            f"Added history: {action}: {name} - {value} - {desc} on {current_time}", level)
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
         item = HistoryModelItem(action, name, value,
                                 desc, current_time, tmp, self)
