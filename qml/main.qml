@@ -41,12 +41,12 @@ ApplicationWindow {
 
     Connections {
         target: updateManager
-        function onProgressChanged() {
+        function onProgressChanged(value) {
             update_window.progressBar.visible = true
-            update_window.progressBar.value = updateManager.getProgress()
+            update_window.progressBar.value = value
             update_window.progressText.visible = true
-            update_window.progressText.text = updateManager.getProgress() + qsTr("% completed")
-            if (updateManager.getProgress() === 100) {
+            update_window.progressText.text = value + qsTr("% completed")
+            if (value === 100) {
                 update_window.restartDialog.open()
             }
         }

@@ -1,6 +1,10 @@
 from PySide6.QtCore import Signal, Slot, QObject, QUrl, Property
 from PySide6.QtQml import QmlElement
 import yaml, math, requests, os
+from src.modules.logger import AppLogger
+
+# Init LOGGER
+logger = AppLogger.get_instance()
 
 QML_IMPORT_NAME = "AppLogic"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -38,7 +42,7 @@ class AppLogic(QObject):
                 release_notes = ""
                 download_url = ""
         else:
-            print(f"Failed to fetch the latest release information. Status code: {response.status_code}")
+            logger.log(f"Failed to fetch the latest release information. Status code: {response.status_code}", "ERROR")
         return {"status": status, "version": latest_version, "changelog": release_notes, "link": download_url}
         
     @Slot(result=str)
@@ -75,6 +79,7 @@ class AppLogic(QObject):
     @Slot(QUrl, list, int, float, str)
     def exportWinCoef(self, fname, y, win_sample_number, win_a0, win_coef_length):
         file_name = fname.toLocalFile()
+        logger.log(f"Exported win coef as{file_name}", "INFO")
         yaml_data = {
             'sample_number': win_sample_number,
             'a0': win_a0,
@@ -94,6 +99,7 @@ class AppLogic(QObject):
     @Slot(QUrl, result=list)
     def importWinCoef(self, fname):
         file_name = fname.toLocalFile()
+        logger.log(f"Imported win coef {file_name}", "INFO")
         arr = []
         try:
             with open(file_name, 'r') as yaml_file:
@@ -134,6 +140,7 @@ class AppLogic(QObject):
     def exportDemoCoef(self, fname, y, demo_step, demo_sample, demo_cycle, demo_adc):
         y_sin, y_cos = y
         file_name = fname.toLocalFile()
+        logger.log(f"Exported demo coef as {file_name}", "INFO")
         yaml_data = {
             'step': demo_step,
             'sample': demo_sample,
@@ -161,6 +168,7 @@ class AppLogic(QObject):
     @Slot(QUrl, result=list)
     def importDemoCoef(self, fname):
         file_name = fname.toLocalFile()
+        logger.log(f"Imported demo coef {file_name}", "INFO")
         sinArr = []
         cosArr = []
         try:
