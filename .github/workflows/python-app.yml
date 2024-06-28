@@ -72,7 +72,7 @@ jobs:
       - name: Deploy App
         run: |
           invoke deploy
-          Rename-Item -Path "main.exe" -NewName "sensetool-${{ steps.version_step.outputs.GitVersion_FullSemVer }}.exe"
+          Rename-Item -Path "main.exe" -NewName "sensetool.exe"
 
       - name: Create Release
         id: create_release
@@ -93,6 +93,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}\sensetool-${{ steps.version_step.outputs.GitVersion_FullSemVer }}.exe
-          asset_name: sensetool-${{ steps.version_step.outputs.GitVersion_FullSemVer }}.exe
+          asset_path: ${{ github.workspace }}\sensetool.exe
+          asset_name: sensetool.exe
           asset_content_type: application/exe
