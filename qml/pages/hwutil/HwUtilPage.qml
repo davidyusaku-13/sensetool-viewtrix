@@ -23,17 +23,24 @@ Item{
                 font.pixelSize: 17
                 TabButton {
                     text: qsTr("Window Coefficient Generator")
+                    HoverHandler{
+                        cursorShape: Qt.PointingHandCursor
+                    }
                 }
                 TabButton {
                     text: qsTr("Demodulator Coefficient Generator")
+                    HoverHandler{
+                        cursorShape: Qt.PointingHandCursor
+                    }
                 }
             }
             StackLayout{
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.margins: 10
-                
+
                 currentIndex: bar.currentIndex
+
                 // Window Coef Layout
                 ColumnLayout{
                     RowLayout{
