@@ -41,7 +41,7 @@ ChartView {
     function createWin(win_sample_number, win_a0, win_length){
         // WINDOW COEF
         chartView.createSeries(ChartView.SeriesTypeLine, "Window Coefficient Generator", xAxis, yAxis)
-        let y = window.manager.logic.win_coef_gen(win_sample_number, win_a0, win_length)
+        let y = window.logic.win_coef_gen(win_sample_number, win_a0, win_length)
         for(let i=0; i<y.length; i++){
             chartView.series(0).append(i, y[i])
         }
@@ -58,14 +58,14 @@ ChartView {
         chartView.createSeries(ChartView.SeriesTypeLine, "Q Coef", xAxis, yAxis)
 
         // I Coef
-        let y_sin = window.manager.logic.demo_coef_gen(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq)[0]
+        let y_sin = window.logic.demo_coef_gen(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq)[0]
         for(let i=0; i<y_sin.length; i++){
             chartView.series(0).append(i, y_sin[i])
         }
         chartView.series(0).style = Qt.DotLine
         
         // Q Coef
-        let y_cos = window.manager.logic.demo_coef_gen(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq)[1]
+        let y_cos = window.logic.demo_coef_gen(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq)[1]
         for(let i=0; i<y_cos.length; i++){
             chartView.series(1).append(i, y_cos[i])
         }
