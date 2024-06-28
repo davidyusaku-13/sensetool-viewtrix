@@ -101,3 +101,5 @@ jobs:
         with:
           artifacts: "${{ github.workspace }}\\sensetool.exe"
           bodyFile: "CHANGELOG.md"
+          name: Release ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
+          tag: ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
