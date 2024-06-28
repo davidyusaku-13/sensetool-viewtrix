@@ -29,7 +29,7 @@ class AppLogic(QObject):
         if response.status_code == 200:
             latest_release = response.json()
             latest_version = latest_release['tag_name']
-            if latest_version >= current_version:
+            if latest_version > current_version:
                 status = True
                 release_notes = latest_release['body']
                 download_url = latest_release['assets'][0]['browser_download_url'] if latest_release['assets'] else latest_release['zipball_url']
