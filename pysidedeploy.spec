@@ -26,7 +26,7 @@ qml_files = qml\main.qml,qml\sensetrix.qml,qml\updatewindow.qml,qml\pages\hwutil
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated
-modules = QuickControls2,OpenGL,Network,QuickTemplates2,QmlModels,Gui,Qml,Quick,Widgets,Core
+modules = Core,Gui,Quick,Network,OpenGL,QuickControls2,Qml,QuickTemplates2,QmlModels,Widgets
 # qt plugins used by the application
 plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmltooling,egldeviceintegrations,xcbglintegrations,iconengines,networkinformation,scenegraph,styles,networkaccess,platforms,generic,platforminputcontexts
 

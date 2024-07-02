@@ -10,6 +10,8 @@ from src.modules.logic import AppLogic
 from src.modules.translator import Translator
 from src.modules.updater import UpdateManager
 
+QML_FILE = Path(__file__).resolve().parent / "./qml/main.qml"
+
 # Init LOGGER
 logger = AppLogger.get_instance()
 
@@ -17,6 +19,14 @@ def restart_application():
     logger.log("App restarted", "INFO")
     python = sys.executable
     os.execl(python, python, *sys.argv)
+
+def setup_context_properties(app, engine):
+    translator = Translator(app, engine)
+    engine.rootContext().setContextProperty("translator", translator)
+
+    updateManager = UpdateManager()
+    updateManager.restartApplication.connect(restart_application)
+    engine.rootContext().setContextProperty("updateManager", updateManager)
     
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -26,17 +36,11 @@ if __name__ == "__main__":
 
     engine = QQmlApplicationEngine()
     QQuickStyle.setStyle("Material")
-    qml_file = Path(__file__).resolve().parent / "./qml/main.qml"
     
-    translator = Translator(app, engine)
-    engine.rootContext().setContextProperty("translator", translator)
-    
-    updateManager = UpdateManager()
-    updateManager.restartApplication.connect(restart_application)
-    engine.rootContext().setContextProperty("updateManager", updateManager)
+    setup_context_properties(app, engine)
     
     logger.log("App opened", "INFO")
-    engine.load(qml_file)
+    engine.load(QML_FILE)
 
     if not engine.rootObjects():
         sys.exit(-1)
