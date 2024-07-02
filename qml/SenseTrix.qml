@@ -11,8 +11,8 @@ import "pages/scanarr"
 import "pages/hwutil"
 
 Rectangle{
-    id: root
-    Material.theme: settings.isDarkTheme ? Material.Dark : Material.Light
+    property int theme: settings.isDarkTheme ? Material.Dark : Material.Light
+    Material.theme: theme
     Settings{
         id: settings
         property alias isDarkTheme: popUp.isDarkTheme

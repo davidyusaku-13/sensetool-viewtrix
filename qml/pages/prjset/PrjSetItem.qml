@@ -86,11 +86,10 @@ ShadowRect{
             Button{
                 id: drag
                 anchors.centerIn: parent
-                // Layout.margins: 7
                 flat: true
-                // icon.source: "../../images/drag"
                 icon.source: "qrc:/images/drag"
-                icon.color: Material.foreground
+                icon.height: 15
+                icon.color: Material.theme === Material.Light ? Material.color(Material.background, Material.Shade900) : Material.color(Material.background, Material.Shade200)
                 padding: 0
                 MouseArea {
                     id: dragArea
