@@ -21,9 +21,11 @@ ApplicationWindow {
     height: 720
     
     SenseTrix{
+        id: sensetool
         anchors.fill: parent
         UpdateWindow{
             id: update_window
+            Material.theme: sensetool.theme
         }
         Component.onCompleted: {
             if(logic.checkUpdate()["status"]){

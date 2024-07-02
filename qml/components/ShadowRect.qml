@@ -12,6 +12,7 @@ Rectangle{
         horizontalOffset: 0
         verticalOffset: 0
         radius: 3
-        color: Material.theme === Material.Light ? "#80000000" : Material.background
+        // color: Material.theme === Material.Light ? "#80000000" : Material.background
+        color: Material.color(Material.foreground, Material.Shade200)
     }
 }

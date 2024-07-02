@@ -31,6 +31,7 @@ Item{
                         width: parent.width
                         height: 50
                         color: Material.accent
+                        z: 2
                         Text{
                             text: "Notification"
                             color: Material.foreground
@@ -54,6 +55,7 @@ Item{
                 ToolbarBtn{
                     text: qsTr("Clear History")
                     Layout.margins: 10
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                     onClicked: {
                         window.historyModel.clear()
                     }
@@ -81,7 +83,7 @@ Item{
                     implicitHeight: 50
                     Layout.margins: 10
                     Text{
-                        text: "Theme"
+                        text: qsTr("Theme")
                         font.family: "Montserrat"
                         font.pixelSize: 15
                         Layout.fillWidth: true
@@ -90,7 +92,7 @@ Item{
                     Switch{
                         id: themeToggle
                         display: AbstractButton.TextBesideIcon
-                        text: checked ? qsTr("Light Theme") : qsTr("Dark Theme")
+                        text: checked ? qsTr("Dark Theme") : qsTr("Light Theme")
                     }
                 }
                 RowLayout{
@@ -98,7 +100,7 @@ Item{
                     implicitHeight: 50
                     Layout.margins: 10
                     Text{
-                        text: "Language"
+                        text: qsTr("Language")
                         font.family: "Montserrat"
                         font.pixelSize: 15
                         Layout.fillWidth: true

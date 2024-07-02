@@ -120,6 +120,7 @@ ShadowRect{
             }
             PrjSetWindow{
                 id: prjSetWindow
+                Material.theme: sensetool.theme
                 onCreate: (object) => {
                               // itemList.append(object);
                                   // layout.history("Added", object)

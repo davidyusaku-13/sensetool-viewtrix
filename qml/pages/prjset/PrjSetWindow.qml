@@ -13,14 +13,14 @@ Window {
     
     signal create(var object)
     signal modify(int index, var object)
-    
+
     property PrjSetObject object: PrjSetObject{}
     property int index: -1
     property bool isEdit: false
     property HoverHandler cursor: HoverHandler{
         cursorShape: Qt.IBeamCursor
     }
-    
+
     function manage(i: int, model: var){
         if(i !== -1){
             isEdit = true
@@ -42,128 +42,136 @@ Window {
                      }
                  }
     }
-    ColumnLayout{
+    ShadowRect{
         anchors.fill: parent
-        spacing: 20
-        anchors.margins: 20
-        //item
         ColumnLayout{
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Text{
-                text: qsTr("Name")
-                font.family: "Montserrat Medium"
-                font.pixelSize: 20
-            }
-            Frame{
-                Layout.fillWidth: true
-                Layout.preferredHeight: itemInput.lineCount*childrenRect.height
-                TextInput{
-                    id: itemInput
-                    anchors.fill: parent
-                    text: root.object.name
-                    onTextChanged: root.object.name = text
-                    
-                    font.family: "Montserrat"
-                    font.pixelSize: 17
-                    wrapMode: Text.Wrap
-                    clip: true
-                    autoScroll: false
-                    selectByMouse: true
-                    validator: RegularExpressionValidator {regularExpression: /[0-9A-Z_]+/}
-                    HoverHandler {
-                        cursorShape: Qt.IBeamCursor
-                    }
-                }
-            }
-        }
-        //value
-        ColumnLayout{
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Text{
-                text: qsTr("Value")
-                font.family: "Montserrat Medium"
-                font.pixelSize: 20
-            }
-            Frame{
-                Layout.fillWidth: true
-                Layout.preferredHeight: valueInput.lineCount*childrenRect.height
-                TextInput{
-                    id: valueInput
-                    anchors.fill: parent
-                    text: root.object.value
-                    onTextChanged: root.object.value = text
-                    font.family: "Montserrat"
-                    font.pixelSize: 17
-                    wrapMode: Text.Wrap
-                    clip: true
-                    autoScroll: false
-                    selectByMouse: true
-                    validator: RegularExpressionValidator {regularExpression: /[0-9a-zA-Z*()_" "<>+-/:?]+/}
-                    HoverHandler {
-                        cursorShape: Qt.IBeamCursor
-                    }
-                }
-            }
-        }
-        //desc
-        ColumnLayout{
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Text{
-                text: qsTr("Description")
-                font.family: "Montserrat Medium"
-                font.pixelSize: 20
-            }
-            Frame{
+            anchors.fill: parent
+            spacing: 20
+            anchors.margins: 20
+            //item
+            ColumnLayout{
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                TextEdit{
-                    anchors.fill: parent
-                    text: root.object.desc
-                    onTextChanged: root.object.desc = text
-                    font.family: "Montserrat"
-                    font.pixelSize: 17
-                    wrapMode: Text.Wrap
-                    selectByMouse: true
+                Text{
+                    text: qsTr("Name")
+                    font.family: "Montserrat Medium"
+                    font.pixelSize: 20
+                    color: Material.foreground
+                }
+                Frame{
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: itemInput.lineCount*childrenRect.height
+                    TextInput{
+                        id: itemInput
+                        anchors.fill: parent
+                        text: root.object.name
+                        onTextChanged: root.object.name = text
+                        color: Material.foreground
+                        font.family: "Montserrat"
+                        font.pixelSize: 17
+                        wrapMode: Text.Wrap
+                        clip: true
+                        autoScroll: false
+                        selectByMouse: true
+                        validator: RegularExpressionValidator {regularExpression: /[0-9A-Z_]+/}
+                        HoverHandler {
+                            cursorShape: Qt.IBeamCursor
+                        }
+                    }
                 }
             }
-        }
-        //button
-        RowLayout{
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.alignment: Qt.AlignRight
-            spacing: 5
-            //add
-            RoundButton {
-                implicitWidth: 80
-                text: root.isEdit ? qsTr("Save") : qsTr("Add")
-                enabled: (text === qsTr("Add") && root.object.name === "") ? false : true
-                HoverHandler {
-                    cursorShape: Qt.PointingHandCursor
+            //value
+            ColumnLayout{
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Text{
+                    text: qsTr("Value")
+                    font.family: "Montserrat Medium"
+                    font.pixelSize: 20
+                    color: Material.foreground
                 }
-                onClicked: {
-                    if (root.isEdit == true) {
-                        confirmWindow.show()
-                    } else {
-                        root.create(root.object)
+                Frame{
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: valueInput.lineCount*childrenRect.height
+                    TextInput{
+                        id: valueInput
+                        anchors.fill: parent
+                        text: root.object.value
+                        onTextChanged: root.object.value = text
+                        color: Material.foreground
+                        font.family: "Montserrat"
+                        font.pixelSize: 17
+                        wrapMode: Text.Wrap
+                        clip: true
+                        autoScroll: false
+                        selectByMouse: true
+                        validator: RegularExpressionValidator {regularExpression: /[0-9a-zA-Z*()_" "<>+-/:?]+/}
+                        HoverHandler {
+                            cursorShape: Qt.IBeamCursor
+                        }
+                    }
+                }
+            }
+            //desc
+            ColumnLayout{
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Text{
+                    text: qsTr("Description")
+                    font.family: "Montserrat Medium"
+                    font.pixelSize: 20
+                    color: Material.foreground
+                }
+                Frame{
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    TextEdit{
+                        anchors.fill: parent
+                        text: root.object.desc
+                        onTextChanged: root.object.desc = text
+                        color: Material.foreground
+                        font.family: "Montserrat"
+                        font.pixelSize: 17
+                        wrapMode: Text.Wrap
+                        selectByMouse: true
+                    }
+                }
+            }
+            //button
+            RowLayout{
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignRight
+                spacing: 5
+                //add
+                RoundButton {
+                    implicitWidth: 80
+                    text: root.isEdit ? qsTr("Save") : qsTr("Add")
+                    enabled: (itemInput.acceptableInput && valueInput.acceptableInput)
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    onClicked: {
+                        if (root.isEdit == true) {
+                            confirmWindow.show()
+                        } else {
+                            root.create(root.object)
+                            root.object.reset()
+                            root.close()
+                        }
+                    }
+                }
+                //cancel
+                RoundButton {
+                    implicitWidth: 80
+                    text: qsTr("Cancel")
+                    HoverHandler {
+                        cursorShape: Qt.PointingHandCursor
+                    }
+                    onClicked: {
                         root.object.reset()
                         root.close()
                     }
-                }
-            }
-            //cancel
-            RoundButton {
-                implicitWidth: 80
-                text: qsTr("Cancel")
-                HoverHandler {
-                    cursorShape: Qt.PointingHandCursor
-                }
-                onClicked: {
-                    root.object.reset()
-                    root.close()
                 }
             }
         }
