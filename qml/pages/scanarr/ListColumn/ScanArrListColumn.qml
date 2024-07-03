@@ -2,7 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import QtQuick.Dialogs
-import "../../components"
+import "../../../components"
 
 Item{
     id: root
@@ -43,7 +43,7 @@ Item{
                         anchors.rightMargin: 7
                         fillMode: Image.PreserveAspectFit
                         height: parent.height-12
-                        source: "../../images/close"
+                        source: "../../../images/close"
                         MouseArea{
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -56,7 +56,7 @@ Item{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        icon.source: "../../images/plus.png"
+                        icon.source: "../../../images/plus.png"
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
@@ -68,7 +68,7 @@ Item{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        icon.source: "../../images/checklist.png"
+                        icon.source: "../../../images/checklist.png"
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
@@ -77,7 +77,7 @@ Item{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        icon.source: "../../images/trash.png"
+                        icon.source: "../../../images/trash.png"
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
