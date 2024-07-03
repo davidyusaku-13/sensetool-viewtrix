@@ -52,8 +52,7 @@ Item{
                 id: drag
                 anchors.centerIn: parent
                 flat: true
-                // icon.source: "qrc:/images/drag"
-                icon.source: "../../images/drag.png"
+                icon.source: "qrc:/images/drag"
                 icon.color: Material.foreground
                 padding: 0
                 MouseArea {

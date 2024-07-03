@@ -7,14 +7,11 @@ import "../../../components"
 Item{
     id: root
     height: desc.lineCount > 1 ? desc.lineCount*25 : 35
-    required property var scanArrList
-    property int itemID: 1
     property string name: "AFE_END"
     property string desc: "To set a flag to indicate the end of a frame request"
     property alias dragArea: dragArea
     property alias checkBox: checkBox
     signal selected(bool status)
-    signal focused()
     RowLayout{
         anchors.fill: parent
         spacing: 0
@@ -28,30 +25,6 @@ Item{
                 onClicked: {
                     root.selected(checked)
                 }
-            }
-        }
-        //ID
-        ShadowRect{
-            Layout.fillHeight: true
-            Layout.preferredWidth: root.width/5
-            Text{
-                id: id
-                anchors.fill: parent
-                anchors.margins: 10
-                text: root.itemID
-                font.pixelSize: 15
-                font.family: "Montserrat Medium"
-                wrapMode: Text.Wrap
-                verticalAlignment: Text.AlignVCenter
-                color: Material.foreground
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    scanArrList.visible = true
-                    root.focused()
-                }
-                cursorShape: Qt.PointingHandCursor
             }
         }
         //scan arr name
@@ -69,14 +42,6 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 color: Material.foreground
             }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    scanArrList.visible = true
-                    root.focused()
-                }
-                cursorShape: Qt.PointingHandCursor
-            }
         }
         //desc
         ShadowRect{
@@ -93,14 +58,6 @@ Item{
                 verticalAlignment: Text.AlignVCenter
                 color: Material.foreground
             }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-                    scanArrList.visible = true
-                    root.focused()
-                }
-                cursorShape: Qt.PointingHandCursor
-            }
         }
         //drag
         ShadowRect{
@@ -111,7 +68,7 @@ Item{
                 id: drag
                 anchors.centerIn: parent
                 flat: true
-                icon.source: "qrc:/images/drag"
+                icon.source: "qrc:/images/drag.png"
                 icon.color: Material.foreground
                 padding: 0
                 MouseArea {

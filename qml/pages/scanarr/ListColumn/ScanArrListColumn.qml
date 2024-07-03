@@ -8,7 +8,6 @@ Item{
     id: root
     property int index: -1
     property var model: null
-    onModelChanged: print(JSON.stringify(model))
     //scan list rect
     ShadowRect{
         anchors.fill: parent
@@ -31,7 +30,7 @@ Item{
                     implicitHeight: 35
                     color: Material.accent
                     Text {
-                        text: "Scan List " + root.index
+                        text: "Scan List " + ((root.index+1) === 0 ? "" : (root.index+1))
                         font.pointSize: 12
                         font.family: "Montserrat SemiBold"
                         anchors.centerIn: parent
@@ -43,7 +42,7 @@ Item{
                         anchors.rightMargin: 7
                         fillMode: Image.PreserveAspectFit
                         height: parent.height-12
-                        source: "../../../images/close"
+                        source: "qrc:/images/close"
                         MouseArea{
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
@@ -56,7 +55,7 @@ Item{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        icon.source: "../../../images/plus.png"
+                        icon.source: "qrc:/images/plus"
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
@@ -68,7 +67,7 @@ Item{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        icon.source: "../../../images/checklist.png"
+                        icon.source: "qrc:/images/checklist"
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
@@ -77,7 +76,7 @@ Item{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                        icon.source: "../../../images/trash.png"
+                        icon.source: "qrc:/images/trash"
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
