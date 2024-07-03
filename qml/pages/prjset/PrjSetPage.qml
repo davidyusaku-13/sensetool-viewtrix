@@ -125,14 +125,14 @@ ShadowRect{
                               // itemList.append(object);
                                   // layout.history("Added", object)
                                   window.prjSetModel.addItem(object.name, object.value, object.desc)
-                                  window.historyModel.addHistory("Added", object.name, object.value, object.desc)
+                                  window.historyModel.addHistory("Added ", object.name, object.value, object.desc)
                           }
                 onModify: (index, object) => {
                                 // itemList.set(index, object);
                                 // layout.history("Modified", object)
                                 let i = selectedGroup.get(0).itemsIndex
                                 window.prjSetModel.edit(i, object.name, object.value, object.desc)
-                                window.historyModel.addHistory("Modified", object.name, object.value, object.desc)
+                                window.historyModel.addHistory("Modified ", object.name, object.value, object.desc)
                               }
             }
         }
