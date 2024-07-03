@@ -3,7 +3,9 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import QtQuick.Dialogs
 import "../../components"
-import "../prjset"
+import "./ArrangementColumn"
+import "./ItemColumn"
+import "./ListColumn"
 
 ShadowRect{
     Layout.fillWidth: true
