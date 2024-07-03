@@ -20,14 +20,6 @@ def restart_application():
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-def setup_context_properties(app, engine):
-    translator = Translator(app, engine)
-    engine.rootContext().setContextProperty("translator", translator)
-
-    updateManager = UpdateManager()
-    updateManager.restartApplication.connect(restart_application)
-    engine.rootContext().setContextProperty("updateManager", updateManager)
-    
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     
@@ -37,7 +29,12 @@ if __name__ == "__main__":
     engine = QQmlApplicationEngine()
     QQuickStyle.setStyle("Material")
     
-    setup_context_properties(app, engine)
+    translator = Translator(app, engine)
+    engine.rootContext().setContextProperty("translator", translator)
+
+    updateManager = UpdateManager()
+    updateManager.restartApplication.connect(restart_application)
+    engine.rootContext().setContextProperty("updateManager", updateManager)
     
     logger.log("App opened", "INFO")
     engine.load(QML_FILE)

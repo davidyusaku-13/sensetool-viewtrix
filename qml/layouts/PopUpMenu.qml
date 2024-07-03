@@ -92,7 +92,7 @@ Item{
                     Switch{
                         id: themeToggle
                         display: AbstractButton.TextBesideIcon
-                        text: checked ? qsTr("Dark Theme") : qsTr("Light Theme")
+                        text: checked ? qsTr("Dark") : qsTr("Light")
                     }
                 }
                 RowLayout{

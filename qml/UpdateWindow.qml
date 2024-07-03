@@ -28,7 +28,7 @@ Window {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 Text {
-                    text: qsTr("We have added new features and fix some bugs to make your experience seamless")
+                    text: qsTr("We have added new features and fixed some bugs to make your experience seamless")
                     anchors.fill: parent
                     font.family: "Montserrat SemiBold"
                     font.pixelSize: 15

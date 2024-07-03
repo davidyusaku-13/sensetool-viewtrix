@@ -2,4 +2,5 @@ Bugfixes
 
 What's new in this update:
 
-- fixed logs folder sometimes weren't created successfully
+- fixed some translations that weren't correctly translated
+- tidying up history section

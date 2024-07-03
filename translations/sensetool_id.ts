@@ -81,13 +81,13 @@
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="95"/>
-        <source>Dark Theme</source>
-        <translation>Tema Gelap</translation>
+        <source>Dark</source>
+        <translation>Gelap</translation>
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="95"/>
-        <source>Light Theme</source>
-        <translation>Tema Terang</translation>
+        <source>Light</source>
+        <translation>Terang</translation>
     </message>
     <message>
         <location filename="../qml/layouts/PopUpMenu.qml" line="103"/>
@@ -201,7 +201,7 @@
     </message>
     <message>
         <location filename="../qml/UpdateWindow.qml" line="28"/>
-        <source>We have added new features and fix some bugs to make your experience seamless</source>
+        <source>We have added new features and fixed some bugs to make your experience seamless</source>
         <translation>Kami telah menambahkan fitur baru dan memperbaiki beberapa bug untuk membuat pengalaman Anda lancar</translation>
     </message>
     <message>
