@@ -3,3 +3,4 @@ PySide6_Addons==6.7.1
 PySide6_Essentials==6.7.1
 PyYAML==6.0.1
 shiboken6==6.7.1
+requests==2.32.3
