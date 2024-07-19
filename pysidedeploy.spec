@@ -5,15 +5,15 @@ title = SenseTool
 # of input_file
 project_dir = .
 # source file path
-input_file = D:\Kuliah\Viewtrix\sensetool-viewtrix\main.py
+input_file = .\main.py
 # directory where exec is stored
 exec_directory = .
 # application icon
-icon = D:\Kuliah\Viewtrix\sensetool-viewtrix\icon.ico
+icon = .\icon.ico
 
 [python]
 # python path
-python_path = D:\Kuliah\Viewtrix\sensetool-viewtrix\env\Scripts\python.exe
+python_path = .\env\Scripts\python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization
@@ -26,7 +26,7 @@ qml_files = qml\main.qml,qml\sensetrix.qml,qml\updatewindow.qml,qml\pages\hwutil
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated
-modules = Network,Widgets,QmlModels,OpenGL,Gui,Qml,QuickControls2,Core,Quick,QuickTemplates2
+modules = OpenGL,Widgets,Network,Qml,Core,QmlModels,Gui,QuickTemplates2,QuickControls2,Quick
 # qt plugins used by the application
 plugins = platformthemes,tls,accessiblebridge,platforms/darwin,imageformats,qmltooling,egldeviceintegrations,xcbglintegrations,iconengines,networkinformation,scenegraph,styles,networkaccess,platforms,generic,platforminputcontexts
 
