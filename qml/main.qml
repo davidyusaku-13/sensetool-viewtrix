@@ -20,7 +20,7 @@ ApplicationWindow {
     width: 1280
     height: 720
     
-    SenseTrix{
+    SenseTool{
         id: sensetool
         anchors.fill: parent
         UpdateWindow{
