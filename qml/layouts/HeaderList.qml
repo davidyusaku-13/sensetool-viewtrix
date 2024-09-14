@@ -17,7 +17,7 @@ ListView {
     delegate: MyButton {
         required property var model
         required property int index
-        anchors.verticalCenter: parent.verticalCenter
+        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         icon.source: model.icon
         text: model.name
         isHeaderBtn: true
