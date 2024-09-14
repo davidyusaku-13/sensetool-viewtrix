@@ -26,4 +26,5 @@ ListView {
             ListView.view.currentIndex = ListView.isCurrentItem ? -1 : index
         }
     }
+    Component.onCompleted: currentIndex = -1
 }

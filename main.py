@@ -22,28 +22,28 @@ def restart_application():
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    
+
     app.setOrganizationName("Viewtrix")
     app.setOrganizationDomain("Viewtrix")
 
     engine = QQmlApplicationEngine()
     QQuickStyle.setStyle("Material")
-    
+
     translator = Translator(app, engine)
     engine.rootContext().setContextProperty("translator", translator)
 
     updateManager = UpdateManager()
     updateManager.restartApplication.connect(restart_application)
     engine.rootContext().setContextProperty("updateManager", updateManager)
-    
+
     logger.log("App opened", "INFO")
     engine.load(QML_FILE)
 
     if not engine.rootObjects():
         sys.exit(-1)
-        
+
     app.exec()
-    
+
     # LOG EXITAPP
     logger.log("App closed", "INFO")
     sys.exit()
