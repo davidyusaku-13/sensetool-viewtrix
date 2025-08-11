@@ -1,7 +1,6 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Signal, Slot, QModelIndex
 from PySide6.QtQml import QmlElement
 from typing import List, Optional
-from ..core.base import BaseQmlObject
 from .historymodelitem import HistoryModelItem
 import datetime
 
@@ -9,12 +8,13 @@ QML_IMPORT_NAME = "HistoryModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QmlElement
-class HistoryModel(QAbstractListModel, BaseQmlObject):
+class HistoryModel(QAbstractListModel):
     dataChanged = Signal(QModelIndex, QModelIndex)
+    errorOccurred = Signal(str, arguments=['message'])
+    operationCompleted = Signal(str, arguments=['operation'])
 
     def __init__(self, parent=None):
-        QAbstractListModel.__init__(self, parent)
-        BaseQmlObject.__init__(self)
+        super().__init__(parent)
         self._items: List[HistoryModelItem] = []
 
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:

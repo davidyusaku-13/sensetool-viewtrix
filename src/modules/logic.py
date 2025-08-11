@@ -17,6 +17,9 @@ class AppLogic(BaseQmlObject):
     including coefficient generation, file operations, and updates.
     """
     
+    # Signals
+    parentChanged = Signal(QObject)
+    
     def __init__(self, parent: QObject = None):
         """Initialize application logic.
         

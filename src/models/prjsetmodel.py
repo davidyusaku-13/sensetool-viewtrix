@@ -1,7 +1,6 @@
-from PySide6.QtCore import Qt, QAbstractListModel, Slot, QModelIndex, QObject, QUrl
+from PySide6.QtCore import Qt, QAbstractListModel, Slot, QModelIndex, QObject, QUrl, Signal
 from PySide6.QtQml import QmlElement
 from typing import List, Tuple, Optional
-from ..core.base import BaseQmlObject
 from ..services.file_service import FileService
 from .prjsetmodelitem import PrjSetModelItem
 from .historymodel import HistoryModel
@@ -10,11 +9,12 @@ QML_IMPORT_NAME = "PrjSetModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QmlElement
-class PrjSetModel(QAbstractListModel, BaseQmlObject):
+class PrjSetModel(QAbstractListModel):
+    errorOccurred = Signal(str, arguments=['message'])
+    operationCompleted = Signal(str, arguments=['operation'])
 
     def __init__(self, parent=None):
-        QAbstractListModel.__init__(self, parent)
-        BaseQmlObject.__init__(self)
+        super().__init__(parent)
         self._items: List[PrjSetModelItem] = []
         self._file_service = FileService()
 
