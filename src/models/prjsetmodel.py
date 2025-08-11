@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt, QAbstractListModel, Slot, QModelIndex, QObject, Q
 from PySide6.QtQml import QmlElement
 from typing import List, Tuple, Optional
 from ..services.file_service import FileService
+from ..modules.logger import AppLogger
 from .prjsetmodelitem import PrjSetModelItem
 from .historymodel import HistoryModel
 
@@ -17,6 +18,20 @@ class PrjSetModel(QAbstractListModel):
         super().__init__(parent)
         self._items: List[PrjSetModelItem] = []
         self._file_service = FileService()
+        self._logger = AppLogger.get_instance()
+    
+    def _log_info(self, message: str) -> None:
+        """Log info message."""
+        self._logger.log(f"{self.__class__.__name__}: {message}", "INFO")
+    
+    def _log_error(self, message: str) -> None:
+        """Log error message and emit error signal."""
+        self._logger.log(f"{self.__class__.__name__}: {message}", "ERROR")
+        self.errorOccurred.emit(message)
+    
+    def _log_debug(self, message: str) -> None:
+        """Log debug message."""
+        self._logger.log(f"{self.__class__.__name__}: {message}", "DEBUG")
 
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         """Return the number of items in the model."""
