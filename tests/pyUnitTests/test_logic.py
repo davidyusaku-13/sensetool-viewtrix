@@ -2,6 +2,8 @@ import unittest
 from src.modules.logic import AppLogic
 from PySide6.QtCore import QUrl
 import pathlib as pl
+from PySide6.QtWidgets import QApplication
+import sys
 
 class AppLogicTestCase(unittest.TestCase):
   
@@ -10,6 +12,9 @@ class AppLogicTestCase(unittest.TestCase):
       raise AssertionError("File does not exist: %s" % str(path))
   
   def setUp(self):
+    # Ensure QApplication exists for QML objects
+    if not QApplication.instance():
+      self.app = QApplication(sys.argv)
     self._model = AppLogic()
       
   def test_logic_win_coef_gen(self):
@@ -29,12 +34,16 @@ class AppLogicTestCase(unittest.TestCase):
     win_sample_number, win_a0, win_length = 50, 0.54, "Full"
     # TASK
     fname = "test_logic_export_win_coef.yaml"
-    arr = self._model.importWinCoef(QUrl.fromLocalFile(fname))
-    import_y, import_sample_number, import_a0, import_length = arr
-    self.assertIsInstance(import_y, list)
-    self.assertEqual(win_sample_number, import_sample_number)
-    self.assertEqual(win_a0, import_a0)
-    self.assertEqual(win_length, import_length)
+    result = self._model.importWinCoef(QUrl.fromLocalFile(fname))
+    self.assertIsInstance(result, dict)
+    self.assertIn('coefficients', result)
+    self.assertIn('sample_number', result)
+    self.assertIn('a0', result)
+    self.assertIn('coef_length', result)
+    self.assertIsInstance(result['coefficients'], list)
+    self.assertEqual(win_sample_number, result['sample_number'])
+    self.assertEqual(win_a0, result['a0'])
+    self.assertEqual(win_length, result['coef_length'])
     
   def test_logic_demo_coef_gen(self):
     demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq = 40, 40, 4, 400
@@ -53,13 +62,20 @@ class AppLogicTestCase(unittest.TestCase):
     demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq = 40, 40, 4, 400
     # TASK
     fname = "test_logic_export_demo_coef.yaml"
-    arr = self._model.importDemoCoef(QUrl.fromLocalFile(fname))
-    y, import_num_step, import_sample_number, import_cycle, import_adc_sampling_freq = arr
-    self.assertIsInstance(y, list)
-    self.assertEqual(demo_num_step, import_num_step)
-    self.assertEqual(demo_sample_number, import_sample_number)
-    self.assertEqual(demo_cycle, import_cycle)
-    self.assertEqual(demo_adc_sampling_freq, import_adc_sampling_freq)
+    result = self._model.importDemoCoef(QUrl.fromLocalFile(fname))
+    self.assertIsInstance(result, dict)
+    self.assertIn('i_coefficients', result)
+    self.assertIn('q_coefficients', result)
+    self.assertIn('step', result)
+    self.assertIn('sample', result)
+    self.assertIn('cycle', result)
+    self.assertIn('adc_freq', result)
+    self.assertIsInstance(result['i_coefficients'], list)
+    self.assertIsInstance(result['q_coefficients'], list)
+    self.assertEqual(demo_num_step, result['step'])
+    self.assertEqual(demo_sample_number, result['sample'])
+    self.assertEqual(demo_cycle, result['cycle'])
+    self.assertEqual(demo_adc_sampling_freq, result['adc_freq'])
         
   def tearDown(self):
     del self._model

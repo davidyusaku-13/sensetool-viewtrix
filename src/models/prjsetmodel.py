@@ -1,37 +1,43 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Slot, QModelIndex, QObject, QUrl
 from PySide6.QtQml import QmlElement
-from ..modules.logger import AppLogger
+from typing import List, Tuple, Optional
+from ..core.base import BaseQmlObject
+from ..services.file_service import FileService
 from .prjsetmodelitem import PrjSetModelItem
 from .historymodel import HistoryModel
-import yaml
 
 QML_IMPORT_NAME = "PrjSetModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
-logger = AppLogger.get_instance()
-
 @QmlElement
-class PrjSetModel(QAbstractListModel):
+class PrjSetModel(QAbstractListModel, BaseQmlObject):
 
     def __init__(self, parent=None):
-        super().__init__(parent)
-        self._items = []
+        QAbstractListModel.__init__(self, parent)
+        BaseQmlObject.__init__(self)
+        self._items: List[PrjSetModelItem] = []
+        self._file_service = FileService()
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
+        """Return the number of items in the model."""
         return len(self._items)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index: QModelIndex, role: int = Qt.DisplayRole):
+        """Return data for the given index and role."""
         if not (0 <= index.row() < len(self._items)):
-            return
-        row = self._items[index.row()]
+            return None
+        
+        item = self._items[index.row()]
         if role == Qt.DisplayRole:
-            return row.name
+            return item.name
         elif role == Qt.UserRole + 1:
-            return row.value
+            return item.value
         elif role == Qt.UserRole + 2:
-            return row.desc
+            return item.desc
+        return None
 
-    def roleNames(self):
+    def roleNames(self) -> dict:
+        """Return role names for QML access."""
         roles = super().roleNames()
         roles.update({
             Qt.DisplayRole: b"name",
@@ -41,29 +47,46 @@ class PrjSetModel(QAbstractListModel):
         return roles
     
     @property
-    def itemsData(self):
+    def itemsData(self) -> List[Tuple[str, str, str]]:
+        """Return all items data as tuples."""
         return [(item.name, item.value, item.desc) for item in self._items]
 
     @Slot(int, int, result=bool)
-    def move(self, source: int, target: int):
-        """Slot to move a single row from source to target"""
+    def move(self, source: int, target: int) -> bool:
+        """Move a single row from source to target.
+        
+        Args:
+            source: Source row index
+            target: Target row index
+            
+        Returns:
+            True if move was successful, False otherwise
+        """
         return self.moveRow(QModelIndex(), source, QModelIndex(), target)
 
-    def moveRow(self, sourceParent, sourceRow, dstParent, dstChild):
-        """Move a single row"""
+    def moveRow(self, sourceParent: QModelIndex, sourceRow: int, 
+               dstParent: QModelIndex, dstChild: int) -> bool:
+        """Move a single row."""
         return self.moveRows(sourceParent, sourceRow, 0, dstParent, dstChild)
 
-    def moveRows(self, sourceParent, sourceRow, count, dstParent, dstChild):
-        """Move n rows (n=1+ count)  from sourceRow to dstChild"""
-
-        if sourceRow == dstChild:
+    def moveRows(self, sourceParent: QModelIndex, sourceRow: int, count: int, 
+                dstParent: QModelIndex, dstChild: int) -> bool:
+        """Move n rows from sourceRow to dstChild.
+        
+        Args:
+            sourceParent: Source parent index
+            sourceRow: Source row index
+            count: Number of rows to move
+            dstParent: Destination parent index
+            dstChild: Destination row index
+            
+        Returns:
+            True if move was successful, False otherwise
+        """
+        if sourceRow == dstChild or not (0 <= sourceRow < len(self._items)):
             return False
 
-        elif sourceRow > dstChild:
-            end = dstChild
-
-        else:
-            end = dstChild + 1
+        end = dstChild if sourceRow > dstChild else dstChild + 1
 
         self.beginMoveRows(QModelIndex(), sourceRow,
                            sourceRow + count, QModelIndex(), end)
@@ -86,91 +109,128 @@ class PrjSetModel(QAbstractListModel):
         return True
 
     @Slot(int, result=QObject)
-    def get(self, index):
+    def get(self, index: int) -> Optional[QObject]:
+        """Get item at the specified index.
+        
+        Args:
+            index: Item index
+            
+        Returns:
+            Item at index or None if invalid index
+        """
         if 0 <= index < len(self._items):
             return self._items[index]
         else:
-            logger.log(f"Attempt to access item at invalid index {index}", "WARNING")
+            self._log_warning(f"Attempt to access item at invalid index {index}")
             return None
 
-    def flags(self) -> Qt.ItemFlag:
-        flag = super().flags()
+    def flags(self, index: QModelIndex = QModelIndex()) -> Qt.ItemFlag:
+        """Return item flags for drag and drop support."""
+        flag = super().flags(index)
         flag |= Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
         return flag
 
     @Slot(str, str, str)
-    def addItem(self, name, value, desc):
-        logger.log(f"Added item: {name} - {value} - {desc}", "INFO")
-        self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
-        item = PrjSetModelItem(name, value, desc, self)
-        self._items.append(item)
-        self.endInsertRows()
+    def addItem(self, name: str, value: str, desc: str) -> None:
+        """Add a new item to the model.
+        
+        Args:
+            name: Item name
+            value: Item value
+            desc: Item description
+        """
+        try:
+            self._log_info(f"Adding item: {name} - {value} - {desc}")
+            self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
+            item = PrjSetModelItem(name, value, desc, self)
+            self._items.append(item)
+            self.endInsertRows()
+        except Exception as e:
+            self._log_error(f"Failed to add item: {e}")
 
     @Slot(int, str, str, str)
-    def edit(self, index, name, value, desc):
-        logger.log(f"Edited item at index {index}: {name} - {value} - {desc}", "INFO")
-        if 0 <= index < len(self._items):
-            item = self._items[index]
-            item._name = name
-            item._value = value
-            item._desc = desc
-            self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
-        else:
-            logger.log(f"Attempt to edit item at invalid index {index}", "ERROR")
+    def edit(self, index: int, name: str, value: str, desc: str) -> None:
+        """Edit an existing item.
+        
+        Args:
+            index: Item index
+            name: New item name
+            value: New item value
+            desc: New item description
+        """
+        try:
+            if 0 <= index < len(self._items):
+                self._log_info(f"Editing item at index {index}: {name} - {value} - {desc}")
+                item = self._items[index]
+                item._name = name
+                item._value = value
+                item._desc = desc
+                self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
+            else:
+                self._log_error(f"Attempt to edit item at invalid index {index}")
+        except Exception as e:
+            self._log_error(f"Failed to edit item: {e}")
 
     @Slot(int)
-    def removeItem(self, index):
-        if 0 <= index < len(self._items):
-            self.beginRemoveRows(QModelIndex(), index, index)
-            logger.log(f"Deleted item at index {index}", "INFO")
-            del self._items[index]
-            self.endRemoveRows()
+    def removeItem(self, index: int) -> None:
+        """Remove an item from the model.
+        
+        Args:
+            index: Item index to remove
+        """
+        try:
+            if 0 <= index < len(self._items):
+                self.beginRemoveRows(QModelIndex(), index, index)
+                self._log_info(f"Removing item at index {index}")
+                del self._items[index]
+                self.endRemoveRows()
+            else:
+                self._log_error(f"Attempt to remove item at invalid index {index}")
+        except Exception as e:
+            self._log_error(f"Failed to remove item: {e}")
 
     @Slot()
-    def clear(self):
-        self.beginResetModel()
-        self._items = []
-        self.endResetModel()
-
-    @Slot(QUrl)
-    def exportYAML(self, file: QUrl):
-        file_name = file.toLocalFile()
-        logger.log(f"Exported file: {file_name}", "INFO")
-        yaml_data = {
-            'title': 'Project Settings',
-            'desc': "Project Setting includes the static information which is not be changed during runtime. "
-            "This parameter should be set during the project development phase and fixed after project deployment. "
-            "A file prjset.h shall be generated by script.",
-            'data': []
-        }
-        items_data = self.itemsData
-        for item_data in items_data:
-            pName, pVal, pDesc = item_data
-            yaml_item = {
-                'name': pName,
-                'value': pVal,
-                'desc': pDesc if pDesc != "" else None
-            }
-            yaml_data['data'].append(yaml_item)
-        with open(file_name, 'w') as file:
-            yaml.dump(yaml_data, file, sort_keys=False)
-
-    @Slot(QUrl)
-    def importYAML(self, file: QUrl):
-        file = file.toLocalFile()
-        logger.log(f"Imported file: {file}", "INFO")
+    def clear(self) -> None:
+        """Clear all items from the model."""
         try:
-            with open(file, 'r') as yaml_file:
-                yaml_data = yaml.load(yaml_file, Loader=yaml.FullLoader)
-                if isinstance(yaml_data['data'], list):
-                    for item in yaml_data['data']:
-                        pName = item['name']
-                        pVal = item['value']
-                        pDesc = item['desc'] if item['desc'] != None else ""
-                        self.addItem(pName, pVal, pDesc)
-                else:
-                    print("Invalid YAML format. Expected a list.")
-        except FileNotFoundError:
-            print("File not found:", file)
-        except yaml.YAMLError as e:
-            print("Error loading YAML:", e)
+            self._log_info("Clearing all items")
+            self.beginResetModel()
+            self._items = []
+            self.endResetModel()
+        except Exception as e:
+            self._log_error(f"Failed to clear items: {e}")
+
+    @Slot(QUrl)
+    def exportYAML(self, file: QUrl) -> None:
+        """Export project settings to YAML file.
+        
+        Args:
+            file: File URL to export to
+        """
+        try:
+            items_data = self.itemsData
+            success = self._file_service.export_project_settings(file, items_data)
+            if success:
+                self._log_info(f"Exported project settings to {file.toLocalFile()}")
+            else:
+                self._log_error("Failed to export project settings")
+        except Exception as e:
+            self._log_error(f"Failed to export project settings: {e}")
+
+    @Slot(QUrl)
+    def importYAML(self, file: QUrl) -> None:
+        """Import project settings from YAML file.
+        
+        Args:
+            file: File URL to import from
+        """
+        try:
+            items_data = self._file_service.import_project_settings(file)
+            if items_data:
+                self._log_info(f"Imported project settings from {file.toLocalFile()}")
+                for name, value, desc in items_data:
+                    self.addItem(name, value, desc)
+            else:
+                self._log_error("Failed to import project settings")
+        except Exception as e:
+             self._log_error(f"Failed to import project settings: {e}")

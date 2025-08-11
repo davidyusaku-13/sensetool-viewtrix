@@ -1,45 +1,48 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Signal, Slot, QModelIndex
 from PySide6.QtQml import QmlElement
-from ..modules.logger import AppLogger
+from typing import List, Optional
+from ..core.base import BaseQmlObject
 from .historymodelitem import HistoryModelItem
-import yaml
 import datetime
 
 QML_IMPORT_NAME = "HistoryModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
-logger = AppLogger.get_instance()
-
-current_time = datetime.datetime.now().strftime("%A, %d-%m-%Y %H:%M:%S")
-
 @QmlElement
-class HistoryModel(QAbstractListModel):
+class HistoryModel(QAbstractListModel, BaseQmlObject):
     dataChanged = Signal(QModelIndex, QModelIndex)
 
     def __init__(self, parent=None):
-        super().__init__(parent)
-        self._items = []
+        QAbstractListModel.__init__(self, parent)
+        BaseQmlObject.__init__(self)
+        self._items: List[HistoryModelItem] = []
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
+        """Return the number of history items."""
         return len(self._items)
 
-    def data(self, index, role=Qt.DisplayRole):
+    def data(self, index: QModelIndex, role: int = Qt.DisplayRole):
+        """Return data for the given index and role."""
         if not (0 <= index.row() < len(self._items)):
-            return
+            return None
+        
+        item = self._items[index.row()]
         if role == Qt.DisplayRole:
-            return self._items[index.row()].action
+            return item.action
         elif role == Qt.UserRole + 1:
-            return self._items[index.row()].name
+            return item.name
         elif role == Qt.UserRole + 2:
-            return self._items[index.row()].value
+            return item.value
         elif role == Qt.UserRole + 3:
-            return self._items[index.row()].desc
+            return item.desc
         elif role == Qt.UserRole + 4:
-            return self._items[index.row()].time
+            return item.time
         elif role == Qt.UserRole + 5:
-            return self._items[index.row()].history
+            return item.history
+        return None
 
-    def roleNames(self):
+    def roleNames(self) -> dict:
+        """Return role names for QML access."""
         roles = super().roleNames()
         roles.update({
             Qt.DisplayRole: b"action",
@@ -52,20 +55,34 @@ class HistoryModel(QAbstractListModel):
         return roles
 
     @Slot(str, str, str, str)
-    def addHistory(self, action, name, value, desc):
-        action = action if action != None else ""
-        name = name if name != None else ""
-        value = value if value != None else ""
-        desc = desc if desc != None else ""
-        tmp = f"{action}: {name} - {value} - {desc} on {current_time}"
-        self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
-        item = HistoryModelItem(action, name, value,
-                                desc, current_time, tmp, self)
-        self._items.append(item)
-        self.endInsertRows()
+    def addHistory(self, action: str, name: str, value: str, desc: str) -> None:
+        """Add a new history entry."""
+        try:
+            action = action if action is not None else ""
+            name = name if name is not None else ""
+            value = value if value is not None else ""
+            desc = desc if desc is not None else ""
+            
+            current_time = datetime.datetime.now().strftime("%A, %d-%m-%Y %H:%M:%S")
+            tmp = f"{action}: {name} - {value} - {desc} on {current_time}"
+            
+            self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
+            item = HistoryModelItem(action, name, value, desc, current_time, tmp, self)
+            self._items.append(item)
+            self.endInsertRows()
+            
+            self._log_info(f"Added history entry: {action}")
+        except Exception as e:
+            self._log_error(f"Failed to add history entry: {e}")
 
     @Slot()
-    def clear(self):
-        self.beginResetModel()
-        self._items = []
-        self.endResetModel()
+    def clear(self) -> None:
+        """Clear all history entries."""
+        try:
+            self.beginResetModel()
+            self._items = []
+            self.endResetModel()
+            self._log_info("Cleared all history entries")
+        except Exception as e:
+            self._log_error(f"Failed to clear history entries: {e}")
+            self.endResetModel()
