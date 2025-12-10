@@ -154,6 +154,26 @@ Get-Content qmltestres.txt  # PowerShell
 - Reference related issues/PRs using `(#123)` or `refs #123` where applicable.
 - Rationale: Conventional commits help the project's `GitVersion.yml` and CI to infer the next semantic version bump and automatically create release notes.
 
+## ⚠️ CI / Packaging notes (Nuitka & Python compatibility)
+
+- The Windows build uses `pyside6-deploy` which invokes Nuitka for packaging. Nuitka versions may not support the latest Python (e.g., Nuitka 2.1 does not support Python 3.12).
+- CI currently pins the build job to Python 3.11 to avoid Nuitka compatibility issues. If you need to use Python 3.12, update Nuitka (or pyside6-deploy) to a version that supports it.
+- When debugging deployment failures, inspect the CI logs for the actual Python version used by `pyside6-deploy` and examine `nuitka` output. A helpful pre-build step in workflows is:
+
+  ```pwsh
+  python --version
+  pip --version
+  ```
+
+  This ensures the correct interpreter is used and is very useful when diagnosing `pyside6-deploy` installation behavior.
+
+- CI enforcement: The Windows deployment job verifies the runtime interpreter is Python 3.11 before proceeding with packaging; if a mismatch is detected the job fails early to avoid running Nuitka with an unsupported interpreter.
+
+- When the deployment check fails, the workflow prints helpful diagnostics and points to this documentation section. Suggested next steps if the check fails:
+  - Confirm the job uses Python 3.11 (check `actions/setup-python` and/or workflow env). If not using 3.11, update your workflow to set Python to 3.11 for the build job.
+  - If you need to support Python 3.12, update `Nuitka` (or `pyside6-deploy`) to a version that supports it and adjust the workflow accordingly.
+  - If this is unexpected and you believe there's a toolchain issue, open a GitHub issue and include CI logs and the `python --version` / `pip --version` output shown in CI for faster triage.
+
 ---
 
 Please review these instructions for clarity and completeness. If you want, I can:

@@ -167,10 +167,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Set up Python (build)
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          # Pin build job to Python 3.11 because Nuitka 2.1 does not support Python 3.12
+          python-version: "3.11"
           cache: "pip"
 
       - name: Install GitVersion
@@ -240,6 +241,30 @@ jobs:
       - name: Update version file
         run: |
           echo "${{ steps.version_step.outputs.GitVersion_FullSemVer }}" | Out-File -FilePath "./VERSION.txt" -Encoding utf8
+
+      - name: Verify Python version used for deployment
+        run: |
+          python --version
+          pip --version
+
+      - name: Ensure Python 3.11 for deployment
+        shell: pwsh
+        run: |
+          $v = python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')".Trim()
+          Write-Host "Python reported version: $v"
+          if ($v -ne '3.11') {
+            $docLink = 'https://github.com/davidyusaku-13/sensetool-viewtrix/blob/main/.github/copilot-instructions.md#ci--packaging-notes-nuitka--python-compatibility'
+            Write-Host "========================================="
+            Write-Error "Deployment requires Python 3.11; found $v"
+            Write-Host "Reason: Nuitka (used by pyside6-deploy) may not support Python 3.12. See:
+  $docLink"
+            Write-Host "Suggested actions:" 
+            Write-Host "  - Pin the workflow job to Python 3.11 (recommended)"
+            Write-Host "  - Upgrade Nuitka/pyside6-deploy to a version that supports Python 3.12"
+            Write-Host "  - Open an issue on the repo if you think the toolchain should be updated"
+            Write-Host "========================================="
+            exit 1
+          }
 
       - name: Build application
         run: |
