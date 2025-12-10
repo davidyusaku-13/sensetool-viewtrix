@@ -256,8 +256,7 @@ jobs:
             $docLink = 'https://github.com/davidyusaku-13/sensetool-viewtrix/blob/main/.github/copilot-instructions.md#ci--packaging-notes-nuitka--python-compatibility'
             Write-Host "========================================="
             Write-Error "Deployment requires Python 3.11; found $v"
-            Write-Host "Reason: Nuitka (used by pyside6-deploy) may not support Python 3.12. See:
-  $docLink"
+            Write-Host "Reason: Nuitka (used by pyside6-deploy) may not support Python 3.12. See: $docLink"
             Write-Host "Suggested actions:" 
             Write-Host "  - Pin the workflow job to Python 3.11 (recommended)"
             Write-Host "  - Upgrade Nuitka/pyside6-deploy to a version that supports Python 3.12"
