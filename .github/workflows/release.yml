@@ -1,0 +1,367 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "Version bump type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      prerelease:
+        description: "Mark as pre-release"
+        required: false
+        default: false
+        type: boolean
+      skip_tests:
+        description: "Skip tests (use with caution)"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  QT_VERSION: "6.8.0"
+  PYTHON_VERSION: "3.11"
+
+permissions:
+  contents: write
+
+jobs:
+  # Run tests first (unless skipped)
+  test:
+    name: Pre-release Tests
+    if: ${{ github.event.inputs.skip_tests != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install Qt dependencies (Linux)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev qt6-declarative-dev qt6-tools-dev
+          sudo apt-get install -y libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
+          sudo apt-get install -y libegl1 libxcb-cursor0
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
+        env:
+          QT_QPA_PLATFORM: offscreen
+
+  # Calculate new version
+  version:
+    name: Calculate Version
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.bump.outputs.new_version }}
+      current_version: ${{ steps.current.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current version
+        id: current
+        run: |
+          # Get latest tag, default to 0.0.0 if none exists
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          # Remove 'v' prefix if present
+          CURRENT_VERSION=${LATEST_TAG#v}
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+
+      - name: Bump version
+        id: bump
+        run: |
+          CURRENT="${{ steps.current.outputs.version }}"
+          BUMP_TYPE="${{ github.event.inputs.version_bump }}"
+
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+          # Handle pre-release suffix if present (e.g., 1.0.0-alpha)
+          PATCH=${PATCH%%-*}
+
+          case $BUMP_TYPE in
+            major)
+              MAJOR=$((MAJOR + 1))
+              MINOR=0
+              PATCH=0
+              ;;
+            minor)
+              MINOR=$((MINOR + 1))
+              PATCH=0
+              ;;
+            patch)
+              PATCH=$((PATCH + 1))
+              ;;
+          esac
+
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "New version: $NEW_VERSION (bumped $BUMP_TYPE from $CURRENT)"
+
+  # Build for all platforms
+  build:
+    name: Build (${{ matrix.os }})
+    needs: [version]
+    if: ${{ always() && needs.version.result == 'success' }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: sensetool-windows
+            executable: sensetool.exe
+            qt_arch: win64_mingw
+          - os: ubuntu-latest
+            artifact_name: sensetool-linux
+            executable: sensetool
+            qt_arch: gcc_64
+          - os: macos-latest
+            artifact_name: sensetool-macos
+            executable: sensetool.app
+            qt_arch: clang_64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+
+      - name: Install Qt (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev qt6-declarative-dev qt6-tools-dev
+          sudo apt-get install -y libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
+          sudo apt-get install -y libegl1 libxcb-cursor0 patchelf
+
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install qt6
+          echo "/opt/homebrew/opt/qt6/bin" >> $GITHUB_PATH
+
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: "windows"
+          target: "desktop"
+          arch: ${{ matrix.qt_arch }}
+          modules: "qtcharts qt5compat qtshadertools"
+          cache: true
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install invoke
+          pip install -r requirements.txt
+
+      - name: Update version file
+        shell: bash
+        run: |
+          echo "${{ needs.version.outputs.new_version }}" > VERSION.txt
+
+      - name: Build resources
+        run: pyside6-rcc ./resource.qrc -o ./resource_rc.py
+
+      - name: Build application (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          pyside6-deploy -f
+          # Find and rename the executable
+          $exeFiles = Get-ChildItem -Filter "*.exe" | Where-Object { $_.Name -ne "sensetool.exe" }
+          if ($exeFiles) {
+            $firstExe = $exeFiles[0]
+            Rename-Item -Path $firstExe.FullName -NewName "sensetool.exe"
+            Write-Host "Renamed $($firstExe.Name) to sensetool.exe"
+          } elseif (Test-Path "sensetool.exe") {
+            Write-Host "sensetool.exe already exists"
+          } else {
+            Write-Error "No executable found after build"
+            exit 1
+          }
+
+      - name: Build application (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          pyside6-deploy -f
+          # Find and rename the executable
+          if [ -f "SenseTool" ]; then
+            mv SenseTool sensetool
+          elif [ -f "main" ]; then
+            mv main sensetool
+          fi
+          chmod +x sensetool
+
+      - name: Build application (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          pyside6-deploy -f
+          # Find the app bundle
+          if [ -d "SenseTool.app" ]; then
+            mv SenseTool.app sensetool.app
+          elif [ -d "main.app" ]; then
+            mv main.app sensetool.app
+          fi
+
+      - name: Verify build (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (!(Test-Path "sensetool.exe")) {
+            Write-Error "Build verification failed: sensetool.exe not found"
+            Get-ChildItem
+            exit 1
+          }
+          $fileSize = (Get-Item "sensetool.exe").Length
+          Write-Host "Build successful. File size: $fileSize bytes"
+
+      - name: Verify build (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          if [ ! -f "sensetool" ]; then
+            echo "Build verification failed: sensetool not found"
+            ls -la
+            exit 1
+          fi
+          echo "Build successful. File size: $(stat -c%s sensetool) bytes"
+
+      - name: Verify build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          if [ ! -d "sensetool.app" ]; then
+            echo "Build verification failed: sensetool.app not found"
+            ls -la
+            exit 1
+          fi
+          echo "Build successful"
+
+      - name: Create archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path sensetool.exe, VERSION.txt -DestinationPath "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip"
+
+      - name: Create archive (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          tar -czvf "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.tar.gz" sensetool VERSION.txt
+
+      - name: Create archive (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          zip -r "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip" sensetool.app VERSION.txt
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: |
+            ${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.*
+          retention-days: 7
+
+  # Create GitHub release
+  release:
+    name: Create Release
+    needs: [version, build, test]
+    if: ${{ always() && needs.version.result == 'success' && needs.build.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: List artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          find ./artifacts -type f -name "*.*"
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ needs.version.outputs.new_version }}" -m "Release v${{ needs.version.outputs.new_version }}"
+          git push origin "v${{ needs.version.outputs.new_version }}"
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          # Get commits since last tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD~1)
+          else
+            COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD~10..HEAD~1)
+          fi
+
+          # Create release notes
+          cat << 'EOF' > release_notes.md
+          ## What's Changed
+
+          $COMMITS
+
+          ## Downloads
+
+          | Platform | File |
+          |----------|------|
+          | Windows | `sensetool-windows-${{ needs.version.outputs.new_version }}.zip` |
+          | Linux | `sensetool-linux-${{ needs.version.outputs.new_version }}.tar.gz` |
+          | macOS | `sensetool-macos-${{ needs.version.outputs.new_version }}.zip` |
+
+          EOF
+
+          echo "Release notes generated"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.version.outputs.new_version }}
+          name: Release v${{ needs.version.outputs.new_version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
+          files: |
+            ./artifacts/**/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Summary
+        run: |
+          echo "## Release Created Successfully! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** v${{ needs.version.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Bump Type:** ${{ github.event.inputs.version_bump }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Pre-release:** ${{ github.event.inputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
