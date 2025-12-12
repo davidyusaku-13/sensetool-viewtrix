@@ -5,15 +5,15 @@ title = SenseTool
 # of input_file
 project_dir = .
 # source file path
-input_file = .\main.py
+input_file = main.py
 # directory where exec is stored
 exec_directory = .
 # application icon
-icon = .\icon.ico
+icon = icon.ico
 
 [python]
 # python path
-python_path = .\env\Scripts\python.exe
+python_path = env/Scripts/python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization
@@ -22,7 +22,7 @@ packages = Nuitka==2.5.1
 [qt]
 # comma separated path to qml files required
 # normally all the qml files required by the project are added automatically
-qml_files = qml\main.qml,qml\sensetool.qml,qml\updatewindow.qml,qml\pages\hwutil\coefgenchart.qml,qml\pages\hwutil\hwutilpage.qml,qml\pages\prjset\confirmwindow.qml,qml\pages\prjset\prjsetitem.qml,qml\pages\prjset\prjsetobject.qml,qml\pages\prjset\prjsetpage.qml,qml\pages\prjset\prjsetwindow.qml,qml\pages\scanarr\scanarritem.qml,qml\pages\scanarr\scanarrpage.qml,qml\pages\scanarr\arrangementcolumn\scanarrcolumn.qml,qml\pages\scanarr\arrangementcolumn\scanarritem.qml,qml\pages\scanarr\arrangementcolumn\scanarrobject.qml,qml\pages\scanarr\arrangementcolumn\scanarrwindow.qml,qml\pages\scanarr\itemcolumn\scanitem.qml,qml\pages\scanarr\itemcolumn\scanitemcolumn.qml,qml\pages\scanarr\itemcolumn\scanobject.qml,qml\pages\scanarr\itemcolumn\scanwindow.qml,qml\pages\scanarr\listcolumn\scanarrlistcolumn.qml,qml\pages\scanarr\listcolumn\scanarrlistitem.qml,qml\pages\scanarr\listcolumn\scanarrlistobject.qml,qml\pages\scanarr\listcolumn\scanarrlistwindow.qml,qml\pages\scanarr\confirmwindow.qml,qml\components\mybutton.qml,qml\components\shadowrect.qml,qml\components\toolbarbtn.qml,qml\layouts\header.qml,qml\layouts\headerlist.qml,qml\layouts\popupmenu.qml,qml\layouts\sidebar.qml,qml\layouts\sidebarlist.qml
+qml_files = qml/main.qml,qml/SenseTool.qml,qml/UpdateWindow.qml,qml/pages/hwutil/CoefGenChart.qml,qml/pages/hwutil/HwUtilPage.qml,qml/pages/prjset/ConfirmWindow.qml,qml/pages/prjset/PrjSetItem.qml,qml/pages/prjset/PrjSetObject.qml,qml/pages/prjset/PrjSetPage.qml,qml/pages/prjset/PrjSetWindow.qml,qml/pages/scanarr/ScanArrItem.qml,qml/pages/scanarr/ScanArrPage.qml,qml/pages/scanarr/ArrangementColumn/ScanArrColumn.qml,qml/pages/scanarr/ArrangementColumn/ScanArrItem.qml,qml/pages/scanarr/ArrangementColumn/ScanArrObject.qml,qml/pages/scanarr/ArrangementColumn/ScanArrWindow.qml,qml/pages/scanarr/ItemColumn/ScanItem.qml,qml/pages/scanarr/ItemColumn/ScanItemColumn.qml,qml/pages/scanarr/ItemColumn/ScanObject.qml,qml/pages/scanarr/ItemColumn/ScanWindow.qml,qml/pages/scanarr/ListColumn/ScanArrListColumn.qml,qml/pages/scanarr/ListColumn/ScanArrListItem.qml,qml/pages/scanarr/ListColumn/ScanArrListObject.qml,qml/pages/scanarr/ListColumn/ScanArrListWindow.qml,qml/pages/scanarr/ConfirmWindow.qml,qml/components/MyButton.qml,qml/components/ShadowRect.qml,qml/components/ToolbarBtn.qml,qml/layouts/Header.qml,qml/layouts/HeaderList.qml,qml/layouts/PopUpMenu.qml,qml/layouts/SideBar.qml,qml/layouts/SideBarList.qml
 # excluded qml plugin binaries
 excluded_qml_plugins = QtSensors,QtWebEngine
 # qt modules used. comma separated

@@ -276,9 +276,6 @@ jobs:
       - name: Build application (Linux)
         if: runner.os == 'Linux'
         run: |
-          # Convert Windows paths to Unix paths in pysidedeploy.spec
-          sed -i 's|\\\\|/|g' pysidedeploy.spec
-          sed -i 's|\\|/|g' pysidedeploy.spec
           pyside6-deploy -f
           if [ -f "SenseTool" ]; then
             mv SenseTool sensetool
@@ -290,9 +287,6 @@ jobs:
       - name: Build application (macOS)
         if: runner.os == 'macOS'
         run: |
-          # Convert Windows paths to Unix paths in pysidedeploy.spec
-          sed -i '' 's|\\\\|/|g' pysidedeploy.spec
-          sed -i '' 's|\\|/|g' pysidedeploy.spec
           pyside6-deploy -f
           if [ -d "SenseTool.app" ]; then
             mv SenseTool.app sensetool.app
