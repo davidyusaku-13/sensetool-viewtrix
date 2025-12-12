@@ -17,7 +17,7 @@ python_path = .\env\Scripts\python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization
-packages = Nuitka==2.1
+packages = Nuitka==2.5.1
 
 [qt]
 # comma separated path to qml files required
