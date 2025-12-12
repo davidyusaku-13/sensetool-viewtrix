@@ -1,11 +1,21 @@
-name: Release
+name: CI/CD
 
 on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
     inputs:
-      version_bump:
-        description: "Version bump type"
+      release:
+        description: "Create a release"
         required: true
+        default: false
+        type: boolean
+      version_bump:
+        description: "Version bump type (only if release is true)"
+        required: false
+        default: "patch"
         type: choice
         options:
           - patch
@@ -13,11 +23,6 @@ on:
           - major
       prerelease:
         description: "Mark as pre-release"
-        required: false
-        default: false
-        type: boolean
-      skip_tests:
-        description: "Skip tests (use with caution)"
         required: false
         default: false
         type: boolean
@@ -30,10 +35,75 @@ permissions:
   contents: write
 
 jobs:
-  # Run tests first (unless skipped)
+  # ============================================
+  # TEST JOB - Runs on all triggers
+  # ============================================
   test:
-    name: Pre-release Tests
-    if: ${{ github.event.inputs.skip_tests != 'true' }}
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: "requirements.txt"
+
+      - name: Install Qt (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev qt6-declarative-dev qt6-tools-dev
+          sudo apt-get install -y libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
+          sudo apt-get install -y libegl1 libxcb-cursor0
+
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install qt6
+          echo "/opt/homebrew/opt/qt6/bin" >> $GITHUB_PATH
+
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: "windows"
+          target: "desktop"
+          arch: "win64_mingw"
+          modules: "qtcharts qt5compat qtshadertools"
+          cache: true
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov flake8
+          pip install -r requirements.txt
+
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
+        env:
+          QT_QPA_PLATFORM: offscreen
+
+  # ============================================
+  # SECURITY JOB - Runs on all triggers
+  # ============================================
+  security:
+    name: Security Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,30 +113,30 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: "pip"
-
-      - name: Install Qt dependencies (Linux)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qt6-base-dev qt6-declarative-dev qt6-tools-dev
-          sudo apt-get install -y libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
-          sudo apt-get install -y libegl1 libxcb-cursor0
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install bandit
           pip install -r requirements.txt
 
-      - name: Run tests
-        run: pytest tests/ -v --tb=short
-        env:
-          QT_QPA_PLATFORM: offscreen
+      - name: Run bandit security scan
+        run: bandit -r src/ -f json -o bandit-report.json || true
 
-  # Calculate new version
+      - name: Upload bandit report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  # ============================================
+  # VERSION JOB - Only runs for releases
+  # ============================================
   version:
     name: Calculate Version
     runs-on: ubuntu-latest
+    if: github.event.inputs.release == 'true'
     outputs:
       new_version: ${{ steps.bump.outputs.new_version }}
       current_version: ${{ steps.current.outputs.version }}
@@ -79,9 +149,7 @@ jobs:
       - name: Get current version
         id: current
         run: |
-          # Get latest tag, default to 0.0.0 if none exists
           LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          # Remove 'v' prefix if present
           CURRENT_VERSION=${LATEST_TAG#v}
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "Current version: $CURRENT_VERSION"
@@ -92,10 +160,7 @@ jobs:
           CURRENT="${{ steps.current.outputs.version }}"
           BUMP_TYPE="${{ github.event.inputs.version_bump }}"
 
-          # Parse version components
           IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
-
-          # Handle pre-release suffix if present (e.g., 1.0.0-alpha)
           PATCH=${PATCH%%-*}
 
           case $BUMP_TYPE in
@@ -117,11 +182,13 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION (bumped $BUMP_TYPE from $CURRENT)"
 
-  # Build for all platforms
+  # ============================================
+  # BUILD JOB - Only runs for releases
+  # ============================================
   build:
     name: Build (${{ matrix.os }})
-    needs: [version]
-    if: ${{ always() && needs.version.result == 'success' }}
+    needs: [test, security, version]
+    if: github.event.inputs.release == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -194,7 +261,6 @@ jobs:
         shell: pwsh
         run: |
           pyside6-deploy -f
-          # Find and rename the executable
           $exeFiles = Get-ChildItem -Filter "*.exe" | Where-Object { $_.Name -ne "sensetool.exe" }
           if ($exeFiles) {
             $firstExe = $exeFiles[0]
@@ -211,7 +277,6 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           pyside6-deploy -f
-          # Find and rename the executable
           if [ -f "SenseTool" ]; then
             mv SenseTool sensetool
           elif [ -f "main" ]; then
@@ -223,7 +288,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           pyside6-deploy -f
-          # Find the app bundle
           if [ -d "SenseTool.app" ]; then
             mv SenseTool.app sensetool.app
           elif [ -d "main.app" ]; then
@@ -286,11 +350,13 @@ jobs:
             ${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.*
           retention-days: 7
 
-  # Create GitHub release
+  # ============================================
+  # RELEASE JOB - Only runs for releases
+  # ============================================
   release:
     name: Create Release
-    needs: [version, build, test]
-    if: ${{ always() && needs.version.result == 'success' && needs.build.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    needs: [version, build]
+    if: github.event.inputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -315,41 +381,11 @@ jobs:
           git tag -a "v${{ needs.version.outputs.new_version }}" -m "Release v${{ needs.version.outputs.new_version }}"
           git push origin "v${{ needs.version.outputs.new_version }}"
 
-      - name: Generate release notes
-        id: notes
-        run: |
-          # Get commits since last tag
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -n "$PREV_TAG" ]; then
-            COMMITS=$(git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD~1)
-          else
-            COMMITS=$(git log --pretty=format:"- %s (%h)" HEAD~10..HEAD~1)
-          fi
-
-          # Create release notes
-          cat << 'EOF' > release_notes.md
-          ## What's Changed
-
-          $COMMITS
-
-          ## Downloads
-
-          | Platform | File |
-          |----------|------|
-          | Windows | `sensetool-windows-${{ needs.version.outputs.new_version }}.zip` |
-          | Linux | `sensetool-linux-${{ needs.version.outputs.new_version }}.tar.gz` |
-          | macOS | `sensetool-macos-${{ needs.version.outputs.new_version }}.zip` |
-
-          EOF
-
-          echo "Release notes generated"
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.version.outputs.new_version }}
           name: Release v${{ needs.version.outputs.new_version }}
-          body_path: release_notes.md
           draft: false
           prerelease: ${{ github.event.inputs.prerelease == 'true' }}
           files: |
