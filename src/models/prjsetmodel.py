@@ -136,7 +136,7 @@ class PrjSetModel(QAbstractListModel):
         if 0 <= index < len(self._items):
             return self._items[index]
         else:
-            self._log_warning(f"Attempt to access item at invalid index {index}")
+            self._log_error(f"Attempt to access item at invalid index {index}")
             return None
 
     def flags(self, index: QModelIndex = QModelIndex()) -> Qt.ItemFlag:
