@@ -1,4 +1,5 @@
-import threading, logging, logging.config, os
+import logging
+import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -9,14 +10,11 @@ if not LOG_DIR.exists():
     
 class AppLogger:
     _instance = None
-    _lock = threading.Lock()
 
     @staticmethod
     def get_instance():
         if AppLogger._instance is None:
-            with AppLogger._lock:
-                if AppLogger._instance is None:
-                    AppLogger._instance = AppLogger()
+            AppLogger._instance = AppLogger()
         return AppLogger._instance
 
     def __init__(self):
