@@ -2,35 +2,27 @@ from PySide6.QtCore import Qt, QAbstractListModel, Signal, Slot, QModelIndex
 from PySide6.QtQml import QmlElement
 from typing import List, Optional
 from .historymodelitem import HistoryModelItem
-from ..modules.logger import AppLogger
+from ..core.mixins import LoggingMixin
 import datetime
 
 QML_IMPORT_NAME = "HistoryModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
 @QmlElement
-class HistoryModel(QAbstractListModel):
+class HistoryModel(QAbstractListModel, LoggingMixin):
     dataChanged = Signal(QModelIndex, QModelIndex)
     errorOccurred = Signal(str, arguments=['message'])
     operationCompleted = Signal(str, arguments=['operation'])
 
     def __init__(self, parent=None):
-        super().__init__(parent)
+        QAbstractListModel.__init__(self, parent)
+        LoggingMixin.__init__(self)
         self._items: List[HistoryModelItem] = []
-        self._logger = AppLogger.get_instance()
-    
-    def _log_info(self, message: str) -> None:
-        """Log info message."""
-        self._logger.log(f"{self.__class__.__name__}: {message}", "INFO")
-    
+
     def _log_error(self, message: str) -> None:
         """Log error message and emit error signal."""
         self._logger.log(f"{self.__class__.__name__}: {message}", "ERROR")
         self.errorOccurred.emit(message)
-    
-    def _log_debug(self, message: str) -> None:
-        """Log debug message."""
-        self._logger.log(f"{self.__class__.__name__}: {message}", "DEBUG")
 
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         """Return the number of history items."""

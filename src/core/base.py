@@ -9,10 +9,10 @@ from typing import Any, Dict, Optional
 from PySide6.QtCore import QObject, Signal, Slot, Property
 from PySide6.QtQml import QmlElement
 from .config import get_config_manager
-from ..modules.logger import AppLogger
+from .mixins import LoggingMixin
 
 
-class BaseQmlObject(QObject):
+class BaseQmlObject(QObject, LoggingMixin):
     """Base class for QML-exposed objects.
     
     Provides common functionality like logging, configuration access,
@@ -25,49 +25,33 @@ class BaseQmlObject(QObject):
     
     def __init__(self, parent: Optional[QObject] = None):
         """Initialize base QML object.
-        
+
         Args:
             parent: Parent QObject
         """
-        super().__init__(parent)
-        self._logger = AppLogger.get_instance()
+        QObject.__init__(self, parent)
+        LoggingMixin.__init__(self)
         self._config = get_config_manager()
         self._initialized = False
     
     @Property(bool, notify=operationCompleted)
     def initialized(self) -> bool:
         """Check if object is initialized.
-        
+
         Returns:
             True if object is initialized
         """
         return self._initialized
-    
-    def _log_info(self, message: str) -> None:
-        """Log info message.
-        
-        Args:
-            message: Message to log
-        """
-        self._logger.log(f"{self.__class__.__name__}: {message}", "INFO")
-    
+
     def _log_error(self, message: str) -> None:
         """Log error message and emit error signal.
-        
+
         Args:
             message: Error message to log
         """
         self._logger.log(f"{self.__class__.__name__}: {message}", "ERROR")
         self.errorOccurred.emit(message)
-    
-    def _log_debug(self, message: str) -> None:
-        """Log debug message.
-        
-        Args:
-            message: Debug message to log
-        """
-        self._logger.log(f"{self.__class__.__name__}: {message}", "DEBUG")
-    
+
     @Slot()
     def initialize(self) -> None:
         """Initialize the object.
@@ -97,50 +81,26 @@ class BaseQmlObject(QObject):
         return self.__class__.__name__
 
 
-class BaseService(ABC):
+class BaseService(ABC, LoggingMixin):
     """Base class for application services.
-    
+
     Provides common functionality for service classes that handle
     business logic and data operations.
     """
-    
+
     def __init__(self):
         """Initialize base service."""
-        self._logger = AppLogger.get_instance()
+        LoggingMixin.__init__(self)
         self._config = get_config_manager()
     
     @abstractmethod
     def initialize(self) -> bool:
         """Initialize the service.
-        
+
         Returns:
             True if initialization was successful
         """
         pass
-    
-    def _log_info(self, message: str) -> None:
-        """Log info message.
-        
-        Args:
-            message: Message to log
-        """
-        self._logger.log(f"{self.__class__.__name__}: {message}", "INFO")
-    
-    def _log_error(self, message: str) -> None:
-        """Log error message.
-        
-        Args:
-            message: Error message to log
-        """
-        self._logger.log(f"{self.__class__.__name__}: {message}", "ERROR")
-    
-    def _log_debug(self, message: str) -> None:
-        """Log debug message.
-        
-        Args:
-            message: Debug message to log
-        """
-        self._logger.log(f"{self.__class__.__name__}: {message}", "DEBUG")
 
 
 class ValidationMixin:
