@@ -86,16 +86,13 @@ class ConfigManager:
 
 
 # Global configuration instance
-_config_manager = None
+_config_manager = ConfigManager()
 
 
 def get_config_manager() -> ConfigManager:
     """Get global configuration manager instance.
-    
+
     Returns:
         ConfigManager instance
     """
-    global _config_manager
-    if _config_manager is None:
-        _config_manager = ConfigManager()
     return _config_manager
