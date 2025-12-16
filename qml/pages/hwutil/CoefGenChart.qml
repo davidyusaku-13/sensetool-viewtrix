@@ -20,22 +20,15 @@ ChartView {
         chartView.axes[0].max = y.length
     }
     
-    function drawDemo(y_sin, y_cos){
-        // I Coef
-        chartView.createSeries(ChartView.SeriesTypeLine, "I Coef", xAxis, yAxis)
-        for(let i=0; i<y_sin.length; i++){
-            chartView.series(0).append(i, y_sin[i])
+    function drawDemo(coefficients){
+        // Single series for coefficients
+        chartView.createSeries(ChartView.SeriesTypeLine, "Demodulator Coefficients", xAxis, yAxis)
+        for(let i=0; i<coefficients.length; i++){
+            chartView.series(0).append(i, coefficients[i])
         }
         chartView.series(0).style = Qt.DotLine
-        
-        // Q Coef
-        chartView.createSeries(ChartView.SeriesTypeLine, "Q Coef", xAxis, yAxis)
-        for(let i=0; i<y_cos.length; i++){
-            chartView.series(1).append(i, y_cos[i])
-        }
-        chartView.series(1).style = Qt.DotLine
-        
-        chartView.axes[0].max = y_sin.length
+
+        chartView.axes[0].max = coefficients.length
     }
     
     function createWin(win_sample_number, win_a0, win_length){
@@ -54,26 +47,18 @@ ChartView {
     
     function createDemo(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq){
         // Chart & Title creation
-        chartView.createSeries(ChartView.SeriesTypeLine, "I Coef", xAxis, yAxis)
-        chartView.createSeries(ChartView.SeriesTypeLine, "Q Coef", xAxis, yAxis)
+        chartView.createSeries(ChartView.SeriesTypeLine, "Demodulator Coefficients", xAxis, yAxis)
 
-        // I Coef
-        let y_sin = window.logic.demo_coef_gen(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq)[0]
-        for(let i=0; i<y_sin.length; i++){
-            chartView.series(0).append(i, y_sin[i])
+        // Single coefficient list
+        let coefficients = window.logic.demo_coef_gen(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq)
+        for(let i=0; i<coefficients.length; i++){
+            chartView.series(0).append(i, coefficients[i])
         }
-        chartView.series(0).style = Qt.DotLine
-        
-        // Q Coef
-        let y_cos = window.logic.demo_coef_gen(demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq)[1]
-        for(let i=0; i<y_cos.length; i++){
-            chartView.series(1).append(i, y_cos[i])
-        }
-        chartView.series(1).style = Qt.binding(chartView.setStyle)
-        
+        chartView.series(0).style = Qt.binding(chartView.setStyle)
+
         chartView.axes[0].max = demo_sample_number
-        
-        return [y_sin, y_cos]
+
+        return coefficients
     }
     
     function setStyle(){

@@ -157,13 +157,12 @@ Item{
                             nameFilters: ["YAML files (*.yaml *.yml)"]
                             onAccepted: {
                                 let importRes = window.logic.importDemoCoef(selectedFile)
-                                let y = importRes[0]
                                 demo.clear()
-                                demo.drawDemo(y[0], y[1])
-                                demoFields.itemAt(0).text = importRes[1]
-                                demoFields.itemAt(1).text = importRes[2]
-                                demoFields.itemAt(2).text = importRes[3]
-                                demoFields.itemAt(3).text = importRes[4]
+                                demo.drawDemo(importRes.coefficients)
+                                demoFields.itemAt(0).text = importRes.step
+                                demoFields.itemAt(1).text = importRes.sample
+                                demoFields.itemAt(2).text = importRes.cycle
+                                demoFields.itemAt(3).text = importRes.adc_freq
                                 window.historyModel.addHistory("Imported", selectedFile, "", "")
                             }
                         }
