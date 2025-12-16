@@ -18,7 +18,6 @@ class AppLogic(BaseQmlObject):
     """
     
     # Signals
-    parentChanged = Signal(QObject)
     
     def __init__(self, parent: QObject = None):
         """Initialize application logic.
@@ -37,15 +36,6 @@ class AppLogic(BaseQmlObject):
         self._coefficient_service.initialize()
         self._file_service.initialize()
         self._update_service.initialize()
-        
-    @Property(QObject)
-    def parent(self) -> QObject:
-        return super().parent()
-    
-    @parent.setter
-    def parent(self, parent: QObject):
-        super().setParent(parent)
-        self.parentChanged.emit(parent)
 
     @Slot(result=dict)
     def checkUpdate(self) -> Dict[str, Any]:
