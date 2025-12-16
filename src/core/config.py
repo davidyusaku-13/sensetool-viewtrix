@@ -5,9 +5,8 @@ including application settings, constants, and environment variables.
 """
 
 import os
-import configparser
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from dataclasses import dataclass
 
 
@@ -42,35 +41,10 @@ class ConfigManager:
     from various sources including files and environment variables.
     """
     
-    def __init__(self, config_path: Optional[Path] = None):
-        """Initialize configuration manager.
-        
-        Args:
-            config_path: Optional path to configuration file
-        """
+    def __init__(self):
+        """Initialize configuration manager."""
         self._config = AppConfig()
-        self._config_path = config_path or self._get_default_config_path()
-        self._load_config()
-    
-    def _get_default_config_path(self) -> Path:
-        """Get default configuration file path."""
-        return Path(__file__).parent.parent / "modules" / "config.ini"
-    
-    def _load_config(self) -> None:
-        """Load configuration from file if it exists."""
-        if not self._config_path.exists():
-            return
-            
-        parser = configparser.ConfigParser()
-        parser.read(self._config_path)
-        
-        # Load application settings if they exist
-        if parser.has_section('app'):
-            app_section = parser['app']
-            self._config.app_name = app_section.get('name', self._config.app_name)
-            self._config.window_width = app_section.getint('window_width', self._config.window_width)
-            self._config.window_height = app_section.getint('window_height', self._config.window_height)
-    
+
     @property
     def config(self) -> AppConfig:
         """Get application configuration."""
