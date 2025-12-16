@@ -166,36 +166,36 @@ class AppLogic(BaseQmlObject):
             return {"coefficients": [], "sample_number": 0, "a0": 0.0, "coef_length": "Full"}
     
     @Slot(int, int, int, int, result=list)
-    def demo_coef_gen(self, demo_num_step: int, demo_sample_number: int, 
-                     demo_cycle: int, demo_adc_sampling_freq: int) -> List[List[int]]:
+    def demo_coef_gen(self, demo_num_step: int, demo_sample_number: int,
+                     demo_cycle: int, demo_adc_sampling_freq: int) -> List[int]:
         """Generate demo coefficients.
-        
+
         Args:
             demo_num_step: Number of steps
             demo_sample_number: Number of samples
             demo_cycle: Cycle count
             demo_adc_sampling_freq: ADC sampling frequency
-            
+
         Returns:
-            List containing [I_coefficients, Q_coefficients]
+            List of demo coefficients
         """
         try:
             coefficients = self._coefficient_service.generate_demo_coefficients(
                 demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq
             )
-            return [coefficients.i_coefficients, coefficients.q_coefficients]
+            return coefficients.coefficients
         except Exception as e:
             self._log_error(f"Failed to generate demo coefficients: {e}")
-            return [[], []]
+            return []
 
     @Slot(QUrl, list, int, int, int, int)
-    def exportDemoCoef(self, fname: QUrl, y: List[List[int]], demo_step: int, 
+    def exportDemoCoef(self, fname: QUrl, y: List[int], demo_step: int,
                       demo_sample: int, demo_cycle: int, demo_adc: int) -> None:
         """Export demo coefficients to file.
-        
+
         Args:
             fname: File URL to export to
-            y: List containing [I_coefficients, Q_coefficients]
+            y: List of demo coefficients
             demo_step: Number of steps
             demo_sample: Number of samples
             demo_cycle: Cycle count
@@ -203,42 +203,40 @@ class AppLogic(BaseQmlObject):
         """
         try:
             from ..services.coefficient_service import DemoCoefficients
-            
-            y_sin, y_cos = y
+
             coefficients = DemoCoefficients(
                 num_step=demo_step,
                 sample_number=demo_sample,
                 cycle=demo_cycle,
                 adc_sampling_freq=demo_adc,
-                coefficients=y_sin  # Note: DemoCoefficients only stores one coefficient list
+                coefficients=y
             )
-            
+
             success = self._file_service.export_demo_coefficients(fname, coefficients)
             if success:
                 self._log_info(f"Exported demo coefficients to {fname.toLocalFile()}")
             else:
                 self._log_error("Failed to export demo coefficients")
-                
+
         except Exception as e:
             self._log_error(f"Failed to export demo coefficients: {e}")
 
     @Slot(QUrl, result='QVariant')
     def importDemoCoef(self, fname: QUrl) -> Dict[str, Any]:
         """Import demo coefficients from file.
-        
+
         Args:
             fname: File URL to import from
-            
+
         Returns:
-            Dictionary containing i_coefficients, q_coefficients, step, sample, cycle, and adc_freq
+            Dictionary containing coefficients, step, sample, cycle, and adc_freq
         """
         try:
             coefficients = self._file_service.import_demo_coefficients(fname)
             if coefficients:
                 self._log_info(f"Imported demo coefficients from {fname.toLocalFile()}")
                 return {
-                    "i_coefficients": coefficients.coefficients,
-                    "q_coefficients": [],  # DemoCoefficients only stores one coefficient list
+                    "coefficients": coefficients.coefficients,
                     "step": coefficients.num_step,
                     "sample": coefficients.sample_number,
                     "cycle": coefficients.cycle,
@@ -246,7 +244,7 @@ class AppLogic(BaseQmlObject):
                 }
             else:
                 self._log_error("Failed to import demo coefficients")
-                return {"i_coefficients": [], "q_coefficients": [], "step": 0, "sample": 0, "cycle": 0, "adc_freq": 0}
+                return {"coefficients": [], "step": 0, "sample": 0, "cycle": 0, "adc_freq": 0}
         except Exception as e:
             self._log_error(f"Failed to import demo coefficients: {e}")
-            return {"i_coefficients": [], "q_coefficients": [], "step": 0, "sample": 0, "cycle": 0, "adc_freq": 0}
+            return {"coefficients": [], "step": 0, "sample": 0, "cycle": 0, "adc_freq": 0}
