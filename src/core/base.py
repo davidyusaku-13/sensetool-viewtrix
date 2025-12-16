@@ -175,16 +175,16 @@ class ValidationMixin:
     @staticmethod
     def validate_integer_range(value: Any, min_val: int, max_val: int, name: str = "value") -> int:
         """Validate that a value is an integer within a specific range.
-        
+
         Args:
             value: Value to validate
             min_val: Minimum allowed value
             max_val: Maximum allowed value
             name: Name of the value for error messages
-            
+
         Returns:
             Validated integer value
-            
+
         Raises:
             ValueError: If value is not within the specified range
         """
@@ -195,21 +195,3 @@ class ValidationMixin:
             return int_value
         except (TypeError, ValueError) as e:
             raise ValueError(f"Invalid {name}: {e}")
-    
-    @staticmethod
-    def validate_string_not_empty(value: Any, name: str = "value") -> str:
-        """Validate that a value is a non-empty string.
-        
-        Args:
-            value: Value to validate
-            name: Name of the value for error messages
-            
-        Returns:
-            Validated string value
-            
-        Raises:
-            ValueError: If value is not a non-empty string
-        """
-        if not isinstance(value, str) or not value.strip():
-            raise ValueError(f"{name} must be a non-empty string")
-        return value.strip()
