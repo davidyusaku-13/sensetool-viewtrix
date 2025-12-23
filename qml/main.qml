@@ -11,9 +11,7 @@ ApplicationWindow {
     
     property PrjSetModel prjSetModel: PrjSetModel {}
     property HistoryModel historyModel: HistoryModel{}
-    property AppLogic logic: AppLogic{
-        parent: window
-    }
+    property AppLogic logic: AppLogic{}
 
     title: qsTr("SenseTool-v" + logic.getVersion())
     visible: true
