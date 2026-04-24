@@ -32,7 +32,7 @@ env:
   PYTHON_VERSION: "3.11"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   # ============================================
@@ -65,12 +65,13 @@ jobs:
           sudo apt-get install -y qt6-base-dev qt6-declarative-dev qt6-tools-dev
           sudo apt-get install -y libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
           sudo apt-get install -y libegl1 libxcb-cursor0
+          echo "/usr/lib/qt6/bin" >> $GITHUB_PATH
 
       - name: Install Qt (macOS)
         if: runner.os == 'macOS'
         run: |
           brew install qt6
-          echo "/opt/homebrew/opt/qt6/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix qt6)/bin" >> $GITHUB_PATH
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
@@ -83,6 +84,26 @@ jobs:
           modules: "qtcharts qt5compat qtshadertools"
           cache: true
 
+      - name: Add Qt bin to PATH (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $qtRoot = Join-Path $env:RUNNER_WORKSPACE "Qt"
+          if (!(Test-Path $qtRoot)) {
+            Write-Error "Qt installation root not found at $qtRoot"
+            exit 1
+          }
+
+          $qmlTestRunner = Get-ChildItem -Path $qtRoot -Filter "qmltestrunner.exe" -File -Recurse |
+            Select-Object -First 1
+
+          if (-not $qmlTestRunner) {
+            Write-Error "Unable to locate qmltestrunner.exe under $qtRoot"
+            exit 1
+          }
+
+          $qmlTestRunner.DirectoryName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -94,10 +115,29 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      - name: Run tests
+      - name: Run tests (Linux)
+        if: runner.os == 'Linux'
         run: pytest tests/ -v --tb=short
         env:
           QT_QPA_PLATFORM: offscreen
+
+      - name: Run tests (Windows/macOS)
+        if: runner.os != 'Linux'
+        run: pytest tests/ -v --tb=short
+
+      - name: Run QML tests (Windows)
+        if: runner.os == 'Windows'
+        run: qmltestrunner.exe -input tests/qmlUnitTests
+
+      - name: Run QML tests (Linux)
+        if: runner.os == 'Linux'
+        run: qmltestrunner -input tests/qmlUnitTests
+        env:
+          QT_QPA_PLATFORM: offscreen
+
+      - name: Run QML tests (macOS)
+        if: runner.os == 'macOS'
+        run: qmltestrunner -input tests/qmlUnitTests
 
   # ============================================
   # SECURITY JOB - Runs on all triggers
@@ -121,7 +161,41 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run bandit security scan
-        run: bandit -r src/ -f json -o bandit-report.json || true
+        shell: bash
+        run: |
+          set +e
+          bandit -r src/ -f json -o bandit-report.json
+          bandit_exit=$?
+          set -e
+
+          if [ ! -f bandit-report.json ]; then
+            echo "Bandit did not produce a JSON report"
+            exit $bandit_exit
+          fi
+
+          python - <<'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          report = json.loads(Path("bandit-report.json").read_text(encoding="utf-8"))
+          high_findings = [
+              issue for issue in report.get("results", [])
+              if issue.get("issue_severity") == "HIGH"
+          ]
+
+          if not high_findings:
+              print("No high-severity Bandit findings.")
+              sys.exit(0)
+
+          print(f"High-severity Bandit findings: {len(high_findings)}")
+          for issue in high_findings[:20]:
+              print(
+                  f"- {issue.get('filename')}:{issue.get('line_number')} "
+                  f"{issue.get('test_id')} {issue.get('issue_text')}"
+              )
+          sys.exit(1)
+          PY
 
       - name: Upload bandit report
         uses: actions/upload-artifact@v4
@@ -129,6 +203,7 @@ jobs:
         with:
           name: bandit-report
           path: bandit-report.json
+          if-no-files-found: warn
 
   # ============================================
   # VERSION JOB - Only runs for releases
@@ -229,7 +304,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install qt6
-          echo "/opt/homebrew/opt/qt6/bin" >> $GITHUB_PATH
+          echo "$(brew --prefix qt6)/bin" >> $GITHUB_PATH
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
@@ -253,6 +328,33 @@ jobs:
         run: |
           echo "${{ needs.version.outputs.new_version }}" > VERSION.txt
 
+      - name: Prepare CI deploy spec
+        shell: bash
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+
+          source = Path("pysidedeploy.spec")
+          target = Path("pysidedeploy.ci.spec")
+          python_path_line = "python_path = "
+
+          updated_lines = []
+          replaced = False
+          for line in source.read_text(encoding="utf-8").splitlines():
+              if line.startswith(python_path_line):
+                  updated_lines.append(f"{python_path_line}{sys.executable}")
+                  replaced = True
+              else:
+                  updated_lines.append(line)
+
+          if not replaced:
+              raise SystemExit("python_path entry not found in pysidedeploy.spec")
+
+          target.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
+          print(f"Generated {target} with python_path={sys.executable}")
+          PY
+
       - name: Build resources
         run: pyside6-rcc ./resource.qrc -o ./resource_rc.py
 
@@ -260,7 +362,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          pyside6-deploy -f
+          pyside6-deploy -c pysidedeploy.ci.spec -f
           $exeFiles = Get-ChildItem -Filter "*.exe" | Where-Object { $_.Name -ne "sensetool.exe" }
           if ($exeFiles) {
             $firstExe = $exeFiles[0]
@@ -276,7 +378,7 @@ jobs:
       - name: Build application (Linux)
         if: runner.os == 'Linux'
         run: |
-          pyside6-deploy -f
+          pyside6-deploy -c pysidedeploy.ci.spec -f
           if [ -f "SenseTool" ]; then
             mv SenseTool sensetool
           elif [ -f "main" ]; then
@@ -287,7 +389,7 @@ jobs:
       - name: Build application (macOS)
         if: runner.os == 'macOS'
         run: |
-          pyside6-deploy -f
+          pyside6-deploy -c pysidedeploy.ci.spec -f
           if [ -d "SenseTool.app" ]; then
             mv SenseTool.app sensetool.app
           elif [ -d "main.app" ]; then
@@ -358,15 +460,18 @@ jobs:
     needs: [version, build]
     if: github.event.inputs.release == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Download all artifacts
+      - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: sensetool-*
           path: ./artifacts
 
       - name: List artifacts
@@ -374,18 +479,28 @@ jobs:
           echo "Downloaded artifacts:"
           find ./artifacts -type f -name "*.*"
 
-      - name: Create and push tag
+      - name: Ensure release tag exists
+        id: tag
         run: |
+          git fetch --tags --force
+          TAG_NAME="v${{ needs.version.outputs.new_version }}"
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Tag $TAG_NAME already exists; reusing it."
+            exit 0
+          fi
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v${{ needs.version.outputs.new_version }}" -m "Release v${{ needs.version.outputs.new_version }}"
-          git push origin "v${{ needs.version.outputs.new_version }}"
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ needs.version.outputs.new_version }}
-          name: Release v${{ needs.version.outputs.new_version }}
+          tag_name: ${{ steps.tag.outputs.tag_name }}
+          name: Release ${{ steps.tag.outputs.tag_name }}
           draft: false
           prerelease: ${{ github.event.inputs.prerelease == 'true' }}
           files: |
@@ -398,6 +513,6 @@ jobs:
         run: |
           echo "## Release Created Successfully! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** v${{ needs.version.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.tag.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Bump Type:** ${{ github.event.inputs.version_bump }}" >> $GITHUB_STEP_SUMMARY
           echo "**Pre-release:** ${{ github.event.inputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
