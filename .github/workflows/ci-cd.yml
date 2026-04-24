@@ -131,9 +131,12 @@ jobs:
 
       - name: Run QML tests (Linux)
         if: runner.os == 'Linux'
-        run: qmltestrunner -input tests/qmlUnitTests
+        run: qmltestrunner -platform offscreen -input tests/qmlUnitTests
         env:
           QT_QPA_PLATFORM: offscreen
+          QT_QUICK_BACKEND: software
+          QSG_RHI_BACKEND: software
+          LIBGL_ALWAYS_SOFTWARE: "1"
 
       - name: Run QML tests (macOS)
         if: runner.os == 'macOS'
