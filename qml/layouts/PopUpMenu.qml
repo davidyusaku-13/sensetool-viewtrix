@@ -125,7 +125,8 @@ Item{
                         cursorShape: Qt.PointingHandCursor
                     }
                     onClicked: {
-                        if(logic.checkUpdate()["status"]){
+                        window.updateInfo = logic.checkUpdate()
+                        if(window.updateInfo["status"]){
                             update_window.show()
                         }
                     }

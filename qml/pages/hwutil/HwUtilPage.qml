@@ -60,11 +60,11 @@ Item{
                             onAccepted: {
                                 let importRes = window.logic.importWinCoef(selectedFile)
                                 win.clear()
-                                win.drawWin(importRes[0])
-                                winFields.itemAt(0).text = importRes[1]
-                                winFields.itemAt(1).text = importRes[2]
-                                winLength.currentIndex = winLength.find(importRes[3])
-                                window.historyModel.addHistory("Imported", selectedFile, "", "")
+                                win.drawWin(importRes.coefficients)
+                                winFields.itemAt(0).text = importRes.sample_number
+                                winFields.itemAt(1).text = importRes.a0
+                                winLength.currentIndex = winLength.find(importRes.coef_length)
+                                window.historyModel.addHistory("Imported", selectedFile.toString(), "", "")
                             }
                         }
                         ToolbarBtn{
@@ -81,9 +81,10 @@ Item{
                             nameFilters: ["YAML files (*.yaml *.yml)"]
                             onAccepted: {
                                 win.clear()
-                                let y = win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, winFields.itemAt(2).text)
-                                window.logic.exportWinCoef(selectedFile, y, winFields.itemAt(0).text, winFields.itemAt(1).text, winFields.itemAt(2).text)
-                                window.historyModel.addHistory("Exported", selectedFile)
+                                let currentLength = winLength.textAt(winLength.currentIndex)
+                                let y = win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, currentLength)
+                                window.logic.exportWinCoef(selectedFile, y, winFields.itemAt(0).text, winFields.itemAt(1).text, currentLength)
+                                window.historyModel.addHistory("Exported", selectedFile.toString(), "", "")
                             }
                         }
                     }
@@ -163,7 +164,7 @@ Item{
                                 demoFields.itemAt(1).text = importRes.sample
                                 demoFields.itemAt(2).text = importRes.cycle
                                 demoFields.itemAt(3).text = importRes.adc_freq
-                                window.historyModel.addHistory("Imported", selectedFile, "", "")
+                                window.historyModel.addHistory("Imported", selectedFile.toString(), "", "")
                             }
                         }
                         ToolbarBtn{
@@ -182,7 +183,7 @@ Item{
                                 demo.clear()
                                 let y = demo.createDemo(demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
                                 window.logic.exportDemoCoef(selectedFile, y, demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
-                                window.historyModel.addHistory("Exported", selectedFile)
+                                window.historyModel.addHistory("Exported", selectedFile.toString(), "", "")
                             }
                         }
                     }

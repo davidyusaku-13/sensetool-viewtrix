@@ -12,8 +12,15 @@ ApplicationWindow {
     property PrjSetModel prjSetModel: PrjSetModel {}
     property HistoryModel historyModel: HistoryModel{}
     property AppLogic logic: AppLogic{}
+    property var updateInfo: ({
+        "status": false,
+        "current_version": "",
+        "version": "",
+        "changelog": "",
+        "link": ""
+    })
 
-    title: qsTr("SenseTool-v" + logic.getVersion())
+    title: logic ? qsTr("SenseTool-v" + logic.getVersion()) : qsTr("SenseTool")
     visible: true
     width: 1280
     height: 720
@@ -26,7 +33,11 @@ ApplicationWindow {
             Material.theme: sensetool.theme
         }
         Component.onCompleted: {
-            if(logic.checkUpdate()["status"]){
+            if (!logic) {
+                return
+            }
+            window.updateInfo = logic.checkUpdate()
+            if(window.updateInfo["status"]){
                 update_window.show()
             }
         }
@@ -46,9 +57,14 @@ ApplicationWindow {
             update_window.progressBar.value = value
             update_window.progressText.visible = true
             update_window.progressText.text = value + qsTr("% completed")
-            if (value === 100) {
-                update_window.restartDialog.open()
-            }
+        }
+        function onDownloadCompleted() {
+            update_window.restartDialog.open()
+        }
+        function onDownloadFailed(message) {
+            update_window.progressBar.visible = false
+            update_window.progressText.visible = true
+            update_window.progressText.text = message
         }
     }
 }

@@ -4,8 +4,10 @@ This module provides services for checking application updates,
 downloading new versions, and managing the update process.
 """
 
+import platform
+import re
 import requests
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Tuple
 from dataclasses import dataclass
 from PySide6.QtCore import QObject, Signal, QThread
 from ..core.base import BaseService
@@ -124,8 +126,9 @@ class UpdateService(BaseService):
         Returns:
             UpdateInfo object with update details
         """
+        current_version = self._config.get_version()
+
         try:
-            current_version = self._config.get_version()
             releases_url = self._config.get_github_releases_url()
             
             self._log_debug(f"Checking for updates. Current version: {current_version}")
@@ -140,12 +143,7 @@ class UpdateService(BaseService):
             is_update_available = self._is_newer_version(latest_version, current_version)
             
             release_notes = release_data.get('body', '')
-            download_url = ''
-            
-            if release_data.get('assets'):
-                download_url = release_data['assets'][0].get('browser_download_url', '')
-            else:
-                download_url = release_data.get('zipball_url', '')
+            download_url = self._select_download_url(release_data)
             
             update_info = UpdateInfo(
                 is_available=is_update_available,
@@ -181,25 +179,112 @@ class UpdateService(BaseService):
         Returns:
             True if latest version is newer
         """
-        try:
-            # Remove 'v' prefix if present
-            latest = latest.lstrip('v')
-            current = current.lstrip('v')
-            
-            # Split version parts and convert to integers
-            latest_parts = [int(x) for x in latest.split('.') if x.isdigit()]
-            current_parts = [int(x) for x in current.split('.') if x.isdigit()]
-            
-            # Pad shorter version with zeros
-            max_length = max(len(latest_parts), len(current_parts))
-            latest_parts.extend([0] * (max_length - len(latest_parts)))
-            current_parts.extend([0] * (max_length - len(current_parts)))
-            
-            return latest_parts > current_parts
-            
-        except (ValueError, AttributeError):
-            # Fallback to string comparison
-            return latest > current
+        latest_version = self._parse_semver(latest)
+        current_version = self._parse_semver(current)
+
+        if latest_version and current_version:
+            return latest_version > current_version
+
+        return str(latest) > str(current)
+
+    def _parse_semver(self, version: str) -> Optional[Tuple[int, int, int, int, Tuple[Tuple[int, object], ...]]]:
+        """Parse a semantic version string with optional prerelease."""
+        if not isinstance(version, str):
+            return None
+
+        match = re.fullmatch(
+            r"v?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)"
+            r"(?:-(?P<prerelease>[0-9A-Za-z.-]+))?",
+            version.strip()
+        )
+        if not match:
+            return None
+
+        prerelease = match.group("prerelease")
+        prerelease_key: Tuple[Tuple[int, object], ...]
+        if prerelease is None:
+            prerelease_rank = 1
+            prerelease_key = ()
+        else:
+            prerelease_rank = 0
+            prerelease_key = tuple(self._parse_prerelease_identifier(part) for part in prerelease.split("."))
+
+        return (
+            int(match.group("major")),
+            int(match.group("minor")),
+            int(match.group("patch")),
+            prerelease_rank,
+            prerelease_key,
+        )
+
+    @staticmethod
+    def _parse_prerelease_identifier(part: str) -> Tuple[int, object]:
+        """Parse semver prerelease identifier for tuple comparison."""
+        if part.isdigit():
+            return (0, int(part))
+        return (1, part.lower())
+
+    def _select_download_url(self, release_data: Dict[str, Any]) -> str:
+        """Choose platform-appropriate release asset URL."""
+        assets = release_data.get("assets") or []
+        selected_asset = self._select_download_asset(assets)
+        if selected_asset:
+            return selected_asset.get("browser_download_url", "")
+        return ""
+
+    def _select_download_asset(
+        self,
+        assets: List[Dict[str, Any]],
+        system_name: Optional[str] = None,
+        machine_name: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Choose best matching asset for current platform."""
+        if not assets:
+            return None
+
+        system_name = (system_name or platform.system()).lower()
+        machine_name = (machine_name or platform.machine()).lower()
+
+        system_keywords = {
+            "windows": ["windows", "win", ".exe", ".msi"],
+            "linux": ["linux", "appimage", ".deb", ".rpm", ".tar.gz"],
+            "darwin": ["macos", "mac", "darwin", "osx", ".dmg", ".app", ".pkg"],
+        }
+        arch_keywords = {
+            "x86_64": ["x86_64", "amd64", "x64", "64"],
+            "amd64": ["x86_64", "amd64", "x64", "64"],
+            "arm64": ["arm64", "aarch64"],
+            "aarch64": ["arm64", "aarch64"],
+        }
+
+        platform_terms = system_keywords.get(system_name, [system_name])
+        machine_terms = arch_keywords.get(machine_name, [machine_name])
+        scored_assets = []
+
+        for asset in assets:
+            name = str(asset.get("name", "")).lower()
+            if not name:
+                continue
+
+            score = 0
+            if any(term in name for term in platform_terms):
+                score += 10
+            elif len(assets) > 1:
+                continue
+
+            if any(term in name for term in machine_terms):
+                score += 5
+
+            if name.endswith((".exe", ".msi", ".dmg", ".pkg", ".appimage", ".tar.gz", ".zip")):
+                score += 1
+
+            scored_assets.append((score, asset))
+
+        if not scored_assets:
+            return None
+
+        scored_assets.sort(key=lambda item: item[0], reverse=True)
+        return scored_assets[0][1]
     
     def _create_error_update_info(self, current_version: str, error_message: str) -> UpdateInfo:
         """Create UpdateInfo object for error cases.

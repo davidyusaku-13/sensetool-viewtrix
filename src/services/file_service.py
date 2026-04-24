@@ -210,26 +210,33 @@ class FileService(BaseService, ValidationMixin):
             
             with open(path, 'r', encoding='utf-8') as file:
                 data = yaml.safe_load(file)
-            
-            # Validate required fields
-            required_fields = ['demo_step', 'demo_sample', 'demo_cycle', 'demo_adc', 'data']
-            for field in required_fields:
-                if field not in data:
-                    raise ValueError(f"Missing required field: {field}")
-            
-            # Extract coefficients
-            coefficients = []
-            for item in data['data']:
-                if 'y' not in item:
-                    raise ValueError("Invalid data format: missing 'y' field")
-                coefficients.append(int(item['y']))
-            
-            # Create DemoCoefficients object
+
+            if not isinstance(data, dict):
+                raise ValueError("Invalid demo coefficients file format")
+
+            if all(field in data for field in ['demo_step', 'demo_sample', 'demo_cycle', 'demo_adc', 'data']):
+                num_step = int(data['demo_step'])
+                sample_number = int(data['demo_sample'])
+                cycle = int(data['demo_cycle'])
+                adc_sampling_freq = int(data['demo_adc'])
+                coefficients = self._extract_coefficients(data['data'], ('y',))
+            elif all(field in data for field in ['step', 'sample', 'cycle', 'adc_freq']):
+                num_step = int(data['step'])
+                sample_number = int(data['sample'])
+                cycle = int(data['cycle'])
+                adc_sampling_freq = int(data['adc_freq'])
+                legacy_coefficients = data.get('i_coef') or data.get('q_coef') or data.get('data')
+                if legacy_coefficients is None:
+                    raise ValueError("Missing coefficient data in legacy demo file")
+                coefficients = self._extract_coefficients(legacy_coefficients, ('y_sin', 'y_cos', 'y'))
+            else:
+                raise ValueError("Missing required demo coefficient fields")
+
             result = DemoCoefficients(
-                num_step=int(data['demo_step']),
-                sample_number=int(data['demo_sample']),
-                cycle=int(data['demo_cycle']),
-                adc_sampling_freq=int(data['demo_adc']),
+                num_step=num_step,
+                sample_number=sample_number,
+                cycle=cycle,
+                adc_sampling_freq=adc_sampling_freq,
                 coefficients=coefficients
             )
             
@@ -242,6 +249,38 @@ class FileService(BaseService, ValidationMixin):
         except Exception as e:
             self._log_error(f"Failed to import demo coefficients: {e}")
             return None
+
+    def _extract_coefficients(
+        self,
+        items: Any,
+        accepted_keys: tuple[str, ...]
+    ) -> List[int]:
+        """Extract integer coefficient values from YAML list items."""
+        if not isinstance(items, list):
+            raise ValueError("Coefficient data must be a list")
+
+        coefficients = []
+        for item in items:
+            if not isinstance(item, dict):
+                raise ValueError("Coefficient entries must be dictionaries")
+
+            value = None
+            for key in accepted_keys:
+                if key in item:
+                    value = item[key]
+                    break
+
+            if value is None and len(item) == 1:
+                value = next(iter(item.values()))
+
+            if value is None:
+                raise ValueError(
+                    f"Invalid coefficient entry, expected one of: {', '.join(accepted_keys)}"
+                )
+
+            coefficients.append(int(value))
+
+        return coefficients
     
     def export_project_settings(
         self,
@@ -308,19 +347,32 @@ class FileService(BaseService, ValidationMixin):
             if not isinstance(data, dict) or 'data' not in data:
                 raise ValueError("Invalid project settings file format")
             
-            settings_data = data['data']
-            if not isinstance(settings_data, list):
+            raw_settings = data['data']
+            if not isinstance(raw_settings, list):
                 raise ValueError("Project settings data must be a list")
-            
-            # Validate each setting
-            for i, setting in enumerate(settings_data):
-                if not isinstance(setting, dict):
-                    raise ValueError(f"Setting {i} must be a dictionary")
-                
-                required_fields = ['name', 'value']
-                for field in required_fields:
-                    if field not in setting:
-                        raise ValueError(f"Setting {i} missing required field: {field}")
+
+            settings_data = []
+            for i, setting in enumerate(raw_settings):
+                if isinstance(setting, dict):
+                    required_fields = ['name', 'value']
+                    for field in required_fields:
+                        if field not in setting:
+                            raise ValueError(f"Setting {i} missing required field: {field}")
+                    settings_data.append({
+                        'name': '' if setting['name'] is None else str(setting['name']),
+                        'value': '' if setting['value'] is None else str(setting['value']),
+                        'desc': '' if setting.get('desc') is None else str(setting.get('desc')),
+                    })
+                elif isinstance(setting, (list, tuple)) and len(setting) == 3:
+                    settings_data.append({
+                        'name': '' if setting[0] is None else str(setting[0]),
+                        'value': '' if setting[1] is None else str(setting[1]),
+                        'desc': '' if setting[2] is None else str(setting[2])
+                    })
+                else:
+                    raise ValueError(
+                        f"Setting {i} must be a dictionary or 3-item sequence"
+                    )
             
             self._log_info(
                 f"Successfully imported {len(settings_data)} project settings from {path}"

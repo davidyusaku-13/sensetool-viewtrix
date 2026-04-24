@@ -41,7 +41,6 @@ if __name__ == "__main__":
         engine.rootContext().setContextProperty("translator", translator)
 
         updateManager = UpdateManager()
-        updateManager.restartApplication.connect(restart_application)
         engine.rootContext().setContextProperty("updateManager", updateManager)
 
         logger.log("App opened", "INFO")

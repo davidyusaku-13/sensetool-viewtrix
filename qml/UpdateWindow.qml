@@ -54,10 +54,13 @@ Window {
             }
             Button{
                 Layout.fillWidth: true
-                text: qsTr("Download")
+                enabled: updateManager ? updateManager.canInstallUpdate() : false
+                text: enabled ? qsTr("Download") : qsTr("Self-update unavailable")
                 font.family: "Montserrat"
                 onClicked: {
-                    updateManager.download_update(window.logic.checkUpdate()["link"])
+                    if (updateManager) {
+                        updateManager.downloadUpdate(window.updateInfo["link"])
+                    }
                 }
             }
         }
@@ -67,7 +70,9 @@ Window {
             text: qsTr("The download is complete. Would you like to restart the application now?")
             buttons: MessageDialog.Yes | MessageDialog.No
             onAccepted: {
-                updateManager.restartApplication()
+                if (updateManager) {
+                    updateManager.installUpdate()
+                }
             }
         }
     }

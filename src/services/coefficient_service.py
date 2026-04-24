@@ -110,7 +110,7 @@ class CoefficientService(BaseService, ValidationMixin):
         """
         # Validate inputs
         sample_number = self.validate_integer_range(
-            sample_number, 1, 10000, "sample_number"
+            sample_number, 2, 10000, "sample_number"
         )
         a0 = self.validate_positive_number(a0, "a0")
         

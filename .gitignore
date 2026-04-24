@@ -226,3 +226,4 @@ main.exe
 # OS generated files
 .directory
 *.directory
+.codex

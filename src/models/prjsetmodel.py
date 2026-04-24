@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Slot, QModelIndex, QObject, QUrl, Signal
 from PySide6.QtQml import QmlElement
-from typing import List, Tuple, Optional
+from typing import List, Optional
 from ..services.file_service import FileService
 from ..core.mixins import LoggingMixin
 from .prjsetmodelitem import PrjSetModelItem
@@ -54,9 +54,23 @@ class PrjSetModel(QAbstractListModel, LoggingMixin):
         return roles
     
     @property
-    def itemsData(self) -> List[Tuple[str, str, str]]:
-        """Return all items data as tuples."""
-        return [(item.name, item.value, item.desc) for item in self._items]
+    def itemsData(self) -> List[dict]:
+        """Return all items data in YAML-ready form."""
+        return [
+            {
+                "name": self._normalize_text(item.name),
+                "value": self._normalize_text(item.value),
+                "desc": self._normalize_text(item.desc),
+            }
+            for item in self._items
+        ]
+
+    @staticmethod
+    def _normalize_text(value) -> str:
+        """Normalize model values for QML string properties."""
+        if value is None:
+            return ""
+        return str(value)
 
     @Slot(int, int, result=bool)
     def move(self, source: int, target: int) -> bool:
@@ -147,6 +161,9 @@ class PrjSetModel(QAbstractListModel, LoggingMixin):
             desc: Item description
         """
         try:
+            name = self._normalize_text(name)
+            value = self._normalize_text(value)
+            desc = self._normalize_text(desc)
             self._log_info(f"Adding item: {name} - {value} - {desc}")
             self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
             item = PrjSetModelItem(name, value, desc, self)
@@ -167,6 +184,9 @@ class PrjSetModel(QAbstractListModel, LoggingMixin):
         """
         try:
             if 0 <= index < len(self._items):
+                name = self._normalize_text(name)
+                value = self._normalize_text(value)
+                desc = self._normalize_text(desc)
                 self._log_info(f"Editing item at index {index}: {name} - {value} - {desc}")
                 item = self._items[index]
                 item._name = name
@@ -235,8 +255,12 @@ class PrjSetModel(QAbstractListModel, LoggingMixin):
             items_data = self._file_service.import_project_settings(file)
             if items_data:
                 self._log_info(f"Imported project settings from {file.toLocalFile()}")
-                for name, value, desc in items_data:
-                    self.addItem(name, value, desc)
+                for setting in items_data:
+                    self.addItem(
+                        self._normalize_text(setting["name"]),
+                        self._normalize_text(setting["value"]),
+                        self._normalize_text(setting.get("desc", "")),
+                    )
             else:
                 self._log_error("Failed to import project settings")
         except Exception as e:
