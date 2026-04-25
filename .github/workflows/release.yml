@@ -298,7 +298,7 @@ jobs:
             "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.dmg"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
           path: |
@@ -318,7 +318,7 @@ jobs:
           fetch-depth: 0
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: sensetool-*
           path: ./artifacts
