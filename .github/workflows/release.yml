@@ -1,4 +1,4 @@
-name: CI/CD
+name: Release
 
 on:
   workflow_dispatch:
@@ -26,184 +26,13 @@ permissions:
   contents: read
 
 jobs:
-  # ============================================
-  # TEST JOB - Runs before manual releases
-  # ============================================
-  test:
-    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11"]
+  checks:
+    name: Run checks
+    uses: ./.github/workflows/checks.yml
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
-          cache-dependency-path: "requirements.txt"
-
-      - name: Install Qt (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qt6-base-dev qt6-declarative-dev qt6-tools-dev qml6-module-qtqml-workerscript qml6-module-qtquick-layouts qml6-module-qtquick-controls qml6-module-qtquick-templates qml6-module-qtquick-window qml6-module-qt5compat-graphicaleffects
-          sudo apt-get install -y libgl1-mesa-dev libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-xinerama0 libxcb-xfixes0
-          sudo apt-get install -y libegl1 libxcb-cursor0
-          echo "/usr/lib/qt6/bin" >> $GITHUB_PATH
-
-      - name: Install Qt (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install qt6
-          echo "$(brew --prefix qt6)/bin" >> $GITHUB_PATH
-
-      - name: Install Qt (Windows)
-        if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: ${{ env.QT_VERSION }}
-          host: "windows"
-          target: "desktop"
-          arch: "win64_mingw"
-          modules: "qtcharts qt5compat qtshadertools"
-          cache: true
-
-      - name: Add Qt bin to PATH (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $qtRoot = Join-Path $env:RUNNER_WORKSPACE "Qt"
-          if (!(Test-Path $qtRoot)) {
-            Write-Error "Qt installation root not found at $qtRoot"
-            exit 1
-          }
-
-          $qmlTestRunner = Get-ChildItem -Path $qtRoot -Filter "qmltestrunner.exe" -File -Recurse |
-            Select-Object -First 1
-
-          if (-not $qmlTestRunner) {
-            Write-Error "Unable to locate qmltestrunner.exe under $qtRoot"
-            exit 1
-          }
-
-          $qmlTestRunner.DirectoryName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest pytest-cov flake8
-          pip install -r requirements.txt
-
-      - name: Lint with flake8
-        run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-      - name: Run tests (Linux)
-        if: runner.os == 'Linux'
-        run: pytest tests/ -v --tb=short
-        env:
-          QT_QPA_PLATFORM: offscreen
-
-      - name: Run tests (Windows/macOS)
-        if: runner.os != 'Linux'
-        run: pytest tests/ -v --tb=short
-
-      - name: Run QML tests (Windows)
-        if: runner.os == 'Windows'
-        run: qmltestrunner.exe -input tests/qmlUnitTests
-
-      - name: Run QML tests (Linux)
-        if: runner.os == 'Linux'
-        run: qmltestrunner -platform offscreen -input tests/qmlUnitTests
-        env:
-          QT_QPA_PLATFORM: offscreen
-          QT_QUICK_BACKEND: software
-          QSG_RHI_BACKEND: software
-          LIBGL_ALWAYS_SOFTWARE: "1"
-
-      - name: Run QML tests (macOS)
-        if: runner.os == 'macOS'
-        run: qmltestrunner -input tests/qmlUnitTests
-
-  # ============================================
-  # SECURITY JOB - Runs before manual releases
-  # ============================================
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install bandit
-          pip install -r requirements.txt
-
-      - name: Run bandit security scan
-        shell: bash
-        run: |
-          set +e
-          bandit -r src/ -f json -o bandit-report.json
-          bandit_exit=$?
-          set -e
-
-          if [ ! -f bandit-report.json ]; then
-            echo "Bandit did not produce a JSON report"
-            exit $bandit_exit
-          fi
-
-          python - <<'PY'
-          import json
-          import sys
-          from pathlib import Path
-
-          report = json.loads(Path("bandit-report.json").read_text(encoding="utf-8"))
-          high_findings = [
-              issue for issue in report.get("results", [])
-              if issue.get("issue_severity") == "HIGH"
-          ]
-
-          if not high_findings:
-              print("No high-severity Bandit findings.")
-              sys.exit(0)
-
-          print(f"High-severity Bandit findings: {len(high_findings)}")
-          for issue in high_findings[:20]:
-              print(
-                  f"- {issue.get('filename')}:{issue.get('line_number')} "
-                  f"{issue.get('test_id')} {issue.get('issue_text')}"
-              )
-          sys.exit(1)
-          PY
-
-      - name: Upload bandit report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: bandit-report
-          path: bandit-report.json
-          if-no-files-found: warn
-
-  # ============================================
-  # VERSION JOB - Only runs for releases
-  # ============================================
   version:
     name: Calculate Version
+    needs: checks
     runs-on: ubuntu-latest
     outputs:
       new_version: ${{ steps.bump.outputs.new_version }}
@@ -250,12 +79,9 @@ jobs:
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "New version: $NEW_VERSION (bumped $BUMP_TYPE from $CURRENT)"
 
-  # ============================================
-  # BUILD JOB - Only runs for releases
-  # ============================================
   build:
     name: Build (${{ matrix.os }})
-    needs: [test, security, version]
+    needs: [checks, version]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -263,15 +89,12 @@ jobs:
         include:
           - os: windows-latest
             artifact_name: sensetool-windows
-            executable: sensetool.exe
             qt_arch: win64_mingw
           - os: ubuntu-latest
             artifact_name: sensetool-linux
-            executable: sensetool
             qt_arch: gcc_64
           - os: macos-latest
             artifact_name: sensetool-macos
-            executable: sensetool.app
             qt_arch: clang_64
 
     steps:
@@ -452,33 +275,36 @@ jobs:
           fi
           echo "Build successful"
 
-      - name: Create archive (Windows)
+      - name: Prepare release asset (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Compress-Archive -Path sensetool.exe -DestinationPath "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip"
+          Move-Item -Path sensetool.exe -Destination "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.exe"
 
-      - name: Create archive (Linux)
+      - name: Prepare release asset (Linux)
         if: runner.os == 'Linux'
         run: |
-          tar -czvf "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.tar.gz" sensetool
+          mv sensetool "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}"
+          chmod +x "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}"
 
-      - name: Create archive (macOS)
+      - name: Prepare release asset (macOS)
         if: runner.os == 'macOS'
         run: |
-          zip -r "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip" sensetool.app
+          hdiutil create \
+            -volname "SenseTool" \
+            -srcfolder sensetool.app \
+            -ov \
+            -format UDZO \
+            "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.dmg"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            ${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.*
+            ${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}*
           retention-days: 7
 
-  # ============================================
-  # RELEASE JOB - Only runs for releases
-  # ============================================
   release:
     name: Create Release
     needs: [version, build]
@@ -500,7 +326,7 @@ jobs:
       - name: List artifacts
         run: |
           echo "Downloaded artifacts:"
-          find ./artifacts -type f -name "*.*"
+          find ./artifacts -type f -print
 
       - name: Ensure release tag exists
         id: tag

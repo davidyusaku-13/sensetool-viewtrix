@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Run checks
+    uses: ./.github/workflows/checks.yml

@@ -57,5 +57,5 @@ pytest tests/
 
 ## CI / CD notes
 
-- The repository uses GitHub Actions to run tests, linting, and security scans across multiple platforms. The main build pipeline uses `GitVersion` for semver, installs Qt in CI runners, and creates Windows builds as part of the release process.
-- Releases are created from the manual GitHub Actions workflow dispatch and the workflow drops platform archives like `sensetool-windows-<version>.zip`.
+- The repository uses GitHub Actions to run tests, linting, and security scans across multiple platforms. `CI` runs on pull requests and manual dispatch, while `Release` runs only from manual workflow dispatch and bumps semver from the latest tag.
+- Releases build platform assets: `sensetool-windows-<version>.exe`, `sensetool-linux-<version>`, and `sensetool-macos-<version>.dmg`.
