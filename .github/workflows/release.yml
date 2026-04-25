@@ -328,28 +328,12 @@ jobs:
           echo "Downloaded artifacts:"
           find ./artifacts -type f -print
 
-      - name: Ensure release tag exists
-        id: tag
-        run: |
-          git fetch --tags --force
-          TAG_NAME="v${{ needs.version.outputs.new_version }}"
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-
-          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            echo "Tag $TAG_NAME already exists; reusing it."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
-          git push origin "$TAG_NAME"
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.tag.outputs.tag_name }}
-          name: Release ${{ steps.tag.outputs.tag_name }}
+          tag_name: v${{ needs.version.outputs.new_version }}
+          target_commitish: ${{ github.sha }}
+          name: Release v${{ needs.version.outputs.new_version }}
           draft: false
           prerelease: ${{ github.event.inputs.prerelease == 'true' }}
           files: |
@@ -362,6 +346,6 @@ jobs:
         run: |
           echo "## Release Created Successfully! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Version:** ${{ steps.tag.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** v${{ needs.version.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
           echo "**Bump Type:** ${{ github.event.inputs.version_bump }}" >> $GITHUB_STEP_SUMMARY
           echo "**Pre-release:** ${{ github.event.inputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
