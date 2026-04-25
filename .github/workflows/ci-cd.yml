@@ -1,19 +1,10 @@
 name: CI/CD
 
 on:
-  push:
-    branches: ["main", "develop"]
-  pull_request:
-    branches: ["main"]
   workflow_dispatch:
     inputs:
-      release:
-        description: "Create a release"
-        required: true
-        default: false
-        type: boolean
       version_bump:
-        description: "Version bump type (only if release is true)"
+        description: "Version bump type"
         required: false
         default: "patch"
         type: choice
@@ -36,7 +27,7 @@ permissions:
 
 jobs:
   # ============================================
-  # TEST JOB - Runs on all triggers
+  # TEST JOB - Runs before manual releases
   # ============================================
   test:
     name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
@@ -143,7 +134,7 @@ jobs:
         run: qmltestrunner -input tests/qmlUnitTests
 
   # ============================================
-  # SECURITY JOB - Runs on all triggers
+  # SECURITY JOB - Runs before manual releases
   # ============================================
   security:
     name: Security Scan
@@ -214,7 +205,6 @@ jobs:
   version:
     name: Calculate Version
     runs-on: ubuntu-latest
-    if: github.event.inputs.release == 'true'
     outputs:
       new_version: ${{ steps.bump.outputs.new_version }}
       current_version: ${{ steps.current.outputs.version }}
@@ -266,7 +256,6 @@ jobs:
   build:
     name: Build (${{ matrix.os }})
     needs: [test, security, version]
-    if: github.event.inputs.release == 'true'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -493,7 +482,6 @@ jobs:
   release:
     name: Create Release
     needs: [version, build]
-    if: github.event.inputs.release == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
