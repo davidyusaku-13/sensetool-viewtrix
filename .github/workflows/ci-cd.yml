@@ -327,10 +327,17 @@ jobs:
           pip install -r requirements.txt
           pip install imageio
 
-      - name: Update version file
+      - name: Update package version
         shell: bash
         run: |
-          echo "${{ needs.version.outputs.new_version }}" > VERSION.txt
+          python - <<'PY'
+          from pathlib import Path
+
+          Path("src/version.py").write_text(
+              '__version__ = "${{ needs.version.outputs.new_version }}"\n',
+              encoding="utf-8",
+          )
+          PY
 
       - name: Prepare CI deploy spec
         shell: bash
@@ -460,17 +467,17 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Compress-Archive -Path sensetool.exe, VERSION.txt -DestinationPath "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip"
+          Compress-Archive -Path sensetool.exe -DestinationPath "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip"
 
       - name: Create archive (Linux)
         if: runner.os == 'Linux'
         run: |
-          tar -czvf "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.tar.gz" sensetool VERSION.txt
+          tar -czvf "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.tar.gz" sensetool
 
       - name: Create archive (macOS)
         if: runner.os == 'macOS'
         run: |
-          zip -r "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip" sensetool.app VERSION.txt
+          zip -r "${{ matrix.artifact_name }}-${{ needs.version.outputs.new_version }}.zip" sensetool.app
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

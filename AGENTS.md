@@ -22,4 +22,4 @@ Add Python unit tests beside related coverage in `tests/pyUnitTests/` with names
 Recent history uses Conventional Commits such as `fix: ...` and `refactor: ...`; continue that format and keep subjects concise. PRs should describe the user-visible change, note affected areas (`src/services`, `qml/pages`, etc.), link issues when relevant, and include screenshots or short recordings for QML/UI updates. Call out any platform-specific behavior, especially Windows-only packaging or `qmltestrunner.exe` assumptions in `tasks.py`.
 
 ## Configuration & Release Notes
-Treat `src/modules/config.ini`, `VERSION.txt`, and YAML fixtures in `yaml/` as runtime inputs; update them deliberately and mention changes in the PR. CI tests on Windows, macOS, and Ubuntu, while release packaging uses Python 3.11, so avoid unverified packaging changes.
+Treat `src/modules/config.ini`, `src/version.py`, and YAML fixtures in `yaml/` as runtime inputs; update them deliberately and mention changes in the PR. CI tests on Windows, macOS, and Ubuntu, while release packaging uses Python 3.11, so avoid unverified packaging changes.

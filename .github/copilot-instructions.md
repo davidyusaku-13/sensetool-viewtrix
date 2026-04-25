@@ -31,7 +31,7 @@ This file contains specific, actionable guidance to help AI coding agents (Copil
   - QML: `import AppLogic` (appears in `qml/main.qml`), then `property AppLogic logic: AppLogic{}`
 - File handling: QML uses `QUrl.fromLocalFile()` to pass file URIs. Python services expect either `QUrl` or `Path`/`str` and validate content & extension (YAML only).
 - Logging conventions: Use `AppLogger.get_instance()` and `logger.log("message", "INFO")` (string log level). Logs are in `./logs/app.log`.
-- Versioning & updates: `src/core/config.py` exposes `get_version()` which reads `VERSION.txt` — used by update checks in `update_service.py` and `AppLogic.checkUpdate()`.
+- Versioning & updates: `src/core/config.py` exposes `get_version()` from `src/version.py` — used by update checks in `update_service.py` and `AppLogic.checkUpdate()`.
 - QML exposes Python objects and uses CamelCase method names for QML calls. Python code uses snake_case for internal functions and camelCase for QML-exposed functions where appropriate (e.g., `win_coef_gen`, `exportWinCoef`).
 
 ## 🧭 How to get the app running (dev) — commands & workflows

@@ -4,10 +4,9 @@ This module provides centralized configuration management,
 including application settings, constants, and environment variables.
 """
 
-import os
-from pathlib import Path
 from typing import Dict, Any
 from dataclasses import dataclass
+from src.version import __version__
 
 
 @dataclass
@@ -25,7 +24,6 @@ class AppConfig:
     github_repo: str = "davidyusaku-13/sensetool-viewtrix"
     
     # File paths
-    version_file: str = "VERSION.txt"
     log_file: str = "sensetool.log"
     
     # Logging configuration
@@ -56,12 +54,7 @@ class ConfigManager:
         Returns:
             Application version string
         """
-        version_path = Path(__file__).parent.parent.parent / self._config.version_file
-        try:
-            with open(version_path, 'r', encoding='utf-8') as f:
-                return f.read().strip()
-        except FileNotFoundError:
-            return "0.0.0"
+        return __version__
     
     def get_github_releases_url(self) -> str:
         """Get GitHub releases API URL.
