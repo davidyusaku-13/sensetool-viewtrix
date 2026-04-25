@@ -325,6 +325,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install invoke
           pip install -r requirements.txt
+          pip install imageio
 
       - name: Update version file
         shell: bash
@@ -384,8 +385,24 @@ jobs:
           pyside6-deploy -c pysidedeploy.ci.spec -f
           if [ -f "SenseTool" ]; then
             mv SenseTool sensetool
+          elif [ -f "SenseTool.bin" ]; then
+            mv SenseTool.bin sensetool
           elif [ -f "main" ]; then
             mv main sensetool
+          elif [ -f "main.bin" ]; then
+            mv main.bin sensetool
+          elif [ -f "deployment/SenseTool" ]; then
+            mv deployment/SenseTool sensetool
+          elif [ -f "deployment/SenseTool.bin" ]; then
+            mv deployment/SenseTool.bin sensetool
+          elif [ -f "deployment/main" ]; then
+            mv deployment/main sensetool
+          elif [ -f "deployment/main.bin" ]; then
+            mv deployment/main.bin sensetool
+          else
+            echo "No Linux executable found after build"
+            find . -maxdepth 2 -type f -perm -111 -print
+            exit 1
           fi
           chmod +x sensetool
 
@@ -397,6 +414,14 @@ jobs:
             mv SenseTool.app sensetool.app
           elif [ -d "main.app" ]; then
             mv main.app sensetool.app
+          elif [ -d "deployment/SenseTool.app" ]; then
+            mv deployment/SenseTool.app sensetool.app
+          elif [ -d "deployment/main.app" ]; then
+            mv deployment/main.app sensetool.app
+          else
+            echo "No macOS app bundle found after build"
+            find . -maxdepth 3 -name "*.app" -type d -print
+            exit 1
           fi
 
       - name: Verify build (Windows)
