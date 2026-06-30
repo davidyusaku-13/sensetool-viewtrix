@@ -1,9 +1,10 @@
 from PySide6.QtCore import QObject, Signal, Slot, QThread
-from src.modules.logger import AppLogger
+from src.modules.logger import get_instance
 import requests, os, sys
 
 # Init LOGGER
-logger = AppLogger.get_instance()
+logger = get_instance(__name__)
+
 
 class DownloadThread(QThread):
     progressChanged = Signal(int)
@@ -30,11 +31,12 @@ class DownloadThread(QThread):
             self.progress = 100
             self.progressChanged.emit(100)
             self.downloadCompleted.emit()
-            logger.log("Successfully downloaded newest version", "INFO")
+            logger.info("Successfully downloaded newest version")
         except Exception as e:
             self.progress = 0
             self.progressChanged.emit(0)
-            logger.log(f"Failed to download the newest version: {e}", "ERROR")
+            logger.error("Failed to download the newest version: %s", e)
+
 
 class UpdateManager(QObject):
     progressChanged = Signal(int)
@@ -78,7 +80,7 @@ class UpdateManager(QObject):
 
             self.restartApplication.emit()
         except Exception as e:
-            logger.log(f"Error during rename: {e}", "ERROR")
+            logger.error("Error during rename: %s", e)
 
     @Slot()
     def finalize_update(self):
@@ -101,8 +103,8 @@ class UpdateManager(QObject):
                 current_exe = os.path.join(base, "sensetool.exe")
                 try:
                     os.replace(update_exe, current_exe)
-                    logger.log("Pending update applied on startup", "INFO")
+                    logger.info("Pending update applied on startup")
                 except PermissionError:
-                    logger.log("Update file pending for next restart", "INFO")
+                    logger.info("Update file pending for next restart")
         except Exception as e:
-            logger.log(f"Error during finalize: {e}", "ERROR")
+            logger.error("Error during finalize: %s", e)

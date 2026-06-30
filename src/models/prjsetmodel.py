@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Slot, QModelIndex, QObject, QUrl
 from PySide6.QtQml import QmlElement
-from ..modules.logger import AppLogger
+from ..modules.logger import get_instance
 from .prjsetmodelitem import PrjSetModelItem
 from .historymodel import HistoryModel
 import yaml
@@ -8,7 +8,8 @@ import yaml
 QML_IMPORT_NAME = "PrjSetModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
-logger = AppLogger.get_instance()
+logger = get_instance(__name__)
+
 
 @QmlElement
 class PrjSetModel(QAbstractListModel):
@@ -39,7 +40,7 @@ class PrjSetModel(QAbstractListModel):
             Qt.UserRole + 2: b"desc"
         })
         return roles
-    
+
     @property
     def itemsData(self):
         return [(item.name, item.value, item.desc) for item in self._items]
@@ -55,33 +56,19 @@ class PrjSetModel(QAbstractListModel):
 
     def moveRows(self, sourceParent, sourceRow, count, dstParent, dstChild):
         """Move n rows (n=1+ count)  from sourceRow to dstChild"""
-
-        if sourceRow == dstChild:
+        if (sourceRow < 0 or sourceRow >= len(self._items) or
+                dstChild < 0 or dstChild > len(self._items) or
+                sourceRow == dstChild):
             return False
 
-        elif sourceRow > dstChild:
-            end = dstChild
-
+        if sourceRow < dstChild:
+            dest = dstChild - 1
         else:
-            end = dstChild + 1
+            dest = dstChild
 
-        self.beginMoveRows(QModelIndex(), sourceRow,
-                           sourceRow + count, QModelIndex(), end)
-
-        pops = self._items[sourceRow: sourceRow + count + 1]
-        if sourceRow > dstChild:
-            self._items = (
-                self._items[:dstChild]
-                + pops
-                + self._items[dstChild:sourceRow]
-                + self._items[sourceRow + count + 1:]
-            )
-        else:
-            start = self._items[:sourceRow]
-            middle = self._items[dstChild: dstChild + 1]
-            endlist = self._items[dstChild + count + 1:]
-            self._items = start + middle + pops + endlist
-
+        self.beginMoveRows(sourceParent, sourceRow, sourceRow, dstParent, dest + 1 if sourceRow < dstChild else dest)
+        item = self._items.pop(sourceRow)
+        self._items.insert(dstChild, item)
         self.endMoveRows()
         return True
 
@@ -90,7 +77,6 @@ class PrjSetModel(QAbstractListModel):
         if 0 <= index < len(self._items):
             return self._items[index]
         else:
-            logger.log(f"Attempt to access item at invalid index {index}", "WARNING")
             return None
 
     def flags(self) -> Qt.ItemFlag:
@@ -100,7 +86,7 @@ class PrjSetModel(QAbstractListModel):
 
     @Slot(str, str, str)
     def addItem(self, name, value, desc):
-        logger.log(f"Added item: {name} - {value} - {desc}", "INFO")
+        logger.info("Added item: %s - %s - %s", name, value, desc)
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))
         item = PrjSetModelItem(name, value, desc, self)
         self._items.append(item)
@@ -108,7 +94,7 @@ class PrjSetModel(QAbstractListModel):
 
     @Slot(int, str, str, str)
     def edit(self, index, name, value, desc):
-        logger.log(f"Edited item at index {index}: {name} - {value} - {desc}", "INFO")
+        logger.info("Edited item at index %s: %s - %s - %s", index, name, value, desc)
         if 0 <= index < len(self._items):
             item = self._items[index]
             item._name = name
@@ -116,13 +102,13 @@ class PrjSetModel(QAbstractListModel):
             item._desc = desc
             self.dataChanged.emit(self.index(index, 0), self.index(index, 0))
         else:
-            logger.log(f"Attempt to edit item at invalid index {index}", "ERROR")
+            logger.error("Attempt to edit item at invalid index %s", index)
 
     @Slot(int)
     def removeItem(self, index):
         if 0 <= index < len(self._items):
             self.beginRemoveRows(QModelIndex(), index, index)
-            logger.log(f"Deleted item at index {index}", "INFO")
+            logger.info("Deleted item at index %s", index)
             del self._items[index]
             self.endRemoveRows()
 
@@ -135,7 +121,7 @@ class PrjSetModel(QAbstractListModel):
     @Slot(QUrl)
     def exportYAML(self, file: QUrl):
         file_name = file.toLocalFile()
-        logger.log(f"Exported file: {file_name}", "INFO")
+        logger.info("Exported file: %s", file_name)
         yaml_data = {
             'title': 'Project Settings',
             'desc': "Project Setting includes the static information which is not be changed during runtime. "
@@ -158,7 +144,7 @@ class PrjSetModel(QAbstractListModel):
     @Slot(QUrl)
     def importYAML(self, file: QUrl):
         file = file.toLocalFile()
-        logger.log(f"Imported file: {file}", "INFO")
+        logger.info("Imported file: %s", file)
         try:
             with open(file, 'r') as yaml_file:
                 yaml_data = yaml.load(yaml_file, Loader=yaml.FullLoader)
@@ -169,8 +155,8 @@ class PrjSetModel(QAbstractListModel):
                         pDesc = item['desc'] if item['desc'] != None else ""
                         self.addItem(pName, pVal, pDesc)
                 else:
-                    print("Invalid YAML format. Expected a list.")
+                    logger.warning("Invalid YAML format in %s. Expected a list.", file)
         except FileNotFoundError:
-            print("File not found:", file)
+            logger.error("File not found: %s", file)
         except yaml.YAMLError as e:
-            print("Error loading YAML:", e)
+            logger.error("Error loading YAML from %s: %s", file, e)

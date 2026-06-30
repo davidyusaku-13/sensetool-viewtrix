@@ -1,6 +1,5 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Signal, Slot, QModelIndex
 from PySide6.QtQml import QmlElement
-from ..modules.logger import AppLogger
 from .historymodelitem import HistoryModelItem
 import yaml
 import datetime
@@ -8,9 +7,8 @@ import datetime
 QML_IMPORT_NAME = "HistoryModel"
 QML_IMPORT_MAJOR_VERSION = 1
 
-logger = AppLogger.get_instance()
-
 current_time = datetime.datetime.now().strftime("%A, %d-%m-%Y %H:%M:%S")
+
 
 @QmlElement
 class HistoryModel(QAbstractListModel):

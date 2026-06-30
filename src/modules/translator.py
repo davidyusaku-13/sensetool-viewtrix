@@ -1,9 +1,10 @@
 from PySide6.QtCore import QTranslator, QObject, Slot
-from src.modules.logger import AppLogger
+from src.modules.logger import get_instance
 import os
 
 # Init LOGGER
-logger = AppLogger.get_instance()
+logger = get_instance(__name__)
+
 
 class Translator(QObject):
     def __init__(self, app, engine):
@@ -20,5 +21,5 @@ class Translator(QObject):
             self.app.installTranslator(self.translator)
         else:
             self.app.removeTranslator(self.translator)
-            logger.log(f"Translation file could not be loaded", "ERROR")
+            logger.error("Translation file could not be loaded: %s", langpath)
         self.engine.retranslate()

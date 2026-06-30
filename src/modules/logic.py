@@ -1,13 +1,14 @@
 from PySide6.QtCore import Signal, Slot, QObject, QUrl, Property
 from PySide6.QtQml import QmlElement
 import yaml, math, requests, os, time
-from src.modules.logger import AppLogger
+from src.modules.logger import get_instance
 
 # Init LOGGER
-logger = AppLogger.get_instance()
+logger = get_instance(__name__)
 
 QML_IMPORT_NAME = "AppLogic"
 QML_IMPORT_MAJOR_VERSION = 1
+
 
 @QmlElement
 class AppLogic(QObject):
@@ -16,15 +17,14 @@ class AppLogic(QObject):
     _update_cache_time = 0
     UPDATE_CACHE_TTL = 300  # 5 minutes
     _version_cache = None
-    
+
     def __init__(self):
         super().__init__()
-        
-        
+
     @Property(QObject)
     def parent(self) -> QObject:
         return super().parent()
-    
+
     @parent.setter
     def parent(self, parent: QObject):
         super().setParent(parent)
@@ -36,7 +36,7 @@ class AppLogic(QObject):
         now = time.time()
         if self._update_cache is not None and (now - self._update_cache_time) < self.UPDATE_CACHE_TTL:
             return self._update_cache
-        
+
         current_version = self._parse_version(self.getVersion())
         url = f"https://api.github.com/repos/davidyusaku-13/sensetool-viewtrix/releases/latest"
         try:
@@ -54,13 +54,13 @@ class AppLogic(QObject):
                     release_notes = ""
                     download_url = ""
             else:
-                logger.log(f"Failed to fetch the latest release information. Status code: {response.status_code}", "ERROR")
+                logger.error("Failed to fetch the latest release information. Status code: %s", response.status_code)
                 status = False
                 release_notes = ""
                 download_url = ""
                 raw_tag = ""
         except requests.RequestException as e:
-            logger.log(f"Network error during update check: {e}", "ERROR")
+            logger.error("Network error during update check: %s", e)
             status = False
             release_notes = ""
             download_url = ""
@@ -95,7 +95,6 @@ class AppLogic(QObject):
         except FileNotFoundError:
             self._version_cache = "0.0.0"
         return self._version_cache
-        
 
     @Slot(list, result=list)
     def divideArray(self, array):
@@ -123,7 +122,7 @@ class AppLogic(QObject):
     @Slot(QUrl, list, int, float, str)
     def exportWinCoef(self, fname, y, win_sample_number, win_a0, win_coef_length):
         file_name = fname.toLocalFile()
-        logger.log(f"Exported win coef as{file_name}", "INFO")
+        logger.info("Exported win coef as %s", file_name)
         yaml_data = {
             'sample_number': win_sample_number,
             'a0': win_a0,
@@ -143,7 +142,7 @@ class AppLogic(QObject):
     @Slot(QUrl, result=list)
     def importWinCoef(self, fname):
         file_name = fname.toLocalFile()
-        logger.log(f"Imported win coef {file_name}", "INFO")
+        logger.info("Imported win coef %s", file_name)
         arr = []
         try:
             with open(file_name, 'r') as yaml_file:
@@ -153,19 +152,19 @@ class AppLogic(QObject):
                         y = item['y']
                         arr.append(y)
                 else:
-                    print("Invalid YAML format. Expected a list.")
+                    logger.warning("Invalid WIN coef YAML format. Expected a list.")
                 if 'sample_number' in yaml_data and 'a0' in yaml_data and 'coef_length' in yaml_data:
                     sample_number = yaml_data['sample_number']
                     a0 = yaml_data['a0']
                     coef_length = yaml_data['coef_length']
                 else:
-                    print("Sample Number, a0, and Coef Length must not be empty")
+                    logger.warning("Sample Number, a0, and Coef Length must not be empty")
         except FileNotFoundError:
-            print("File not found:", file_name)
+            logger.error("File not found: %s", file_name)
         except yaml.YAMLError as e:
-            print("Error loading YAML:", e)
+            logger.error("Error loading WIN coef YAML: %s", e)
         return [arr, sample_number, a0, coef_length]
-    
+
     @Slot(int, int, int, int, result=list)
     def demo_coef_gen(self, demo_num_step, demo_sample_number, demo_cycle, demo_adc_sampling_freq):
         I_Coef = []
@@ -184,7 +183,7 @@ class AppLogic(QObject):
     def exportDemoCoef(self, fname, y, demo_step, demo_sample, demo_cycle, demo_adc):
         y_sin, y_cos = y
         file_name = fname.toLocalFile()
-        logger.log(f"Exported demo coef as {file_name}", "INFO")
+        logger.info("Exported demo coef as %s", file_name)
         yaml_data = {
             'step': demo_step,
             'sample': demo_sample,
@@ -212,7 +211,7 @@ class AppLogic(QObject):
     @Slot(QUrl, result=list)
     def importDemoCoef(self, fname):
         file_name = fname.toLocalFile()
-        logger.log(f"Imported demo coef {file_name}", "INFO")
+        logger.info("Imported demo coef %s", file_name)
         sinArr = []
         cosArr = []
         try:
@@ -232,9 +231,9 @@ class AppLogic(QObject):
                     cycle = yaml_data['cycle']
                     adc_freq = yaml_data['adc_freq']
                 else:
-                    print("Invalid YAML format. Expected a list.")
+                    logger.warning("Invalid demo coef YAML format. Expected required fields.")
         except FileNotFoundError:
-            print("File not found:", file_name)
+            logger.error("File not found: %s", file_name)
         except yaml.YAMLError as e:
-            print("Error loading YAML:", e)
+            logger.error("Error loading demo coef YAML: %s", e)
         return [[sinArr, cosArr], step, sample, cycle, adc_freq]
