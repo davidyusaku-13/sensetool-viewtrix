@@ -7,6 +7,10 @@ import "../components"
 Item{
     property alias currentIndex: popUpLayout.currentIndex
     property alias isDarkTheme: themeToggle.checked
+    property string language: "en"
+    onLanguageChanged: {
+        translator.change_language(language)
+    }
     ShadowRect{
         anchors.fill: parent
         color: Material.background
@@ -71,7 +75,7 @@ Item{
                     Layout.preferredHeight: 50
                     color: Material.accent
                     Text{
-                        text: qsTr("Setting")
+                        text: qsTr("App Settings")
                         font.pixelSize: 20
                         font.family: "Montserrat SemiBold"
                         color: Material.foreground
@@ -92,7 +96,7 @@ Item{
                     Switch{
                         id: themeToggle
                         display: AbstractButton.TextBesideIcon
-                        text: checked ? qsTr("Dark") : qsTr("Light")
+                        text: qsTr("Dark Mode")
                     }
                 }
                 RowLayout{
@@ -106,13 +110,13 @@ Item{
                         Layout.fillWidth: true
                         color: Material.foreground
                     }
-                    Switch{
-                        id: langToggle
-                        display: AbstractButton.TextBesideIcon
-                        text: checked ? qsTr("Indonesia") : qsTr("English")
-                        onToggled: {
-                            let lang = text === qsTr("Indonesia") ? "id" : "en"
-                            translator.change_language(lang)
+                    ComboBox{
+                        id: langCombo
+                        Layout.fillWidth: true
+                        model: [qsTr("English"), qsTr("Indonesia")]
+                        currentIndex: language === "id" ? 1 : 0
+                        onActivated: {
+                            language = currentIndex === 1 ? "id" : "en"
                         }
                     }
                 }
@@ -133,6 +137,15 @@ Item{
                 Item{
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                }
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.margins: 10
+                    text: "v" + logic.getVersion()
+                    color: Material.foreground
+                    opacity: 0.5
+                    font.pixelSize: 12
+                    font.family: "Montserrat"
                 }
             }
         }

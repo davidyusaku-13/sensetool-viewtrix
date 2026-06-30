@@ -16,6 +16,7 @@ Rectangle{
     Settings{
         id: settings
         property alias isDarkTheme: popUp.isDarkTheme
+        property alias language: popUp.language
     }
     ListModel{
         id: historyList

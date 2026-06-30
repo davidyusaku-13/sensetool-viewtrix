@@ -11,7 +11,7 @@ ListView {
             "name": "Notification",
             "icon": "qrc:/images/notification"
         }, {
-            "name": "Setting",
+            "name": "App Settings",
             "icon": "qrc:/images/setting"
         }]
     delegate: MyButton {
