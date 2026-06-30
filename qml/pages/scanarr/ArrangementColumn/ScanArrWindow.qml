@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import "../"
+import "../../../components"
 
 Window {
     id: root
@@ -106,13 +107,10 @@ Window {
             Layout.alignment: Qt.AlignRight
             spacing: 5
             //add
-            RoundButton{
+            BaseRoundButton{
                 implicitWidth: 80
                 text: root.isEdit ? "Save" : "Add"
                 enabled: (text === "Add" && root.object.name === "") ? false : true
-                HoverHandler{
-                    cursorShape: Qt.PointingHandCursor
-                }
                 onClicked: {
                     if(root.isEdit == true){
                         confirmWindow.show()
@@ -124,12 +122,9 @@ Window {
                 }
             }
             //cancel
-            RoundButton{
+            BaseRoundButton{
                 implicitWidth: 80
                 text: "Cancel"
-                HoverHandler{
-                    cursorShape: Qt.PointingHandCursor
-                }
                 onClicked: {
                     root.object.reset()
                     root.close()

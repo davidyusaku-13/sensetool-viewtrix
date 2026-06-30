@@ -23,15 +23,9 @@ Item{
                 font.pixelSize: 17
                 TabButton {
                     text: qsTr("Window Coefficient Generator")
-                    HoverHandler{
-                        cursorShape: Qt.PointingHandCursor
-                    }
                 }
                 TabButton {
                     text: qsTr("Demodulator Coefficient Generator")
-                    HoverHandler{
-                        cursorShape: Qt.PointingHandCursor
-                    }
                 }
             }
             StackLayout{
@@ -124,13 +118,10 @@ Item{
                             Layout.fillWidth: true
                             model: [ "Half", "Full" ]
                         }
-                        Button{
+                        BaseButton{
                             id: winBtn
                             implicitWidth: 80
                             text: "OK"
-                            HoverHandler{
-                                cursorShape: Qt.PointingHandCursor
-                            }
                             onClicked: {
                                 win.clear()
                                 win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, winLength.textAt(winLength.currentIndex))
@@ -222,13 +213,10 @@ Item{
                                 validator: RegularExpressionValidator { regularExpression: /[0-9.]+/ }
                             }
                         }
-                        Button{
+                        BaseButton{
                             id: demoBtn
                             implicitWidth: 80
                             text: qsTr("OK")
-                            HoverHandler{
-                                cursorShape: Qt.PointingHandCursor
-                            }
                             onClicked: {
                                 demo.clear()
                                 demo.createDemo(demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)

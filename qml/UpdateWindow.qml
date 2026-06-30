@@ -52,7 +52,7 @@ Window {
                 color: Material.foreground
                 visible: false
             }
-            Button{
+            BaseButton{
                 Layout.fillWidth: true
                 text: qsTr("Download")
                 font.family: "Montserrat"

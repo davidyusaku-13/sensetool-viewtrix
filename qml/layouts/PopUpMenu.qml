@@ -120,14 +120,11 @@ Item{
                         }
                     }
                 }
-                Button{
+                BaseButton{
                     Layout.fillWidth: true
                     Layout.margins: 10
                     text: qsTr("Check for updates")
                     font.family: "Montserrat"
-                    HoverHandler{
-                        cursorShape: Qt.PointingHandCursor
-                    }
                     onClicked: {
                         if(logic.checkUpdate()["status"]){
                             update_window.show()

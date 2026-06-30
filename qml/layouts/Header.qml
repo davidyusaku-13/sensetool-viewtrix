@@ -12,7 +12,7 @@ ShadowRect{
     //header button
     RowLayout{
         anchors.fill: parent
-        MyButton{
+        IconButton{
             id: menuBtn
             display: AbstractButton.IconOnly
             icon.source: "qrc:/images/menu-icon2"

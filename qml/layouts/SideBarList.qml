@@ -6,7 +6,7 @@ ListView {
     anchors.fill: parent
     anchors.margins: 7
     spacing: 5
-    delegate: MyButton {
+    delegate: IconButton {
         required property var model
         required property int index
         anchors.horizontalCenter: parent.horizontalCenter

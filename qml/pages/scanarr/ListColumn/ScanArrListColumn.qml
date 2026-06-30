@@ -51,35 +51,26 @@ Item{
                     }
                 }
                 RowLayout{
-                    RoundButton{
+                    BaseRoundButton{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                         icon.source: "qrc:/images/plus"
-                        HoverHandler{
-                            cursorShape: Qt.PointingHandCursor
-                        }
                         onClicked: {
                             scanArrListWindow.manage(-1,null)
                         }
                     }
-                    RoundButton{
+                    BaseRoundButton{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                         icon.source: "qrc:/images/checklist"
-                        HoverHandler{
-                            cursorShape: Qt.PointingHandCursor
-                        }
                     }
-                    RoundButton{
+                    BaseRoundButton{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
                         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                         icon.source: "qrc:/images/trash"
-                        HoverHandler{
-                            cursorShape: Qt.PointingHandCursor
-                        }
                     }
                     ScanArrListWindow{
                         id: scanArrListWindow

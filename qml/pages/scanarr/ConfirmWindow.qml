@@ -35,7 +35,7 @@ Window {
             Item{
                 implicitWidth: 60
                 implicitHeight: 30
-                RoundButton{
+                BaseRoundButton{
                     anchors.fill: parent
                     text: "YES"
                     display: AbstractButton.TextOnly
@@ -49,7 +49,7 @@ Window {
             Item{
                 implicitWidth: 60
                 implicitHeight: 30
-                RoundButton{
+                BaseRoundButton{
                     anchors.fill: parent
                     text: "NO"
                     display: AbstractButton.TextOnly

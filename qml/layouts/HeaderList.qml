@@ -14,7 +14,7 @@ ListView {
             "name": "App Settings",
             "icon": "qrc:/images/setting"
         }]
-    delegate: MyButton {
+    delegate: IconButton {
         required property var model
         required property int index
         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter

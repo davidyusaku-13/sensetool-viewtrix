@@ -144,13 +144,10 @@ Window {
                 Layout.alignment: Qt.AlignRight
                 spacing: 5
                 //add
-                RoundButton {
+                BaseRoundButton{
                     implicitWidth: 80
                     text: root.isEdit ? qsTr("Save") : qsTr("Add")
                     enabled: (itemInput.acceptableInput && valueInput.acceptableInput)
-                    HoverHandler {
-                        cursorShape: Qt.PointingHandCursor
-                    }
                     onClicked: {
                         if (root.isEdit == true) {
                             confirmWindow.show()
@@ -162,12 +159,9 @@ Window {
                     }
                 }
                 //cancel
-                RoundButton {
+                BaseRoundButton{
                     implicitWidth: 80
                     text: qsTr("Cancel")
-                    HoverHandler {
-                        cursorShape: Qt.PointingHandCursor
-                    }
                     onClicked: {
                         root.object.reset()
                         root.close()
