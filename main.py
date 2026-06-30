@@ -1,4 +1,4 @@
-import sys, os, resource_rc
+import sys, os, subprocess, resource_rc
 from pathlib import Path
 from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QQmlApplicationEngine
@@ -16,15 +16,33 @@ QML_FILE = Path(__file__).resolve().parent / "./qml/main.qml"
 logger = AppLogger.get_instance()
 
 def restart_application():
-    logger.log("App restarted", "INFO")
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
+    """Launch updater batch script and exit current process.
+    The batch waits for this process to finish, replaces the .exe,
+    and starts the new version."""
+    logger.log("App restarting for update", "INFO")
+    bat_path = os.path.join(os.getcwd(), "restart_update.bat")
+    with open(bat_path, "w") as f:
+        f.write('@echo off\r\n')
+        f.write('ping 127.0.0.1 -n 4 > nul\r\n')
+        f.write('if exist "sensetool_update.exe" (\r\n')
+        f.write('    move /Y "sensetool_update.exe" "sensetool.exe" > nul\r\n')
+        f.write(')\r\n')
+        f.write('start "" "sensetool.exe"\r\n')
+        f.write('del "%~f0"\r\n')
+    subprocess.Popen(['cmd.exe', '/c', bat_path],
+                     creationflags=subprocess.CREATE_NO_WINDOW)
+    sys.exit(0)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     app.setOrganizationName("Viewtrix")
     app.setOrganizationDomain("Viewtrix")
+
+    # Finalize any pending update before loading UI
+    pending_update = UpdateManager()
+    pending_update.finalize_update()
+    del pending_update
 
     engine = QQmlApplicationEngine()
     QQuickStyle.setStyle("Material")

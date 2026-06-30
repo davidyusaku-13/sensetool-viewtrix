@@ -7,7 +7,7 @@ import "components"
 Window {
     width: 400
     height: 300
-    title: "New update available"
+    title: qsTr("New update available")
     property alias progressBar: progressBar
     property alias progressText: progressText
     property alias restartDialog: restartDialog
@@ -47,6 +47,13 @@ Window {
                 visible: false
             }
             Text{
+                id: preparingText
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                color: Material.foreground
+                text: qsTr("Preparing download...")
+                visible: false
+            }
+            Text{
                 id: progressText
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 color: Material.foreground
@@ -57,6 +64,9 @@ Window {
                 text: qsTr("Download")
                 font.family: "Montserrat"
                 onClicked: {
+                    preparingText.visible = true
+                    progressBar.visible = true
+                    progressBar.value = 0
                     updateManager.download_update(window.logic.checkUpdate()["link"])
                 }
             }

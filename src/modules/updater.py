@@ -30,11 +30,11 @@ class DownloadThread(QThread):
             self.progress = 100
             self.progressChanged.emit(100)
             self.downloadCompleted.emit()
-            logger.log(f"Successfully downloaded newest version", "INFO")
+            logger.log("Successfully downloaded newest version", "INFO")
         except Exception as e:
             self.progress = 0
             self.progressChanged.emit(0)
-            logger.log(f"Failed to download the newest version", "ERROR")
+            logger.log(f"Failed to download the newest version: {e}", "ERROR")
 
 class UpdateManager(QObject):
     progressChanged = Signal(int)
@@ -65,26 +65,44 @@ class UpdateManager(QObject):
 
     @Slot()
     def rename_and_restart(self):
+        """Move downloaded update to update marker and signal restart.
+        Does NOT touch the running executable — a batch script handles
+        replacement after the process exits."""
         try:
-            current_exe = os.path.join(os.getcwd(), "sensetool.exe")
             tmp_exe = os.path.join(os.getcwd(), "sensetool_tmp.exe")
-            new_exe = os.path.join(os.getcwd(), "sensetool_new.exe")
+            update_exe = os.path.join(os.getcwd(), "sensetool_update.exe")
 
-            if os.path.exists(current_exe):
-                os.remove(current_exe)
-
-            os.rename(tmp_exe, new_exe)
+            if os.path.exists(update_exe):
+                os.remove(update_exe)
+            os.rename(tmp_exe, update_exe)
 
             self.restartApplication.emit()
         except Exception as e:
-            logger.log(f"Error during renaming: {e}", "ERROR")
+            logger.log(f"Error during rename: {e}", "ERROR")
 
     @Slot()
     def finalize_update(self):
+        """Apply pending update and clean up stale temp files.
+        Called once at startup — renames the update binary when possible."""
         try:
-            new_exe = os.path.join(os.getcwd(), "sensetool_new.exe")
-            if os.path.exists(new_exe):
-                os.rename(new_exe, os.path.join(os.getcwd(), "sensetool.exe"))
-                os.execv(sys.executable, [sys.executable] + sys.argv)
+            base = os.getcwd()
+
+            # Clean up stale temp / batch files
+            for f in ["sensetool_tmp.exe", "restart_update.bat"]:
+                p = os.path.join(base, f)
+                if os.path.exists(p):
+                    os.remove(p)
+
+            # Apply pending update if running as Python script (dev mode)
+            # In packaged mode the rename will fail gracefully — the
+            # updater batch script handles replacement after exit.
+            update_exe = os.path.join(base, "sensetool_update.exe")
+            if os.path.exists(update_exe):
+                current_exe = os.path.join(base, "sensetool.exe")
+                try:
+                    os.replace(update_exe, current_exe)
+                    logger.log("Pending update applied on startup", "INFO")
+                except PermissionError:
+                    logger.log("Update file pending for next restart", "INFO")
         except Exception as e:
-            logger.log(f"Error during finalizing update: {e}", "ERROR")
+            logger.log(f"Error during finalize: {e}", "ERROR")

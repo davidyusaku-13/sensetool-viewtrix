@@ -13,7 +13,7 @@ icon = .\icon.ico
 
 [python]
 # python path
-python_path = .\env\Scripts\python.exe
+python_path = .venv\Scripts\python.exe
 # python packages to install
 # ordered-set = increase compile time performance of nuitka packaging
 # zstandard = provides final executable size optimization

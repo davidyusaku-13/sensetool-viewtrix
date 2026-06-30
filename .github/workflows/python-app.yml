@@ -3,9 +3,10 @@ name: SenseTool CI/CD
 on:
   push:
     branches: ["main"]
+  pull_request:
+    branches: ["main", "develop"]
 
 permissions:
-  packages: write
   contents: write
 
 jobs:
@@ -26,6 +27,24 @@ jobs:
         id: version_step
         uses: gittools/actions/gitversion/execute@v1.1.1
 
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache Nuitka build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\Nuitka\Cache
+            **\__pycache__
+          key: ${{ runner.os }}-nuitka-${{ hashFiles('requirements.txt', 'pysidedeploy.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-nuitka-
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -37,23 +56,13 @@ jobs:
           dir: "${{ github.workspace }}/Qt/"
           install-deps: "true"
 
-      - name: Install Invoke & other deps
+      - name: Install Dependencies
         run: |
           pip install --upgrade pip
           pip install invoke
           pip install -r requirements.txt
 
-      - name: Install 7-Zip with Chocolatey
-        run: |
-          choco install 7zip -y
-
-      - name: get Dumpbin & add to path
-        run: |
-          curl -Lo dumpbin.zip https://github.com/Delphier/dumpbin/releases/download/v14.40.33811/dumpbin-14.40.33811-x64.zip
-          7z x dumpbin.zip -odumpbin
-          echo "${{ github.workspace }}\dumpbin" >> $env:GITHUB_PATH
-
-      - name: add qmltestrunner to path
+      - name: Add qmltestrunner to PATH
         run: |
           echo "${{ github.workspace }}\Qt\6.7.0\win64_mingw\bin" >> $env:GITHUB_PATH
 
@@ -61,38 +70,28 @@ jobs:
         run: |
           invoke test
 
-      - name: Save CHANGELOG.md to GITHUB_ENV
+      - name: Save CHANGELOG for release body
+        shell: pwsh
         run: |
-          echo "RELEASE_BODY=$(cat CHANGELOG.md)" >> $env:GITHUB_ENV
+          Copy-Item CHANGELOG.md release-body.md
 
-      - name: Get Version and save to VERSION.txt
+
+      - name: Write Version
         run: |
-          echo "${{ steps.version_step.outputs.GitVersion_FullSemVer }}" >> ./VERSION.txt
+          echo "${{ steps.version_step.outputs.GitVersion_FullSemVer }}" > ./VERSION.txt
 
-      - name: Deploy App
+      - name: Build App
         run: |
           invoke deploy
-          Rename-Item -Path "main.exe" -NewName "sensetool.exe"
+          Rename-Item -Path "main.exe" -NewName "sensetool-${{ steps.version_step.outputs.GitVersion_FullSemVer }}.exe"
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: github.ref_name == 'main'
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
-          release_name: Release ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
-          body_path: ${{ github.workspace }}\CHANGELOG.md
+          name: Release ${{ steps.version_step.outputs.GitVersion_FullSemVer }}
+          body_path: release-body.md
           draft: false
           prerelease: false
-
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}\sensetool.exe
-          asset_name: sensetool.exe
-          asset_content_type: application/exe
+          files: sensetool-${{ steps.version_step.outputs.GitVersion_FullSemVer }}.exe

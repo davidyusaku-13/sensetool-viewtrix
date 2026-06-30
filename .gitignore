@@ -8,3 +8,4 @@ test_logic_export_demo_coef.yaml
 test_logic_export_win_coef.yaml
 src/modules/tes.py
 main.exe
+VERSION.txt

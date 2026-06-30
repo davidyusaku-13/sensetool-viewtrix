@@ -1,0 +1,32 @@
+# GitVersion configuration for SenseTool
+# Generates semantic versions from git tags and commit history.
+# See https://gitversion.net/docs/reference/configuration
+
+next-version: 0.3.0
+mode: ContinuousDelivery
+branches:
+  main:
+    label: ''
+    regex: ^main$
+    increment: Patch
+    is-mainline: true
+    source-branches: ['develop', 'hotfix']
+  develop:
+    label: beta
+    regex: ^develop$
+    source-branches: ['feature']
+  feature:
+    label: alpha
+    regex: ^feature/
+    source-branches: ['develop']
+  hotfix:
+    label: ''
+    regex: ^hotfix/
+    source-branches: ['main']
+  release:
+    label: rc
+    regex: ^release/
+    source-branches: ['develop']
+ignore:
+  sha: []
+merge-message-formats: {}

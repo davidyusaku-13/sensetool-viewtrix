@@ -1,6 +1,6 @@
 from PySide6.QtCore import Signal, Slot, QObject, QUrl, Property
 from PySide6.QtQml import QmlElement
-import yaml, math, requests, os
+import yaml, math, requests, os, time
 from src.modules.logger import AppLogger
 
 # Init LOGGER
@@ -12,9 +12,14 @@ QML_IMPORT_MAJOR_VERSION = 1
 @QmlElement
 class AppLogic(QObject):
     parentChanged = Signal(QObject)
+    _update_cache = None
+    _update_cache_time = 0
+    UPDATE_CACHE_TTL = 300  # 5 minutes
+    _version_cache = None
     
     def __init__(self):
         super().__init__()
+        
         
     @Property(QObject)
     def parent(self) -> QObject:
@@ -27,31 +32,70 @@ class AppLogic(QObject):
 
     @Slot(result=dict)
     def checkUpdate(self):
-        current_version = self.getVersion()
+        # Return cached result if still fresh
+        now = time.time()
+        if self._update_cache is not None and (now - self._update_cache_time) < self.UPDATE_CACHE_TTL:
+            return self._update_cache
+        
+        current_version = self._parse_version(self.getVersion())
         url = f"https://api.github.com/repos/davidyusaku-13/sensetool-viewtrix/releases/latest"
-        response = requests.get(url)
-        if response.status_code == 200:
-            latest_release = response.json()
-            latest_version = latest_release['tag_name']
-            if latest_version > current_version:
-                status = True
-                release_notes = latest_release['body']
-                download_url = latest_release['assets'][0]['browser_download_url'] if latest_release['assets'] else latest_release['zipball_url']
+        try:
+            response = requests.get(url, timeout=10)
+            if response.status_code == 200:
+                latest_release = response.json()
+                raw_tag = latest_release['tag_name']
+                latest_version = self._parse_version(raw_tag)
+                if latest_version is not None and (current_version is None or latest_version > current_version):
+                    status = True
+                    release_notes = latest_release['body']
+                    download_url = latest_release['assets'][0]['browser_download_url'] if latest_release['assets'] else latest_release['zipball_url']
+                else:
+                    status = False
+                    release_notes = ""
+                    download_url = ""
             else:
+                logger.log(f"Failed to fetch the latest release information. Status code: {response.status_code}", "ERROR")
                 status = False
                 release_notes = ""
                 download_url = ""
-        else:
-            logger.log(f"Failed to fetch the latest release information. Status code: {response.status_code}", "ERROR")
-        return {"status": status, "version": latest_version, "changelog": release_notes, "link": download_url}
-        
+                raw_tag = ""
+        except requests.RequestException as e:
+            logger.log(f"Network error during update check: {e}", "ERROR")
+            status = False
+            release_notes = ""
+            download_url = ""
+            raw_tag = ""
+        result = {"status": status, "version": raw_tag, "changelog": release_notes, "link": download_url}
+        self._update_cache = result
+        self._update_cache_time = now
+        return result
+
+    def _parse_version(self, version_str):
+        """Parse semver string into comparable tuple of ints.
+        Handles v-prefix, pre-release (-beta.1), and build metadata (+6)."""
+        try:
+            cleaned = version_str.lstrip("vV")
+            # Strip pre-release and build metadata
+            main_part = cleaned.split("+")[0].split("-")[0]
+            parts = [int(x) for x in main_part.split(".")]
+            return tuple(parts)
+        except (ValueError, AttributeError):
+            return None
+
     @Slot(result=str)
     def getVersion(self):
+        if self._version_cache is not None:
+            return self._version_cache
         script_dir = os.path.dirname(os.path.abspath(__file__))
         versionpath = os.path.join(script_dir, '../../VERSION.txt')
-        with open(versionpath, 'r') as f:
-            version = f.read().strip()
-        return version
+        try:
+            with open(versionpath, 'r') as f:
+                version = f.read().strip()
+            self._version_cache = version if version else "0.0.0"
+        except FileNotFoundError:
+            self._version_cache = "0.0.0"
+        return self._version_cache
+        
 
     @Slot(list, result=list)
     def divideArray(self, array):

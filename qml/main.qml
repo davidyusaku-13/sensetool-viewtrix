@@ -46,6 +46,7 @@ ApplicationWindow {
         function onProgressChanged(value) {
             update_window.progressBar.visible = true
             update_window.progressBar.value = value
+            update_window.preparingText.visible = false
             update_window.progressText.visible = true
             update_window.progressText.text = value + qsTr("% completed")
             if (value === 100) {
