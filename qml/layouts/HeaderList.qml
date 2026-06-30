@@ -20,7 +20,8 @@ ListView {
         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         icon.source: model.icon
         text: model.name
-        isHeaderBtn: true
+        tooltipX: 0
+        tooltipY: height
         highlighted: ListView.isCurrentItem
         onClicked: {
             ListView.view.currentIndex = ListView.isCurrentItem ? -1 : index

@@ -6,7 +6,6 @@ ListView {
     anchors.fill: parent
     anchors.margins: 7
     spacing: 5
-    model: sideModel
     delegate: MyButton {
         required property var model
         required property int index
@@ -18,19 +17,5 @@ ListView {
             ListView.view.currentIndex = index
         }
     }
-    ListModel {
-        id: sideModel
-        ListElement {
-            name: "Project Set"
-            icon: "qrc:/images/import"
-        }
-        ListElement {
-            name: "Scan Arrangement"
-            icon: "qrc:/images/scanarr"
-        }
-        ListElement {
-            name: "Hardware Utilities"
-            icon: "qrc:/images/graph"
-        }
-    }
+
 }

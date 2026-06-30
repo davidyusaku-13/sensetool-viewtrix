@@ -20,6 +20,21 @@ Rectangle{
     ListModel{
         id: historyList
     }
+    ListModel {
+        id: mainSidebarModel
+        ListElement {
+            name: "Project Set"
+            icon: "qrc:/images/import"
+        }
+        ListElement {
+            name: "Scan Arrangement"
+            icon: "qrc:/images/scanarr"
+        }
+        ListElement {
+            name: "Hardware Utilities"
+            icon: "qrc:/images/graph"
+        }
+    }
     ColumnLayout{
         anchors.fill: parent
         spacing: 1
@@ -34,6 +49,7 @@ Rectangle{
             //sidebar
             SideBar{
                 id: sidebar
+                model: mainSidebarModel
             }
             //workspace and pop-up
             SplitView{

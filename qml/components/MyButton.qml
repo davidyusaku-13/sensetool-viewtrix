@@ -6,7 +6,10 @@ RoundButton{
     id: button
     implicitWidth: 45
     implicitHeight: 45
-    property bool isHeaderBtn: false
+    property int tooltipX: button.width + 5
+    property int tooltipY: (button.height/2 - implicitHeight/2)
+    Accessible.role: Accessible.Button
+    Accessible.name: text
     highlighted: false
     display: AbstractButton.IconOnly
     icon.source: "images/plus"
@@ -16,7 +19,7 @@ RoundButton{
     ToolTip{
         visible: button.hovered
         text: button.text
-        x: isHeaderBtn ? 0 : (button.width+5)
-        y: isHeaderBtn ? button.height : (button.height/2 - implicitHeight/2)
+        x: button.tooltipX
+        y: button.tooltipY
     }
 }
