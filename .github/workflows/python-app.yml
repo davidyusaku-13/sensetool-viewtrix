@@ -70,11 +70,37 @@ jobs:
         run: |
           invoke test
 
-      - name: Save CHANGELOG for release body
+      - name: Generate release body from git log
         shell: pwsh
         run: |
-          Copy-Item CHANGELOG.md release-body.md
-
+          # Determine previous tag to diff against
+          $prevTag = git describe --tags --abbrev=0 HEAD^ 2>$null
+          if (-not $prevTag) {
+            Write-Host "No previous tag found, using full history"
+            $log = git log --oneline --no-merges --format="- %s (%h)"
+          } else {
+            Write-Host "Generating release body since $prevTag"
+            $log = git log $prevTag..HEAD --oneline --no-merges --format="- %s (%h)"
+          }
+          $body = @()
+          $body += "## What's Changed"
+          $body += ""
+          # Categorize by conventional commit type
+          $features = $log | Select-String "^\- feat(\(.*?\))?:" | ForEach-Object { "$_" }
+          $fixes    = $log | Select-String "^\- fix(\(.*?\))?:"   | ForEach-Object { "$_" }
+          $refactor = $log | Select-String "^\- refactor(\(.*?\))?:" | ForEach-Object { "$_" }
+          $ci       = $log | Select-String "^\- ci(\(.*?\))?:"   | ForEach-Object { "$_" }
+          $docs     = $log | Select-String "^\- docs(\(.*?\))?:" | ForEach-Object { "$_" }
+          $others   = $log | Where-Object { $_ -notmatch "^\- (feat|fix|refactor|ci|docs)(\(.*?\))?" } | ForEach-Object { "$_" }
+          if ($features) { $body += "### Features"; $body += ""; $body += $features; $body += "" }
+          if ($fixes)    { $body += "### Bug Fixes"; $body += ""; $body += $fixes; $body += "" }
+          if ($refactor) { $body += "### Refactoring"; $body += ""; $body += $refactor; $body += "" }
+          if ($ci)       { $body += "### CI/CD"; $body += ""; $body += $ci; $body += "" }
+          if ($docs)     { $body += "### Documentation"; $body += ""; $body += $docs; $body += "" }
+          if ($others)   { $body += "### Other Changes"; $body += ""; $body += $others; $body += "" }
+          $body -join "`r`n" | Out-File -FilePath release-body.md -Encoding utf8
+          Write-Host "Release body generated:"
+          Get-Content release-body.md
 
       - name: Write Version
         run: |

@@ -6,11 +6,17 @@ import "components"
 
 Window {
     width: 400
-    height: 300
+    height: 420
     title: qsTr("New update available")
     property alias progressBar: progressBar
     property alias progressText: progressText
     property alias restartDialog: restartDialog
+    property string releaseNotes: ""
+    onVisibleChanged: {
+        if (visible && !releaseNotes) {
+            releaseNotes = window.logic.checkUpdate()["changelog"]
+        }
+    }
     ShadowRect{
         anchors.fill: parent
         ColumnLayout{
@@ -23,19 +29,22 @@ Window {
                 color: "#F08519"
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
-            Frame{
+            ScrollView {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                clip: true
                 Text {
-                    text: qsTr("We have added new features and fixed some bugs to make your experience seamless")
-                    anchors.fill: parent
-                    font.family: "Montserrat SemiBold"
-                    font.pixelSize: 15
+                    text: releaseNotes || qsTr("We have added new features and fixed some bugs to make your experience seamless")
+                    textFormat: Text.MarkdownText
+                    wrapMode: Text.WordWrap
+                    width: parent.width
+                    font.family: "Montserrat"
+                    font.pixelSize: 13
                     color: Material.foreground
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.Wrap
+                    topPadding: 8
+                    bottomPadding: 8
                 }
+                ScrollBar.vertical.policy: ScrollBar.AsNeeded
             }
             ProgressBar{
                 id: progressBar
