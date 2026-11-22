@@ -6,7 +6,7 @@ import "../../../components"
 
 Item{
     id: root
-    property var arrangements: []
+    property alias scanArrList: scanArrList
     signal focusIndex(int index, var model)
     MouseArea{
         anchors.fill: parent
@@ -47,9 +47,10 @@ Item{
                 onClicked: {
                     for(let i = selectedScanArr.count-1; i>=0; i--){
                         let itemSelected = selectedScanArr.get(i)
-                        var object = scanArrList.get(itemSelected.itemsIndex)
                         scanArrList.remove(itemSelected.itemsIndex)
                     }
+                    // The Scan List column may be showing a deleted arrangement.
+                    root.focusIndex(-1, null)
                 }
             }
             Item{
@@ -80,10 +81,12 @@ Item{
             ScanArrWindow{
                 id: scanArrWindow
                 onCreate: (object) => {
-                              scanArrList.append(object);
+                              scanArrList.append({"name": object.name, "desc": object.desc, "scans": []});
                           }
                 onModify: (index, object) => {
-                              scanArrList.set(index, object);
+                              // Only rename/redescribe; keep the arrangement's scan list.
+                              scanArrList.setProperty(index, "name", object.name);
+                              scanArrList.setProperty(index, "desc", object.desc);
                           }
             }
         }

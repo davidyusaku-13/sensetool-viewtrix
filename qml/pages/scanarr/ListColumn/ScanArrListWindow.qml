@@ -9,7 +9,7 @@ Window {
     minimumWidth: 500
     minimumHeight: 400
     maximumWidth: 500
-    maximumHeight: 00
+    maximumHeight: 400
     color: Material.background
 
     signal create(var object)
@@ -30,6 +30,9 @@ Window {
             root.object.reset()
         }
         index = i
+        // Start every pick with nothing selected.
+        root.names = []
+        selectedScanArrList.remove(0, selectedScanArrList.count)
         root.show()
     }
     ConfirmWindow{

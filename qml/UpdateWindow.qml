@@ -57,7 +57,7 @@ Window {
                 text: qsTr("Download")
                 font.family: "Montserrat"
                 onClicked: {
-                    updateManager.download_update(window.logic.checkUpdate()["link"])
+                    updateManager.download_update(window.logic.updateLink())
                 }
             }
         }

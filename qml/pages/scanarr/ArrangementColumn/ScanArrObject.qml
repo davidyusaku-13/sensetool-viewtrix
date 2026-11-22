@@ -5,10 +5,11 @@ QtObject{
     id: object
     property string name
     property string desc
-    property var scans
+    property var scans: []
 
     function set(object){
-        scans = ["On", "Off"]
+        // The scan list itself is edited in the Scan List column, not here.
+        scans = []
         name = object?.name ?? ""
         desc = object?.desc ?? ""
     }

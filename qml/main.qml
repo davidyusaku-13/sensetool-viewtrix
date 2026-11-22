@@ -27,8 +27,14 @@ ApplicationWindow {
             id: update_window
             Material.theme: sensetool.theme
         }
-        Component.onCompleted: {
-            if(logic.checkUpdate()["status"]){
+        // Runs in a background thread so a slow or missing network never blocks startup.
+        Component.onCompleted: logic.checkUpdateAsync()
+    }
+
+    Connections {
+        target: logic
+        function onUpdateChecked(available, version, changelog, link) {
+            if (available) {
                 update_window.show()
             }
         }

@@ -8,6 +8,11 @@ import "../../components"
 Item{
     Layout.fillHeight: true
     Layout.fillWidth: true
+    MessageDialog {
+        id: hwErrorDialog
+        title: qsTr("Hardware Utility")
+        buttons: MessageDialog.Ok
+    }
     ShadowRect{
         anchors.fill: parent
         color: Material.background
@@ -59,6 +64,11 @@ Item{
                             nameFilters: ["YAML files (*.yaml *.yml)"]
                             onAccepted: {
                                 let importRes = window.logic.importWinCoef(selectedFile)
+                                if(importRes.length === 0){
+                                    hwErrorDialog.text = window.logic.lastError()
+                                    hwErrorDialog.open()
+                                    return
+                                }
                                 win.clear()
                                 win.drawWin(importRes[0])
                                 winFields.itemAt(0).text = importRes[1]
@@ -81,9 +91,14 @@ Item{
                             nameFilters: ["YAML files (*.yaml *.yml)"]
                             onAccepted: {
                                 win.clear()
-                                let y = win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, winFields.itemAt(2).text)
-                                window.logic.exportWinCoef(selectedFile, y, winFields.itemAt(0).text, winFields.itemAt(1).text, winFields.itemAt(2).text)
-                                window.historyModel.addHistory("Exported", selectedFile)
+                                let y = win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, winLength.textAt(winLength.currentIndex))
+                                let err = window.logic.exportWinCoef(selectedFile, y, winFields.itemAt(0).text, winFields.itemAt(1).text, winLength.textAt(winLength.currentIndex))
+                                if(err !== ""){
+                                    hwErrorDialog.text = err
+                                    hwErrorDialog.open()
+                                    return
+                                }
+                                window.historyModel.addHistory("Exported", selectedFile, "", "")
                             }
                         }
                     }
@@ -157,6 +172,11 @@ Item{
                             nameFilters: ["YAML files (*.yaml *.yml)"]
                             onAccepted: {
                                 let importRes = window.logic.importDemoCoef(selectedFile)
+                                if(importRes.length === 0){
+                                    hwErrorDialog.text = window.logic.lastError()
+                                    hwErrorDialog.open()
+                                    return
+                                }
                                 let y = importRes[0]
                                 demo.clear()
                                 demo.drawDemo(y[0], y[1])
@@ -182,8 +202,13 @@ Item{
                             onAccepted: {
                                 demo.clear()
                                 let y = demo.createDemo(demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
-                                window.logic.exportDemoCoef(selectedFile, y, demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
-                                window.historyModel.addHistory("Exported", selectedFile)
+                                let err = window.logic.exportDemoCoef(selectedFile, y, demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
+                                if(err !== ""){
+                                    hwErrorDialog.text = err
+                                    hwErrorDialog.open()
+                                    return
+                                }
+                                window.historyModel.addHistory("Exported", selectedFile, "", "")
                             }
                         }
                     }

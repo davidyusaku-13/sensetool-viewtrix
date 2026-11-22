@@ -51,6 +51,7 @@ Item{
                     }
                 }
                 RowLayout{
+                    enabled: root.model !== null
                     RoundButton{
                         Layout.fillWidth: true
                         Layout.preferredHeight: 35
@@ -71,6 +72,13 @@ Item{
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
+                        // Select all, or deselect all when everything is selected.
+                        onClicked: {
+                            let all = selectedChoose.count === scanArrChooseModel.items.count
+                            for(let i=0; i<scanArrChooseModel.items.count; i++){
+                                scanArrChooseModel.items.get(i).inSelected = !all
+                            }
+                        }
                     }
                     RoundButton{
                         Layout.fillWidth: true
@@ -80,16 +88,19 @@ Item{
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
+                        onClicked: {
+                            for(let i = selectedChoose.count-1; i>=0; i--){
+                                root.model.scans.remove(selectedChoose.get(i).itemsIndex)
+                            }
+                        }
                     }
                     ScanArrListWindow{
                         id: scanArrListWindow
                         onCreate: (object) => {
+                                      if(!root.model) return
                                       for(let i=0; i<object.names.length; i++){
-                                          scanArrChoose.append(object.get(i));
+                                          root.model.scans.append(object.get(i));
                                       }
-                                  }
-                        onModify: (index, object) => {
-                                      scanArrChoose.set(index, object);
                                   }
                     }
                 }
@@ -97,7 +108,7 @@ Item{
             // Scan List
             model: DelegateModel{
                 id: scanArrChooseModel
-                model: root.model?.scans ?? []
+                model: root.model ? root.model.scans : []
                 groups: [
                     DelegateModelGroup {
                         id: selectedChoose
@@ -106,8 +117,8 @@ Item{
                 ]
                 delegate: ScanArrListItem{
                     id: scanArrChooseDel
-                    required property string modelData
-                    name: modelData
+                    required property var model
+                    name: model.name
                     width: ListView.view.width
                     checkBox.checked: scanArrChooseDel.DelegateModel.inSelected
                     onSelected: {

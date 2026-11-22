@@ -9,14 +9,19 @@ ShadowRect{
     id: layout
     Layout.fillHeight: true
     Layout.fillWidth: true
-    function history(status, object){
-        var temp = {
-            "status": status,
-            "name": object["name"],
-            "value": object["value"],
-            "desc": object["desc"]
+
+    function showError(message){
+        if(message !== ""){
+            errorDialog.text = message
+            errorDialog.open()
+            return true
         }
-        historyList.append(temp)
+        return false
+    }
+    MessageDialog {
+        id: errorDialog
+        title: qsTr("Project Setting")
+        buttons: MessageDialog.Ok
     }
     MouseArea{
         anchors.fill: parent
@@ -31,7 +36,6 @@ ShadowRect{
         //toolbar
         RowLayout{
             Layout.fillWidth: true
-            //implicitHeight: 25
             ToolbarBtn{
                 text: qsTr("Import")
                 onClicked: {
@@ -40,12 +44,11 @@ ShadowRect{
             }
             FileDialog {
                 id: dialogImport
-                selectedNameFilter.index: 1
                 fileMode: FileDialog.OpenFile
-                nameFilters: ["YAML files (*.yaml *.yml)"]
+                nameFilters: [qsTr("Project setting (*.yaml *.yml *.xlsx)"), qsTr("YAML files (*.yaml *.yml)"), qsTr("prjcfg spreadsheet (*.xlsx)")]
                 onAccepted: {
-                    window.prjSetModel.importYAML(selectedFile)
-                    window.historyModel.addHistory("Imported", selectedFile, "", "")
+                    if(!layout.showError(window.prjSetModel.importFile(selectedFile)))
+                        window.historyModel.addHistory("Imported", selectedFile, "", "")
                 }
             }
             ToolbarBtn{
@@ -56,12 +59,32 @@ ShadowRect{
             }
             FileDialog {
                 id: dialogExport
-                selectedNameFilter.index: 1
                 fileMode: FileDialog.SaveFile
-                nameFilters: ["YAML files (*.yaml *.yml)"]
+                defaultSuffix: "yaml"
+                nameFilters: [qsTr("YAML files (*.yaml *.yml)")]
                 onAccepted: {
-                    window.prjSetModel.exportYAML(selectedFile)
-                    window.historyModel.addHistory("Exported", selectedFile, "", "")
+                    if(!layout.showError(window.prjSetModel.exportYAML(selectedFile)))
+                        window.historyModel.addHistory("Exported", selectedFile, "", "")
+                }
+            }
+            ToolbarBtn{
+                text: qsTr("Generate prjset.h")
+                onClicked: {
+                    if(window.prjSetModel.issueCount > 0){
+                        layout.showError(qsTr("%1 item(s) have problems (shown in red). Fix them before generating the header.").arg(window.prjSetModel.issueCount))
+                    } else {
+                        dialogHeader.open()
+                    }
+                }
+            }
+            FileDialog {
+                id: dialogHeader
+                fileMode: FileDialog.SaveFile
+                defaultSuffix: "h"
+                nameFilters: [qsTr("C header (*.h)")]
+                onAccepted: {
+                    if(!layout.showError(window.prjSetModel.exportHeader(selectedFile)))
+                        window.historyModel.addHistory("Generated", selectedFile, "", "")
                 }
             }
             ToolbarBtn{
@@ -86,12 +109,9 @@ ShadowRect{
                 onClicked: {
                     for(let i = selectedGroup.count-1; i>=0; i--){
                         let itemSelected = selectedGroup.get(i)
-                        // var object = itemList.get(itemSelected.itemsIndex)
-                            // layout.history("Deleted", object)
-                            // itemList.remove(itemSelected.itemsIndex)
-                            var object = itemSelected.model
-                            window.historyModel.addHistory("Deleted", object.name, object.value, object.desc)
-                            window.prjSetModel.removeItem(itemSelected.itemsIndex)
+                        var object = itemSelected.model
+                        window.historyModel.addHistory("Deleted", object.name, object.value, object.desc)
+                        window.prjSetModel.removeItem(itemSelected.itemsIndex)
                     }
                 }
             }
@@ -121,19 +141,16 @@ ShadowRect{
             PrjSetWindow{
                 id: prjSetWindow
                 Material.theme: sensetool.theme
+                model: window.prjSetModel
                 onCreate: (object) => {
-                              // itemList.append(object);
-                                  // layout.history("Added", object)
-                                  window.prjSetModel.addItem(object.name, object.value, object.desc)
-                                  window.historyModel.addHistory("Added ", object.name, object.value, object.desc)
+                              window.prjSetModel.addItem(object.name, object.value, object.desc, object.group, object.comment)
+                              window.historyModel.addHistory("Added", object.name, object.value, object.desc)
                           }
                 onModify: (index, object) => {
-                                // itemList.set(index, object);
-                                // layout.history("Modified", object)
-                                let i = selectedGroup.get(0).itemsIndex
-                                window.prjSetModel.edit(i, object.name, object.value, object.desc)
-                                window.historyModel.addHistory("Modified ", object.name, object.value, object.desc)
-                              }
+                              // Use the index the window was opened for, not the current selection.
+                              window.prjSetModel.edit(index, object.name, object.value, object.desc, object.group, object.comment)
+                              window.historyModel.addHistory("Modified", object.name, object.value, object.desc)
+                          }
             }
         }
         //project set rect
@@ -146,13 +163,10 @@ ShadowRect{
                 interactive: true
                 clip: true
                 highlightMoveDuration: 1000
-                    onCountChanged: {
-                        currentIndex = count-1
-                    }
                 //header
                 headerPositioning: ListView.OverlayHeader
                 header: RowLayout{
-                        id: workspace1Header
+                    id: workspace1Header
                     width: parent.width
                     height: 35
                     spacing: 0
@@ -185,37 +199,40 @@ ShadowRect{
                         color: Material.accent
                     }
                 }
+                //sections from the item's group
+                section.property: "group"
+                section.criteria: ViewSection.FullString
+                section.delegate: Rectangle{
+                    required property string section
+                    width: ListView.view.width
+                    height: section === "" ? 0 : 30
+                    visible: section !== ""
+                    color: Material.background
+                    Text{
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 12
+                        text: parent.section
+                        font.pointSize: 11
+                        font.family: "Montserrat SemiBold"
+                        color: Material.accent
+                    }
+                }
                 //item list
                 model: DelegateModel{
                     id: itemModel
-                    // model: ListModel{
-                        //     id: itemList
-                        // }
-                        model: window.prjSetModel
+                    model: window.prjSetModel
                     groups: [
                         DelegateModelGroup {
                             id: selectedGroup
                             name: "selected"}
                     ]
-                    // delegate: PrjSetItem{
-                    //     id: itemDel
-                    //     required property var model
-                    //     name: model.name
-                    //     value: model.value
-                    //     desc: model.desc
-                    //     width: ListView.view.width
-                    //     checkBox.checked: DelegateModel.inSelected
-                    //     onSelected: {
-                    //         DelegateModel.inSelected = !DelegateModel.inSelected
-                    //     }
-                    // }
                     delegate: dragDelegate
-                    
                 }
                 //footer
                 footerPositioning: ListView.OverlayFooter
                 footer: ShadowRect{
-                        id: workspace1Footer
+                    id: workspace1Footer
                     width: parent.width
                     height: 35
                     color: Material.accent
@@ -223,55 +240,59 @@ ShadowRect{
                     Text{
                         anchors.centerIn: parent
                         text: selectedGroup.count + qsTr(" of ") + itemModel.count + qsTr(" selected")
+                              + (window.prjSetModel.issueCount > 0 ? qsTr("  •  %1 with problems").arg(window.prjSetModel.issueCount) : "")
                         font.pointSize: 12
                         font.family: "Montserrat SemiBold"
                         color: Material.foreground
                     }
                 }
                 Component {
-                        id: dragDelegate
-                        Rectangle {
-                            id: content
-                            required property var model
-                            required property int index
-                            width: ListView.view.width
-                            height: itemDel.height
-                            color: itemDel.dragArea.held ? Material.foreground : Material.background
-                            Behavior on color { ColorAnimation { duration: 100 } }
-                            radius: 2
-                            PrjSetItem{
-                                id: itemDel
-                                states: State {
-                                    when: itemDel.dragArea.pressed
-                                    ParentChange {
-                                        target: itemDel
-                                        parent: content.ListView.view
-                                    }
-                                }
-                                Drag.hotSpot.x: width / 2
-                                Drag.hotSpot.y: height / 2
-                                Drag.source: content
-                                Drag.active: itemDel.dragArea.pressed
-                                anchors {
-                                    left: parent.left
-                                    right: parent.right
-                                }
-                                width: parent.width
-                                name: model.name
-                                value: model.value
-                                desc: model.desc
-                                content: itemDel
-                                checkBox.checked: DelegateModel.inSelected
-                                onSelected: {
-                                    DelegateModel.inSelected = !DelegateModel.inSelected
+                    id: dragDelegate
+                    Rectangle {
+                        id: content
+                        required property var model
+                        required property int index
+                        width: ListView.view.width
+                        height: itemDel.height
+                        color: itemDel.dragArea.held ? Material.foreground : Material.background
+                        Behavior on color { ColorAnimation { duration: 100 } }
+                        radius: 2
+                        PrjSetItem{
+                            id: itemDel
+                            states: State {
+                                when: itemDel.dragArea.pressed
+                                ParentChange {
+                                    target: itemDel
+                                    parent: content.ListView.view
                                 }
                             }
-                            DropArea {
-                                anchors.fill: parent
-                                onEntered: (drag) => {window.prjSetModel.move(drag.source.index, content.index)}
+                            Drag.hotSpot.x: width / 2
+                            Drag.hotSpot.y: height / 2
+                            Drag.source: content
+                            Drag.active: itemDel.dragArea.pressed
+                            anchors {
+                                left: parent.left
+                                right: parent.right
+                            }
+                            width: parent.width
+                            name: model.name
+                            value: model.value
+                            desc: model.desc
+                            comment: model.comment
+                            resolved: model.resolved
+                            issue: model.issue
+                            content: itemDel
+                            checkBox.checked: DelegateModel.inSelected
+                            onSelected: {
+                                DelegateModel.inSelected = !DelegateModel.inSelected
                             }
                         }
+                        DropArea {
+                            anchors.fill: parent
+                            onEntered: (drag) => {window.prjSetModel.move(drag.source.index, content.index)}
+                        }
                     }
+                }
             }
         }
     }

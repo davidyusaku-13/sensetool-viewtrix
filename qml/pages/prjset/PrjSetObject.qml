@@ -6,7 +6,9 @@ QtObject{
     property string name
     property string value
     property string desc
-    
+    property string group
+    property string comment
+
     function reset(){
         set(null)
     }
@@ -15,13 +17,17 @@ QtObject{
         name = object?.name ?? ""
         value = object?.value ?? ""
         desc = object?.desc ?? ""
+        group = object?.group ?? ""
+        comment = object?.comment ?? ""
     }
 
     function get(){
         let obj = {
             "name": name,
             "value": value,
-            "desc": desc
+            "desc": desc,
+            "group": group,
+            "comment": comment
         }
         return obj
     }

@@ -11,6 +11,9 @@ ShadowRect{
     property string name: "FILTER_THRES_MOTION_TOLERANCE_WINDOW"
     property string value: "(MSN_CH_LEN*MSN_FREQ_CNT*2)+AFE_CRC_LEN"
     property string desc: "Maximum count of timeslot in one mutual frame scan (need to consider for SingleTx, DTO and QTO scan option)"
+    property string comment: ""
+    property string resolved: ""
+    property string issue: ""
     property alias dragArea: dragArea
     property alias checkBox: checkBox
     required property var content
@@ -34,48 +37,104 @@ ShadowRect{
         ShadowRect{
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Text{
-                id: name
+            ColumnLayout{
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.name
-                color: Material.foreground
-                font.pixelSize: 15
-                font.family: "Montserrat Medium"
-                wrapMode: Text.Wrap
-                verticalAlignment: Text.AlignVCenter
+                spacing: 2
+                Text{
+                    id: name
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: root.name
+                    color: Material.foreground
+                    font.pixelSize: 15
+                    font.family: "Montserrat Medium"
+                    wrapMode: Text.Wrap
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                }
+                Text{
+                    Layout.fillWidth: true
+                    visible: root.issue !== ""
+                    text: "\u26A0 " + root.issue
+                    color: "#E53935"
+                    font.pixelSize: 12
+                    font.family: "Montserrat Medium"
+                    elide: Text.ElideRight
+                    HoverHandler { id: issueHover }
+                    ToolTip.visible: issueHover.hovered && truncated
+                    ToolTip.text: root.issue
+                }
             }
         }
         //value
         ShadowRect{
             Layout.fillHeight: true
             Layout.fillWidth: true
-            Text{
-                id: value
+            ColumnLayout{
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.value
-                color: Material.foreground
-                font.pixelSize: 15
-                font.family: "Montserrat Medium"
-                wrapMode: Text.Wrap
-                verticalAlignment: Text.AlignVCenter
+                spacing: 2
+                Text{
+                    id: value
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: root.value
+                    color: Material.foreground
+                    font.pixelSize: 15
+                    font.family: "Montserrat Medium"
+                    wrapMode: Text.Wrap
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                }
+                Text{
+                    Layout.fillWidth: true
+                    visible: root.resolved !== ""
+                    text: "= " + root.resolved
+                    color: Material.accent
+                    font.pixelSize: 12
+                    font.family: "Montserrat Medium"
+                    elide: Text.ElideRight
+                }
             }
         }
         //desc
         ShadowRect{
             Layout.fillHeight: true
             implicitWidth: parent.width*3/7
-            Text{
-                id: desc
+            ColumnLayout{
                 anchors.fill: parent
                 anchors.margins: 10
-                text: root.desc
-                color: Material.foreground
-                font.pixelSize: 15
-                font.family: "Montserrat Medium"
-                wrapMode: Text.Wrap
-                verticalAlignment: Text.AlignVCenter
+                spacing: 2
+                Text{
+                    id: desc
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: root.desc
+                    color: Material.foreground
+                    font.pixelSize: 15
+                    font.family: "Montserrat Medium"
+                    wrapMode: Text.Wrap
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    HoverHandler { id: descHover }
+                    ToolTip.visible: descHover.hovered && truncated
+                    ToolTip.text: root.desc
+                }
+                Text{
+                    Layout.fillWidth: true
+                    visible: root.comment !== ""
+                    text: root.comment
+                    color: Material.foreground
+                    opacity: 0.6
+                    font.pixelSize: 12
+                    font.italic: true
+                    font.family: "Montserrat"
+                    elide: Text.ElideRight
+                    HoverHandler { id: commentHover }
+                    ToolTip.visible: commentHover.hovered && truncated
+                    ToolTip.text: root.comment
+                }
             }
         }
         //drag

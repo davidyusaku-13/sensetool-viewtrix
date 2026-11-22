@@ -1,5 +1,6 @@
 import unittest
-from src.modules.logic import AppLogic
+from src.modules.logic import AppLogic, parse_version, is_newer
+import os, tempfile
 from PySide6.QtCore import QUrl
 import pathlib as pl
 
@@ -61,6 +62,38 @@ class AppLogicTestCase(unittest.TestCase):
     self.assertEqual(demo_cycle, import_cycle)
     self.assertEqual(demo_adc_sampling_freq, import_adc_sampling_freq)
         
+  def test_version_compare(self):
+    self.assertEqual(parse_version("v1.10.2-beta.1+3"), (1, 10, 2))
+    self.assertTrue(is_newer("1.10.0", "1.9.0"))
+    self.assertFalse(is_newer("1.9.0", "1.10.0"))
+    self.assertFalse(is_newer("1.2", "1.2.0"))
+    self.assertFalse(is_newer("1.0.0", ""), "unknown current version must not prompt")
+
+  def test_logic_import_errors(self):
+    missing = QUrl.fromLocalFile("does_not_exist.yaml")
+    self.assertEqual(self._model.importWinCoef(missing), [])
+    self.assertNotEqual(self._model.lastError(), "")
+    self.assertEqual(self._model.importDemoCoef(missing), [])
+    with tempfile.TemporaryDirectory() as d:
+      bad = os.path.join(d, "bad.yaml")
+      with open(bad, "w") as f:
+        f.write("data: []\n")
+      self.assertEqual(self._model.importWinCoef(QUrl.fromLocalFile(bad)), [])
+      self.assertIn("sample_number", self._model.lastError())
+
+  def test_logic_win_coef_small_sample(self):
+    self.assertEqual(self._model.win_coef_gen(1, 0.5, "Full"), [])
+
+  def test_logic_scan_arr_round_trip(self):
+    items = [{"name": "MS", "desc": "mutual"}, {"name": "SS", "desc": ""}]
+    arrs = [{"name": "Normal", "desc": "d", "scans": ["MS", "SS", "MS"]}]
+    with tempfile.TemporaryDirectory() as d:
+      url = QUrl.fromLocalFile(os.path.join(d, "scan.yaml"))
+      self.assertEqual(self._model.exportScanArr(url, items, arrs), "")
+      data = self._model.importScanArr(url)
+    self.assertEqual(data["scan_items"], items)
+    self.assertEqual(data["arrangements"], arrs)
+
   def tearDown(self):
     del self._model
         

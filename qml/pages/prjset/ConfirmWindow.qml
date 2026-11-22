@@ -8,7 +8,8 @@ Window {
     width: 400
     height: 100
     title: "Warning"
-    
+    modality: Qt.ApplicationModal
+
     signal saved(var state)
     
     property bool state

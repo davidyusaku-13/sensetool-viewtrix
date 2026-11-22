@@ -5,31 +5,39 @@ import "../../components"
 
 Window {
     id: root
-    title: isEdit === false ? "Add File" : "Edit File"
+    title: isEdit === false ? qsTr("Add Item") : qsTr("Edit Item")
     minimumWidth: 500
-    minimumHeight: 500
+    minimumHeight: 680
     maximumWidth: 500
-    maximumHeight: 500
-    
+    maximumHeight: 680
+    modality: Qt.ApplicationModal
+
     signal create(var object)
     signal modify(int index, var object)
 
+    // The PrjSetModel being edited; used for duplicate checks and group suggestions.
+    property var model: null
     property PrjSetObject object: PrjSetObject{}
     property int index: -1
     property bool isEdit: false
+    property var groupNames: []
+    readonly property int duplicateIndex: (model && object.name !== "") ? model.indexOfName(object.name) : -1
+    readonly property bool isDuplicate: duplicateIndex !== -1 && duplicateIndex !== index
     property HoverHandler cursor: HoverHandler{
         cursorShape: Qt.IBeamCursor
     }
 
-    function manage(i: int, model: var){
+    function manage(i: int, item: var){
         if(i !== -1){
             isEdit = true
-            object.set(model)
+            object.set(item)
         }else {
             isEdit = false
             root.object.reset()
         }
         index = i
+        groupNames = model ? model.groups() : []
+        groupInput.editText = root.object.group
         root.show()
     }
     ConfirmWindow{
@@ -46,12 +54,11 @@ Window {
         anchors.fill: parent
         ColumnLayout{
             anchors.fill: parent
-            spacing: 20
+            spacing: 14
             anchors.margins: 20
             //item
             ColumnLayout{
                 Layout.fillWidth: true
-                Layout.fillHeight: true
                 Text{
                     text: qsTr("Name")
                     font.family: "Montserrat Medium"
@@ -73,17 +80,24 @@ Window {
                         clip: true
                         autoScroll: false
                         selectByMouse: true
-                        validator: RegularExpressionValidator {regularExpression: /[0-9A-Z_]+/}
+                        // A valid C macro name: must not start with a digit.
+                        validator: RegularExpressionValidator {regularExpression: /[A-Z_][0-9A-Z_]*/}
                         HoverHandler {
                             cursorShape: Qt.IBeamCursor
                         }
                     }
                 }
+                Text{
+                    visible: root.isDuplicate
+                    text: qsTr("An item with this name already exists")
+                    color: "#E53935"
+                    font.family: "Montserrat"
+                    font.pixelSize: 13
+                }
             }
             //value
             ColumnLayout{
                 Layout.fillWidth: true
-                Layout.fillHeight: true
                 Text{
                     text: qsTr("Value")
                     font.family: "Montserrat Medium"
@@ -105,11 +119,29 @@ Window {
                         clip: true
                         autoScroll: false
                         selectByMouse: true
-                        validator: RegularExpressionValidator {regularExpression: /[0-9a-zA-Z*()_" "<>+-/:?]+/}
+                        // Numbers, macro names, strings and all C operators.
+                        validator: RegularExpressionValidator {regularExpression: /[0-9a-zA-Z_ ()*\/%+\-<>=!&|^~?:.,"']+/}
                         HoverHandler {
                             cursorShape: Qt.IBeamCursor
                         }
                     }
+                }
+            }
+            //group
+            ColumnLayout{
+                Layout.fillWidth: true
+                Text{
+                    text: qsTr("Group")
+                    font.family: "Montserrat Medium"
+                    font.pixelSize: 20
+                    color: Material.foreground
+                }
+                ComboBox{
+                    id: groupInput
+                    Layout.fillWidth: true
+                    editable: true
+                    model: root.groupNames
+                    onEditTextChanged: root.object.group = editText
                 }
             }
             //desc
@@ -137,17 +169,32 @@ Window {
                     }
                 }
             }
+            //comment
+            ColumnLayout{
+                Layout.fillWidth: true
+                Text{
+                    text: qsTr("Comment (not written to prjset.h)")
+                    font.family: "Montserrat Medium"
+                    font.pixelSize: 20
+                    color: Material.foreground
+                }
+                TextField{
+                    Layout.fillWidth: true
+                    text: root.object.comment
+                    onTextChanged: root.object.comment = text
+                    selectByMouse: true
+                }
+            }
             //button
             RowLayout{
                 Layout.fillWidth: true
-                Layout.fillHeight: true
                 Layout.alignment: Qt.AlignRight
                 spacing: 5
                 //add
                 RoundButton {
                     implicitWidth: 80
                     text: root.isEdit ? qsTr("Save") : qsTr("Add")
-                    enabled: (itemInput.acceptableInput && valueInput.acceptableInput)
+                    enabled: itemInput.acceptableInput && valueInput.acceptableInput && !root.isDuplicate
                     HoverHandler {
                         cursorShape: Qt.PointingHandCursor
                     }
@@ -155,7 +202,7 @@ Window {
                         if (root.isEdit == true) {
                             confirmWindow.show()
                         } else {
-                            root.create(root.object)
+                            root.create(root.object.get())
                             root.object.reset()
                             root.close()
                         }

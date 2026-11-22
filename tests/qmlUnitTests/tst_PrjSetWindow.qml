@@ -18,7 +18,9 @@ Item {
             let input = {
                 "name": "testName",
                 "value": "testValue",
-                "desc": "testDesc"
+                "desc": "testDesc",
+                "group": "testGroup",
+                "comment": "testComment"
             }
             prjSetWindow.object.set(input)
             let prjSetObj = prjSetWindow.object.get()
