@@ -22,10 +22,13 @@ Rectangle{
     property alias currentPage: pages.currentIndex
     Material.theme: theme
     Material.accent: accent
+    // Apply the saved language once Settings has restored it.
+    Component.onCompleted: Qt.callLater(() => { if(popUp.languageIndex === 1) translator.change_language("id") })
     Settings{
         id: settings
         property alias isDarkTheme: popUp.isDarkTheme
         property alias sidebarFolded: sidebar.folded
+        property alias languageIndex: popUp.languageIndex
     }
     ListModel{
         id: historyList

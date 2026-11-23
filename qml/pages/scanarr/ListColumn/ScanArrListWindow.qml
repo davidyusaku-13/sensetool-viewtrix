@@ -5,7 +5,7 @@ import "../"
 
 Window {
     id: root
-    title: isEdit === false ? "Add File" : "Edit File"
+    title: isEdit === false ? qsTr("Add Scan Steps") : qsTr("Edit Scan Steps")
     minimumWidth: 500
     minimumHeight: 400
     maximumWidth: 500
@@ -44,7 +44,7 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Text{
-                text: "Scan Items"
+                text: qsTr("Scan Items")
                 font.family: "Montserrat Medium"
                 font.pixelSize: 20
                 color: Material.foreground
@@ -96,7 +96,7 @@ Window {
                         z: 2
                         Text{
                             anchors.centerIn: parent
-                            text: selectedScanArrList.count + " of " + itemColumn.scanItemList.count + " selected"
+                            text: qsTr("%1 of %2 selected").arg(selectedScanArrList.count).arg(itemColumn.scanItemList.count)
                             font.pointSize: 12
                             font.family: "Montserrat SemiBold"
                             color: sensetool.onAccent
@@ -114,8 +114,8 @@ Window {
             //add
             RoundButton{
                 implicitWidth: 80
-                text: root.isEdit ? "Save" : "Add"
-                enabled: (text === "Add" && selectedScanArrList.count >= 0) ? true : false
+                text: root.isEdit ? qsTr("Save") : qsTr("Add")
+                enabled: true
                 HoverHandler{
                     cursorShape: Qt.PointingHandCursor
                 }
@@ -134,7 +134,7 @@ Window {
             //cancel
             RoundButton{
                 implicitWidth: 80
-                text: "Cancel"
+                text: qsTr("Cancel")
                 HoverHandler{
                     cursorShape: Qt.PointingHandCursor
                 }

@@ -18,7 +18,7 @@ ListView {
         display: sidebarList.folded ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
         showToolTip: sidebarList.folded
         icon.source: model.icon
-        text: model.name
+        text: qsTr(model.name)
         font.family: "Montserrat Medium"
         font.pixelSize: 14
         highlighted: ListView.isCurrentItem
@@ -29,19 +29,19 @@ ListView {
     ListModel {
         id: sideModel
         ListElement {
-            name: "Project Setting"
+            name: QT_TR_NOOP("Project Setting")
             icon: "qrc:/images/tune"
         }
         ListElement {
-            name: "App Setting"
+            name: QT_TR_NOOP("App Setting")
             icon: "qrc:/images/chip"
         }
         ListElement {
-            name: "Scan Arrangement"
+            name: QT_TR_NOOP("Scan Arrangement")
             icon: "qrc:/images/scanarr"
         }
         ListElement {
-            name: "Hardware Utilities"
+            name: QT_TR_NOOP("Hardware Utilities")
             icon: "qrc:/images/graph"
         }
     }

@@ -134,7 +134,7 @@ ApplicationWindow {
         unsavedDialog.open()
     }
 
-    title: "SenseTool-v" + logic.getVersion() + "  —  "
+    title: qsTr("SenseTool") + "-v" + logic.getVersion() + "  —  "
            + (projectName !== "" ? projectName : qsTr("Untitled project")) + (dirty ? " *" : "")
     visible: true
     width: 1280

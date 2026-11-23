@@ -7,6 +7,7 @@ import "../components"
 Item{
     property alias currentIndex: popUpLayout.currentIndex
     property alias isDarkTheme: themeToggle.checked
+    property alias languageIndex: langChoice.currentIndex
     ShadowRect{
         anchors.fill: parent
         color: Material.background

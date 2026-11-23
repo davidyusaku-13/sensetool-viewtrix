@@ -115,7 +115,7 @@ Item{
                             model: ListModel{
                                 id: winGraphModel
                                 ListElement{
-                                    text: "Sample Number"
+                                    text: QT_TR_NOOP("Sample Number")
                                 }
                                 ListElement{
                                     text: "a0"
@@ -126,7 +126,7 @@ Item{
                                 required property var model
                                 required property int index
                                 Layout.fillWidth: true
-                                label: model.text
+                                label: qsTr(model.text)
                                 validator: RegularExpressionValidator {
                                     regularExpression: /[0-9.]+/
                                 }
@@ -226,23 +226,23 @@ Item{
                             model: ListModel{
                                 id: demoGraphModel
                                 ListElement{
-                                    text: "Step"
+                                    text: QT_TR_NOOP("Step")
                                 }
                                 ListElement{
-                                    text: "Sample"
+                                    text: QT_TR_NOOP("Sample")
                                 }
                                 ListElement{
-                                    text: "Cycle"
+                                    text: QT_TR_NOOP("Cycle")
                                 }
                                 ListElement{
-                                    text: "ADC Freq"
+                                    text: QT_TR_NOOP("ADC Freq")
                                 }
                             }
                             
                             delegate: LabeledField{
                                 required property var model
                                 Layout.fillWidth: true
-                                label: model.text
+                                label: qsTr(model.text)
                                 validator: RegularExpressionValidator { regularExpression: /[0-9.]+/ }
                             }
                         }

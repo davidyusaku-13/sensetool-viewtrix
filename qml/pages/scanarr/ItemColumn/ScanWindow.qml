@@ -5,7 +5,7 @@ import "../"
 
 Window {
     id: root
-    title: isEdit === false ? "Add File" : "Edit File"
+    title: isEdit === false ? qsTr("Add Scan Item") : qsTr("Edit Scan Item")
     minimumWidth: 500
     minimumHeight: 400
     maximumWidth: 500
@@ -40,7 +40,7 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Text{
-                text: "Scan Name"
+                text: qsTr("Scan Name")
                 font.pixelSize: 20
                 font.family: "Montserrat Medium"
                 color: Material.foreground
@@ -69,7 +69,7 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Text{
-                text: "Description"
+                text: qsTr("Description")
                 font.family: "Montserrat Medium"
                 font.pixelSize: 20
                 color: Material.foreground
@@ -98,8 +98,8 @@ Window {
             //add
             RoundButton{
                 implicitWidth: 80
-                text: root.isEdit ? "Save" : "Add"
-                enabled: (text === "Add" && root.object.name === "") ? false : true
+                text: root.isEdit ? qsTr("Save") : qsTr("Add")
+                enabled: root.isEdit || root.object.name !== ""
                 HoverHandler{
                     cursorShape: Qt.PointingHandCursor
                 }
@@ -118,7 +118,7 @@ Window {
             //cancel
             RoundButton{
                 implicitWidth: 80
-                text: "Cancel"
+                text: qsTr("Cancel")
                 HoverHandler{
                     cursorShape: Qt.PointingHandCursor
                 }

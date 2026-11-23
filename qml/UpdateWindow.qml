@@ -7,7 +7,7 @@ import "components"
 Window {
     width: 400
     height: 300
-    title: "New update available"
+    title: qsTr("New update available")
     property alias progressBar: progressBar
     property alias progressText: progressText
     property alias restartDialog: restartDialog

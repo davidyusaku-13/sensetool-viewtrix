@@ -6,7 +6,7 @@ import "../components"
 // Workspace switcher. Folded: icons only (with tooltips). Unfolded: icons and names.
 ShadowRect{
     id: sidebar
-    Layout.preferredWidth: folded ? 60 : 210
+    Layout.preferredWidth: folded ? 60 : 240
     Layout.fillHeight: true
     Behavior on Layout.preferredWidth { NumberAnimation { duration: 150 } }
     readonly property alias index: sidebarList.currentIndex
