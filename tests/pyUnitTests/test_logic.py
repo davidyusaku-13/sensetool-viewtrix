@@ -113,5 +113,24 @@ class AppLogicTestCase(unittest.TestCase):
   def tearDown(self):
     del self._model
         
+  def test_window_coefficients_match_the_generalized_hamming_formula(self):
+    # w[n] = a0 - (1 - a0) * cos(2*pi*n / (N - 1)), scaled to 256 (a0 0.5 = Hann, 0.54 = Hamming)
+    import math
+    for n_samples, a0 in [(50, 0.54), (51, 0.5), (8, 0.0)]:
+      ref = [round((a0 - (1 - a0) * math.cos(2 * math.pi * n / (n_samples - 1))) * 256) for n in range(n_samples)]
+      self.assertEqual(self._model.win_coef_gen(n_samples, a0, "Full"), ref)
+      self.assertEqual(self._model.win_coef_gen(n_samples, a0, "Half"), ref[:n_samples // 2])
+    self.assertEqual(max(self._model.win_coef_gen(50, 0.54, "Full")), 256)
+
+  def test_demodulator_coefficients_are_quadrature_sine_and_cosine(self):
+    import math
+    i_coef, q_coef = self._model.demo_coef_gen(40, 40, 4, 400)
+    self.assertEqual(len(i_coef), 40)
+    # step 40 -> N = 160, cycle 4 -> one period every 40 samples, amplitude 128
+    self.assertEqual((i_coef[0], i_coef[10], i_coef[20], i_coef[30]), (0, 128, 0, -128))
+    self.assertEqual((q_coef[0], q_coef[10], q_coef[20]), (128, 0, -128))
+    for a, b in zip(i_coef, q_coef):
+      self.assertLessEqual(abs(math.hypot(a, b) - 128), 1.5)
+
 if __name__ == '__main__':
   unittest.main()

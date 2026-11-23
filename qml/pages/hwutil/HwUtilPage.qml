@@ -6,8 +6,33 @@ import QtQuick.Dialogs
 import "../../components"
 
 Item{
+    id: page
     Layout.fillHeight: true
     Layout.fillWidth: true
+
+    // Input checks: "" when the fields can be plotted/exported, else what to fix.
+    function winError(){
+        let n = Number(winFields.itemAt(0).text), a0 = Number(winFields.itemAt(1).text)
+        if(winFields.itemAt(0).text === "" || !Number.isInteger(n) || n < 2)
+            return qsTr("Sample Number must be a whole number of at least 2.")
+        if(winFields.itemAt(1).text === "" || isNaN(a0) || a0 < 0 || a0 > 1)
+            return qsTr("a0 must be between 0 and 1 (0.5 = Hann, 0.54 = Hamming).")
+        return ""
+    }
+    function demoError(){
+        for(let i = 0; i < 4; i++){
+            let f = demoFields.itemAt(i), v = Number(f.text)
+            if(f.text === "" || !Number.isInteger(v) || v < 1)
+                return qsTr("%1 must be a whole number of at least 1.").arg(f.label)
+        }
+        return ""
+    }
+    function complain(message){
+        if(message === "") return false
+        hwErrorDialog.text = message
+        hwErrorDialog.open()
+        return true
+    }
     MessageDialog {
         id: hwErrorDialog
         title: qsTr("Hardware Utility")
@@ -39,17 +64,19 @@ Item{
                     }
                 }
             }
-            StackLayout{
+            // Plain stacked pages rather than a StackLayout: a chart laid out while its
+            // tab was hidden stayed 0 px tall when the tab was shown.
+            Item{
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.margins: 10
 
-                currentIndex: bar.currentIndex
-
                 // Window Coef Layout
                 ColumnLayout{
+                    anchors.fill: parent
+                    visible: bar.currentIndex === 0
+                    spacing: 10
                     RowLayout{
-                        Layout.preferredHeight: 4
                         ToolbarBtn{
                             text: qsTr("Import")
                             onClicked: {
@@ -79,6 +106,7 @@ Item{
                         ToolbarBtn{
                             text: qsTr("Export")
                             onClicked: {
+                                if(page.complain(page.winError())) return
                                 exportWinCoef.open()
                             }
                         }
@@ -127,8 +155,9 @@ Item{
                                 required property int index
                                 Layout.fillWidth: true
                                 label: qsTr(model.text)
+                                // sample number: whole number; a0: decimal 0..1
                                 validator: RegularExpressionValidator {
-                                    regularExpression: /[0-9.]+/
+                                    regularExpression: index === 0 ? /[0-9]{1,5}/ : /[01]?(\.[0-9]{0,6})?/
                                 }
                             }
                         }
@@ -148,6 +177,7 @@ Item{
                             text: qsTr("Plot")
                             primary: true
                             onClicked: {
+                                if(page.complain(page.winError())) return
                                 win.clear()
                                 win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, winLength.textAt(winLength.currentIndex))
                             }
@@ -157,8 +187,10 @@ Item{
                 
                 // Demodulator Coef Layout
                 ColumnLayout{
+                    anchors.fill: parent
+                    visible: bar.currentIndex === 1
+                    spacing: 10
                     RowLayout{
-                        Layout.preferredHeight: 4
                         ToolbarBtn{
                             text: qsTr("Import")
                             onClicked: {
@@ -190,6 +222,7 @@ Item{
                         ToolbarBtn{
                             text: qsTr("Export")
                             onClicked: {
+                                if(page.complain(page.demoError())) return
                                 exportDemoCoef.open()
                             }
                         }
@@ -243,7 +276,7 @@ Item{
                                 required property var model
                                 Layout.fillWidth: true
                                 label: qsTr(model.text)
-                                validator: RegularExpressionValidator { regularExpression: /[0-9.]+/ }
+                                validator: RegularExpressionValidator { regularExpression: /[0-9]{1,7}/ }
                             }
                         }
                         ToolbarBtn{
@@ -252,6 +285,7 @@ Item{
                             text: qsTr("Plot")
                             primary: true
                             onClicked: {
+                                if(page.complain(page.demoError())) return
                                 demo.clear()
                                 demo.createDemo(demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)
                             }

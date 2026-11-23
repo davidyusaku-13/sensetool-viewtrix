@@ -4,20 +4,23 @@ import "../components"
 
 ListView {
     id: headerList
-    Layout.fillHeight: true
+    // As tall as its buttons and centred in the header, like the other header buttons.
+    Layout.preferredHeight: 45
+    Layout.alignment: Qt.AlignVCenter
     Layout.preferredWidth: childrenRect.width
+    spacing: 4
+    interactive: false
     orientation: ListView.Horizontal
     model: [{
-            "name": "Notification",
+            "name": qsTr("Activity"),
             "icon": "qrc:/images/notification"
         }, {
-            "name": "Setting",
+            "name": qsTr("Settings"),
             "icon": "qrc:/images/setting"
         }]
     delegate: MyButton {
         required property var model
         required property int index
-        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         icon.source: model.icon
         text: model.name
         isHeaderBtn: true

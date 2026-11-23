@@ -328,9 +328,37 @@ Unsaved changes</source>
     </message>
 </context>
 <context>
+    <name>HeaderList</name>
+    <message>
+        <location filename="../qml/layouts/HeaderList.qml" line="+15"/>
+        <source>Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>HwUtilPage</name>
     <message>
-        <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="+13"/>
+        <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="+17"/>
+        <source>Sample Number must be a whole number of at least 2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>a0 must be between 0 and 1 (0.5 = Hann, 0.54 = Hamming).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>%1 must be a whole number of at least 1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>Hardware Utility</source>
         <translation type="unfinished"></translation>
     </message>
@@ -345,19 +373,19 @@ Unsaved changes</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+18"/>
-        <location line="+109"/>
+        <location line="+20"/>
+        <location line="+114"/>
         <source>Import</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-83"/>
-        <location line="+111"/>
+        <location line="-88"/>
+        <location line="+116"/>
         <source>Export</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-84"/>
+        <location line="-88"/>
         <source>Enter the sample number and a0 below, then press Plot.
 Or Import a window coefficient file.</source>
         <translation type="unfinished"></translation>
@@ -368,13 +396,13 @@ Or Import a window coefficient file.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+21"/>
         <source>Window length</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
-        <location line="+104"/>
+        <location line="+108"/>
         <source>Plot</source>
         <translation type="unfinished"></translation>
     </message>
