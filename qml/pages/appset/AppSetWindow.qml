@@ -19,6 +19,14 @@ Window {
     property int index: -1
     property bool isEdit: false
     property var categoryNames: []
+    // Bumped on every edit so the live problem check re-runs.
+    property int rev: 0
+    readonly property string liveIssue: { rev; return (model && visible && nameInput.text !== "") ? model.checkRegister(index, result()) : "" }
+    function addrOther(text){
+        let a = /^0[xX]/.test(text) ? parseInt(text, 16) : parseInt(text, 10)
+        if(isNaN(a)) return ""
+        return /^0[xX]/.test(text) ? "= " + a : "= 0x" + a.toString(16).toUpperCase().padStart(3, "0")
+    }
     readonly property bool isDuplicate: model !== null && nameInput.text !== ""
                                         && model.indexOfName(nameInput.text, index) !== -1
 
@@ -49,7 +57,11 @@ Window {
                 "category": categoryInput.editText, "desc": descInput.text, "fields": fields}
     }
 
-    ListModel{ id: fieldList }
+    ListModel{
+        id: fieldList
+        onDataChanged: root.rev++
+        onCountChanged: root.rev++
+    }
 
     component FormLabel: Text{
         font.family: "Montserrat Medium"
@@ -72,12 +84,25 @@ Window {
                 placeholderText: qsTr("e.g. 16 or 0x010")
                 validator: RegularExpressionValidator { regularExpression: /(0[xX][0-9A-Fa-f]{1,3}|[0-9]{1,4})/ }
                 selectByMouse: true
+                onTextChanged: root.rev++
+                // the same address in the other base, matching the table's hex column
+                Text{
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: root.addrOther(addrInput.text)
+                    color: Material.foreground
+                    opacity: 0.55
+                    font.family: "Monospace"
+                    font.pixelSize: 13
+                }
             }
             FormLabel{ text: qsTr("Size (bytes)") }
             ComboBox{
                 id: sizeInput
                 Layout.fillWidth: true
                 model: ["1", "2", "4"]
+                onCurrentIndexChanged: root.rev++
             }
             FormLabel{ text: qsTr("Name") }
             TextField{
@@ -173,7 +198,6 @@ Window {
                 TextField{
                     Layout.preferredWidth: 90
                     text: model.dflt
-                    placeholderText: "0"
                     onTextEdited: fieldList.setProperty(index, "dflt", text)
                     validator: RegularExpressionValidator { regularExpression: /(0[xX][0-9A-Fa-f]*|0[bB][01]*|[0-9]*)/ }
                 }
@@ -184,6 +208,16 @@ Window {
                     onClicked: fieldList.remove(index)
                 }
             }
+        }
+        // Live check: the same problems the table would show in red after saving.
+        Text{
+            Layout.fillWidth: true
+            visible: root.liveIssue !== ""
+            text: "\u26A0 " + root.liveIssue
+            wrapMode: Text.Wrap
+            color: "#E53935"
+            font.family: "Montserrat Medium"
+            font.pixelSize: 13
         }
         RowLayout{
             Layout.alignment: Qt.AlignRight

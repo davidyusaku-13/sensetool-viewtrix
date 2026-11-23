@@ -3,11 +3,17 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import "../../../components"
 
+// Scan items: the eAfeScanID_t enum, in value order.
 Item{
     id: root
     property alias scanItemList: scanItemList
+    property var confirm: null
+    readonly property int selectedCount: selectedScanItem.count
     // Emitted when a scan item is renamed so arrangements can follow.
     signal renamed(string oldName, string newName)
+    // Emitted when the selection changes, so page shortcuts act on this column.
+    signal touched()
+
     function moveSelected(delta){
         if(selectedScanItem.count !== 1) return
         let i = selectedScanItem.get(0).itemsIndex
@@ -15,157 +21,93 @@ Item{
         if(j < 0 || j >= scanItemList.count) return
         scanItemList.move(i, j, 1)
     }
+    function addItem(){ scanWindow.manage(-1, null) }
+    function editSelected(){
+        if(selectedScanItem.count === 1){
+            let selected = selectedScanItem.get(0)
+            scanWindow.manage(selected.itemsIndex, selected.model)
+        }
+    }
+    function deleteSelected(){
+        if(selectedScanItem.count === 0) return
+        let rows = []
+        for(let i = 0; i < selectedScanItem.count; i++) rows.push(selectedScanItem.get(i).itemsIndex)
+        rows.sort((a, b) => b - a)
+        root.confirm.ask(qsTr("Delete %1 scan item(s)?").arg(rows.length), () => {
+            for(let r of rows) scanItemList.remove(r)
+        })
+    }
+    function toggleAll(){ selectAll.setAll(selectAll.checkState !== Qt.Checked) }
+
+    ScanWindow{
+        id: scanWindow
+        Material.theme: sensetool.theme
+        Material.accent: sensetool.accent
+        onCreate: (object) => scanItemList.append(object)
+        onModify: (index, object) => {
+                      let oldName = scanItemList.get(index).name
+                      scanItemList.set(index, object)
+                      if(oldName !== object.name) root.renamed(oldName, object.name)
+                  }
+    }
     MouseArea{
         anchors.fill: parent
-        onClicked:{
-            sidebar.folded = true
-        }
+        onClicked: sidebar.folded = true
     }
     ColumnLayout{
         anchors.fill: parent
-        anchors.margins: 20
+        anchors.margins: 12
         spacing: 10
-        // Toolbar
-        RowLayout{
-            Layout.fillWidth: true
-            implicitHeight: 25
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: "Add"
-                onClicked: {
-                    scanWindow.manage(-1,null)
-                }
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: "Edit"
-                enabled: selectedScanItem.count === 1
-                onClicked: {
-                    if(selectedScanItem.count === 1){
-                        var selected = selectedScanItem.get(0)
-                        scanWindow.manage(selected.itemsIndex, selected.model)
-                    }
-                }
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: "Delete"
-                enabled: selectedScanItem.count > 0
-                onClicked: {
-                    for(let i = selectedScanItem.count-1; i>=0; i--){
-                        let itemSelected = selectedScanItem.get(i)
-                        scanItemList.remove(itemSelected.itemsIndex)
-                    }
-                }
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: "\u25B2"
-                enabled: selectedScanItem.count === 1
-                onClicked: root.moveSelected(-1)
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: "\u25BC"
-                enabled: selectedScanItem.count === 1
-                onClicked: root.moveSelected(1)
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: "Select All"
-                onClicked: {
-                    for(var i=0; i< scanItemModel.items.count; i++){
-                        if(!scanItemModel.items.get(i).inSelected){
-                            scanItemModel.items.get(i).inSelected = true
-                        }
-                    }
-                }
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: "Deselect All"
-                onClicked: {
-                    for(var i=0; i< scanItemModel.items.count; i++){
-                        if(scanItemModel.items.get(i).inSelected){
-                            scanItemModel.items.get(i).inSelected = false
-                        }
-                    }
-                }
-            }
-            ScanWindow{
-                id: scanWindow
-                onCreate: (object) => {
-                              scanItemList.append(object);
-                          }
-                onModify: (index, object) => {
-                              let oldName = scanItemList.get(index).name
-                              scanItemList.set(index, object);
-                              if(oldName !== object.name) root.renamed(oldName, object.name)
-                          }
-            }
+        Text{
+            text: qsTr("Scan Items")
+            font.family: "Montserrat SemiBold"
+            font.pixelSize: 15
+            color: Material.foreground
         }
-
-        // Scan Items Content
+        // Wraps onto a second line when the column is narrow instead of squashing buttons.
+        Flow{
+            Layout.fillWidth: true
+            spacing: 6
+            ToolbarBtn{ text: qsTr("Add"); ToolTip.text: qsTr("Add a scan item (Ctrl+N)"); onClicked: root.addItem() }
+            ToolbarBtn{ text: qsTr("Edit"); ToolTip.text: qsTr("Edit (Enter, or double-click)"); enabled: selectedScanItem.count === 1; onClicked: root.editSelected() }
+            ToolbarBtn{ text: qsTr("Delete"); ToolTip.text: qsTr("Delete (Del)"); enabled: selectedScanItem.count > 0; onClicked: root.deleteSelected() }
+            ToolbarBtn{ text: "▲"; ToolTip.text: qsTr("Move up (lowers its value)"); enabled: selectedScanItem.count === 1; onClicked: root.moveSelected(-1) }
+            ToolbarBtn{ text: "▼"; ToolTip.text: qsTr("Move down"); enabled: selectedScanItem.count === 1; onClicked: root.moveSelected(1) }
+        }
         ShadowRect{
-            id: scanContent
             Layout.fillWidth: true
             Layout.fillHeight: true
             color: Material.background
             ListView{
+                id: list
                 anchors.fill: parent
-                interactive: true
                 clip: true
-                //header
+                ScrollBar.vertical: ScrollBar{}
                 headerPositioning: ListView.OverlayHeader
                 header: RowLayout{
-                    id: scanItemHeader
-                    width: parent.width
+                    width: ListView.view.width
                     height: 35
                     spacing: 0
                     z: 2
                     Rectangle{
+                        Layout.preferredWidth: 40
                         Layout.fillHeight: true
-                        Layout.preferredWidth: 80
                         color: Material.accent
-                        Text {
-                            text: "Value"
+                        SelectAllBox{
+                            id: selectAll
                             anchors.centerIn: parent
-                            font.pointSize: 12
-                            font.family: "Montserrat SemiBold"
-                            color: Material.foreground
+                            rows: scanItemModel.items
+                            selectedCount: selectedScanItem.count
                         }
                     }
-                    Repeater{
-                        model: ["Scan Name", "Description"]
-                        Rectangle{
-                            required property string modelData
-                            Layout.fillHeight: true
-                            Layout.fillWidth: modelData === "Description" ? false : true
-                            Layout.preferredWidth: modelData === "Description" ? parent.width*4/7 : 0
-                            color: Material.accent
-                            Text {
-                                text: parent.modelData
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.family: "Montserrat SemiBold"
-                                color: Material.foreground
-                            }
-                        }
-                    }
+                    HeaderCell{ text: "#"; Layout.preferredWidth: 36 }
+                    HeaderCell{ text: qsTr("Name"); Layout.fillWidth: true; Layout.preferredWidth: 0; Layout.horizontalStretchFactor: 12 }
+                    HeaderCell{ text: qsTr("Description"); Layout.fillWidth: true; Layout.preferredWidth: 0; Layout.horizontalStretchFactor: 10 }
                 }
-                //item list
                 model: DelegateModel{
                     id: scanItemModel
-                    model: ListModel{
-                        id: scanItemList
-                    }
-                    // model: window.manager.prjSetModel
-                    groups: [
-                        DelegateModelGroup {
-                            id: selectedScanItem
-                            name: "selected"
-                        }
-                    ]
+                    model: ListModel{ id: scanItemList }
+                    groups: [ DelegateModelGroup { id: selectedScanItem; name: "selected"; onCountChanged: root.touched() } ]
                     delegate: ScanItem{
                         id: scanItemDel
                         required property var model
@@ -175,71 +117,35 @@ Item{
                         desc: model.desc
                         width: ListView.view.width
                         checkBox.checked: scanItemDel.DelegateModel.inSelected
-                        onSelected: {
-                            scanItemDel.DelegateModel.inSelected = !scanItemDel.DelegateModel.inSelected
-                        }
+                        onSelected: scanItemDel.DelegateModel.inSelected = !scanItemDel.DelegateModel.inSelected
+                        onActivated: scanWindow.manage(index, model)
                     }
-                    // delegate: dragDelegate
                 }
-                //footer
                 footerPositioning: ListView.OverlayFooter
                 footer: Rectangle{
-                    id: scanItemFooter
-                    width: parent.width
+                    width: ListView.view.width
                     height: 35
                     color: Material.accent
                     z: 2
                     Text{
                         anchors.centerIn: parent
-                        text: selectedScanItem.count + " of " + scanItemModel.count + " selected"
-                        font.pointSize: 12
+                        text: qsTr("%1 items  •  %2 selected").arg(scanItemModel.count).arg(selectedScanItem.count)
+                        font.pointSize: 11
                         font.family: "Montserrat SemiBold"
-                        color: Material.foreground
+                        color: sensetool.onAccent
                     }
                 }
-                // Component {
-                //     id: dragDelegate
-                //     Rectangle {
-                //         id: content
-                //         required property var model
-                //         required property int index
-                //         width: ListView.view.width
-                //         height: itemDel.height
-                //         color: itemDel.dragArea.held ? "#d6d6d6": "white"
-                //         Behavior on color { ColorAnimation { duration: 100 } }
-                //         radius: 2
-                //         ScanArrItem{
-                //             id: itemDel
-                //             states: State {
-                //                 when: itemDel.dragArea.pressed
-                //                 ParentChange {
-                //                     target: itemDel
-                //                     parent: content.ListView.view
-                //                 }
-                //             }
-                //             Drag.hotSpot.x: width / 2
-                //             Drag.hotSpot.y: height / 2
-                //             Drag.source: content
-                //             Drag.active: itemDel.dragArea.pressed
-                //             anchors {
-                //                 left: parent.left
-                //                 right: parent.right
-                //             }
-                //             height: 35
-                //             width: parent.width
-                //             name: model.name
-                //             desc: model.desc
-                //             content: itemDel
-                //             checkBox.checked: DelegateModel.inSelected
-                //             color: checkBox.checked ? "lightsteelblue": "transparent"
-                //             Behavior on color { ColorAnimation { duration: 100 } }
-                //         }
-                //         DropArea {
-                //             anchors.fill: parent
-                //             onEntered: (drag) => {window.manager.moveItem(drag.source.index, content.index)}
-                //         }
-                //     }
-                // }
+                Text{
+                    anchors.centerIn: parent
+                    visible: list.count === 0
+                    width: parent.width * 0.8
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    text: qsTr("No scan items. The first one must be AFE_END (value 0).")
+                    color: Material.foreground
+                    opacity: 0.6
+                    font.pixelSize: 14
+                }
             }
         }
     }

@@ -35,16 +35,6 @@ Window {
         selectedScanArrList.remove(0, selectedScanArrList.count)
         root.show()
     }
-    ConfirmWindow{
-        id: confirmWindow
-        onSaved: (state) => {
-                     if(state === true){
-                         root.modify(root.index, root.object.get())
-                         root.object.reset()
-                         root.close()
-                     }
-                 }
-    }
     ColumnLayout{
         anchors.fill: parent
         spacing: 20
@@ -109,7 +99,7 @@ Window {
                             text: selectedScanArrList.count + " of " + itemColumn.scanItemList.count + " selected"
                             font.pointSize: 12
                             font.family: "Montserrat SemiBold"
-                            color: Material.foreground
+                            color: sensetool.onAccent
                         }
                     }
                 }
@@ -131,7 +121,9 @@ Window {
                 }
                 onClicked: {
                     if(root.isEdit == true){
-                        confirmWindow.show()
+                        root.modify(root.index, root.object.get())
+                        root.object.reset()
+                        root.close()
                     }else{
                         root.create(root.object)
                         root.object.reset()

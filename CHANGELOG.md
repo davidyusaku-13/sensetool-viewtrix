@@ -10,6 +10,13 @@ What's new in this update:
 - Scan Arrangement: scan items are the `eAfeScanID_t` enum with their values shown and can be reordered; arrangements have an editable ID; step sequences can be inserted into, reordered and repeated
 - Scan Arrangement: Check finds unknown steps, missing `AFE_END`, more than 10 steps, duplicate names/IDs; renaming a scan item updates every arrangement
 - `yaml/prjcfg.yaml` replaces `prjcfg.xlsx`: one file with all three sheets (plus the ReadMe revision history) that every workspace can import; convert an updated spreadsheet with `uv run python -m src.modules.prjcfg prjcfg.xlsx yaml/prjcfg.yaml`
+- Project files: Open / Save / Save As in the header work on one `prjcfg.yaml` for all workspaces (Ctrl+O, Ctrl+S); the last project reopens on startup, the title shows unsaved changes, and closing asks to save
+- Undo / Redo across all workspaces (Ctrl+Z, Ctrl+Shift+Z); deleting now asks first, and saving an edit no longer does
+- Project Setting: search (Ctrl+F) and a "Problems only" filter; compact rows, review comments on hover; a broken item is shown in red and items that only depend on it in orange
+- Scan Arrangement: rebuilt layout - toolbars wrap instead of squashing, names no longer break mid-word, headers line up with columns, the Scan List always shows the picked arrangement
+- App Setting: the register window shows problems while you type and the address in both hex and decimal
+- Keyboard: Ctrl+N add, Enter/F2 or double-click edit, Del delete, Ctrl+A select all, Ctrl+G generate; header checkbox selects all rows
+- One look across pages: shared toolbar style with Generate as the main action, Viewtrix orange accent with readable text in light and dark themes, sidebar labels (menu button) and distinct icons, empty-state hints, labelled Hardware Utilities inputs, clearer Settings (Dark mode switch, language list)
 
 Bugfixes:
 

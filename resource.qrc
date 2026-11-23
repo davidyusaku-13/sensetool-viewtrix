@@ -16,6 +16,8 @@
         <file alias="graph">./qml/images/graph.png</file>
         <file alias="scanarr">./qml/images/scanarr.png</file>
         <file alias="close">./qml/images/close.png</file>
+        <file alias="tune">./qml/images/tune.svg</file>
+        <file alias="chip">./qml/images/chip.svg</file>
     </qresource>
     <qresource prefix="/fonts">
         <file alias="Lato-Black">./qml/fonts/Lato-Black.ttf</file>

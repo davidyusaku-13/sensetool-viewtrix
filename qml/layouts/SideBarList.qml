@@ -1,18 +1,26 @@
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 import "../components"
 
 ListView {
     id: sidebarList
+    property bool folded: true
     anchors.fill: parent
     anchors.margins: 7
     spacing: 5
+    clip: true
     model: sideModel
     delegate: MyButton {
         required property var model
         required property int index
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: sidebarList.folded ? 45 : sidebarList.width
+        radius: sidebarList.folded ? width / 2 : 10
+        display: sidebarList.folded ? AbstractButton.IconOnly : AbstractButton.TextBesideIcon
+        showToolTip: sidebarList.folded
         icon.source: model.icon
         text: model.name
+        font.family: "Montserrat Medium"
+        font.pixelSize: 14
         highlighted: ListView.isCurrentItem
         onClicked: {
             ListView.view.currentIndex = index
@@ -21,12 +29,12 @@ ListView {
     ListModel {
         id: sideModel
         ListElement {
-            name: "Project Set"
-            icon: "qrc:/images/import"
+            name: "Project Setting"
+            icon: "qrc:/images/tune"
         }
         ListElement {
             name: "App Setting"
-            icon: "qrc:/images/setting"
+            icon: "qrc:/images/chip"
         }
         ListElement {
             name: "Scan Arrangement"

@@ -251,6 +251,15 @@ class AppLogic(QObject):
             if data is None:
                 return {}
             data = dict(prjcfg.section(data, 'scanarr'), skipped=[])
+        out = self._scan_from_data(data)
+        if out is None:
+            return self._fail(f"{file_name}: expected 'scan_items' and 'arrangements' lists with a 'name' on every entry", {})
+        self._last_error = ""
+        logger.log(f"Imported scan arrangement {file_name}", "INFO")
+        return out
+
+    def _scan_from_data(self, data):
+        """{scan_items, arrangements, skipped} from parsed data, or None if malformed."""
         try:
             raw_items = data.get('scan_items') or []
             raw_arrs = data.get('arrangements') or []
@@ -260,10 +269,84 @@ class AppLogic(QObject):
             raw_arrs = [dict(a, id=a.get('id', n)) for n, a in enumerate(raw_arrs, 1)]
             items, arrs = self._clean_scan_arr(raw_items, raw_arrs)
         except (KeyError, TypeError, AttributeError):
-            return self._fail(f"{file_name}: expected 'scan_items' and 'arrangements' lists with a 'name' on every entry", {})
-        self._last_error = ""
-        logger.log(f"Imported scan arrangement {file_name}", "INFO")
+            return None
         return {'scan_items': items, 'arrangements': arrs, 'skipped': list(data.get('skipped') or [])}
+
+    # ---- whole project (prjcfg.yaml) -----------------------------------
+    @Slot(QUrl, QObject, QObject, result=dict)
+    def openProject(self, url, prj_model, app_model):
+        """Load a combined prjcfg.yaml (or prjcfg.xlsx) into all three workspaces.
+        Returns {error, scan_items, arrangements, skipped}; on error nothing changes."""
+        path = url.toLocalFile()
+        try:
+            if path.lower().endswith(('.xlsx', '.xlsm')):
+                data, skipped = prjcfg.from_xlsx(path)
+                data['scanarr']['skipped'] = skipped
+            else:
+                with open(path, 'r', encoding='utf-8') as f:
+                    data = yaml.safe_load(f)
+        except Exception as e:  # file, YAML and openpyxl errors
+            return {'error': f"Could not open {path}:\n{e}"}
+        missing = [k for k in ('prjset', 'appset', 'scanarr')
+                   if not isinstance(data, dict) or not isinstance(data.get(k), dict)]
+        if missing:
+            return {'error': f"{path} is not a project file (missing {', '.join(missing)}).\n"
+                             "Use Import on a workspace page to load a single-workspace file."}
+        out = self._restore(data, prj_model, app_model)
+        if out.get('error'):
+            out['error'] = f"Could not open {path}:\n{out['error']}"
+        else:
+            logger.log(f"Opened project {path}", "INFO")
+        return out
+
+    def _restore(self, data, prj_model, app_model):
+        scan = self._scan_from_data(data['scanarr'])
+        if scan is None:
+            return {'error': "scanarr: expected 'scan_items' and 'arrangements' lists with a 'name' on every entry"}
+        # Validate both before touching either model, so a bad file changes nothing.
+        for key, need in (('prjset', 'data'), ('appset', 'registers')):
+            if not isinstance(data[key].get(need), list):
+                return {'error': f"{key}: expected a '{need}' list"}
+        for key, model in (('prjset', prj_model), ('appset', app_model)):
+            err = model.loadData(data[key])
+            if err:
+                return {'error': f"{key}: {err}"}
+        self._project_meta = {k: data[k] for k in ('title', 'desc', 'revisions') if k in data}
+        return dict(scan, error='')
+
+    def _project_doc(self, prj_model, app_model, scan_items, arrangements):
+        doc = {'title': 'Project Configuration', 'desc': prjcfg.DESC}
+        doc.update(getattr(self, '_project_meta', {}))
+        doc['prjset'] = prj_model.document()
+        doc['appset'] = app_model.document()
+        doc['scanarr'] = prjcfg.scanarr_doc(*self._clean_scan_arr(scan_items, arrangements))
+        return doc
+
+    @Slot(QObject, QObject, list, list, result=str)
+    def projectText(self, prj_model, app_model, scan_items, arrangements):
+        """The project as prjcfg.yaml text: used to detect unsaved changes and for undo."""
+        return yaml.dump(self._project_doc(prj_model, app_model, scan_items, arrangements),
+                         sort_keys=False, allow_unicode=True)
+
+    @Slot(str, QObject, QObject, result=dict)
+    def restoreProject(self, text, prj_model, app_model):
+        """Inverse of projectText (undo/redo). Returns the scan data like openProject."""
+        return self._restore(yaml.safe_load(text), prj_model, app_model)
+
+    @Slot(QUrl, QObject, QObject, list, list, result=str)
+    def saveProject(self, url, prj_model, app_model, scan_items, arrangements):
+        path = url.toLocalFile()
+        try:
+            with open(path, 'w', encoding='utf-8', newline='\n') as f:
+                f.write(self.projectText(prj_model, app_model, scan_items, arrangements))
+        except OSError as e:
+            return f"Could not save {path}:\n{e}"
+        logger.log(f"Saved project {path}", "INFO")
+        return ""
+
+    @Slot(QUrl, result=bool)
+    def fileExists(self, url):
+        return bool(url.toLocalFile()) and os.path.isfile(url.toLocalFile())
 
     @Slot(list, list, result=list)
     def checkScanArr(self, scan_items, arrangements):

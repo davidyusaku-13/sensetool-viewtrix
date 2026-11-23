@@ -125,6 +125,16 @@ class PrjSetModelTestCase(unittest.TestCase):
         self.assertEqual([other.get(i).to_dict() for i in range(2)],
                          [self._model.get(i).to_dict() for i in range(2)])
 
+    def test_root_issues_are_counted_separately(self):
+        self._model.clear()
+        self._model.addItem("A", "1 +", "")
+        self._model.addItem("B", "A * 2", "")
+        self._model.addItem("C", "B", "")
+        self.assertEqual((self._model.issueCount, self._model.rootIssueCount), (3, 1))
+        dep = self._model.roleNames()
+        role = [k for k, v in dep.items() if v == b"dependent"][0]
+        self.assertEqual([self._model.data(self._model.index(i), role) for i in range(3)], [False, True, True])
+
     def test_validation_and_resolved_values(self):
         self._model.clear()
         self._model.addItem("TX_LEN", "21", "")

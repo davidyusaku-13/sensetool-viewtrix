@@ -4,11 +4,13 @@ import QtQuick.Layouts
 import QtQuick.Dialogs
 import "../../components"
 
-//project set workspace
+// Project Setting workspace: replaces the PrjSet sheet of prjcfg.xlsx.
 ShadowRect{
     id: layout
     Layout.fillHeight: true
     Layout.fillWidth: true
+
+    readonly property bool filtering: searchField.text.trim() !== "" || problemsOnly.checked
 
     function showError(message){
         if(message !== ""){
@@ -18,140 +20,161 @@ ShadowRect{
         }
         return false
     }
+    function applyFilter(){
+        let q = searchField.text.trim().toLowerCase()
+        let onlyProblems = problemsOnly.checked
+        for(let i = 0; i < itemModel.items.count; i++){
+            let it = itemModel.items.get(i)
+            let m = it.model
+            let ok = (!onlyProblems || m.issue !== "")
+                  && (q === "" || [m.name, m.value, m.desc, m.group, m.comment, m.resolved]
+                                  .some(s => String(s || "").toLowerCase().indexOf(q) !== -1))
+            it.inShown = ok
+            if(!ok) it.inSelected = false
+        }
+    }
+    function addItem(){ prjSetWindow.manage(-1, null) }
+    function editSelected(){
+        if(selectedGroup.count === 1){
+            let selected = selectedGroup.get(0)
+            prjSetWindow.manage(selected.itemsIndex, selected.model)
+        }
+    }
+    function deleteSelected(){
+        if(selectedGroup.count === 0) return
+        let rows = []
+        for(let i = 0; i < selectedGroup.count; i++) rows.push(selectedGroup.get(i).itemsIndex)
+        rows.sort((a, b) => b - a)
+        confirmDelete.ask(qsTr("Delete %1 item(s)?").arg(rows.length), () => {
+            for(let r of rows){
+                let item = window.prjSetModel.get(r)
+                window.historyModel.addHistory("Deleted", item.name, item.value, item.desc)
+                window.prjSetModel.removeItem(r)
+            }
+        })
+    }
+    function generate(){
+        if(window.prjSetModel.rootIssueCount > 0)
+            layout.showError(qsTr("%1 item(s) have problems (shown in red). Fix them before generating the header.").arg(window.prjSetModel.rootIssueCount))
+        else
+            dialogHeader.open()
+    }
+
     MessageDialog {
         id: errorDialog
         title: qsTr("Project Setting")
         buttons: MessageDialog.Ok
     }
+    ConfirmDialog { id: confirmDelete; title: qsTr("Project Setting") }
+    FileDialog {
+        id: dialogImport
+        fileMode: FileDialog.OpenFile
+        nameFilters: [qsTr("Project setting (*.yaml *.yml *.xlsx)"), qsTr("YAML files (*.yaml *.yml)"), qsTr("prjcfg spreadsheet (*.xlsx)")]
+        onAccepted: {
+            if(!layout.showError(window.prjSetModel.importFile(selectedFile)))
+                window.historyModel.addHistory("Imported", selectedFile, "", "")
+        }
+    }
+    FileDialog {
+        id: dialogExport
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "yaml"
+        nameFilters: [qsTr("YAML files (*.yaml *.yml)")]
+        onAccepted: {
+            if(!layout.showError(window.prjSetModel.exportYAML(selectedFile)))
+                window.historyModel.addHistory("Exported", selectedFile, "", "")
+        }
+    }
+    FileDialog {
+        id: dialogHeader
+        fileMode: FileDialog.SaveFile
+        defaultSuffix: "h"
+        nameFilters: [qsTr("C header (*.h)")]
+        onAccepted: {
+            if(!layout.showError(window.prjSetModel.exportHeader(selectedFile)))
+                window.historyModel.addHistory("Generated", selectedFile, "", "")
+        }
+    }
+    PrjSetWindow{
+        id: prjSetWindow
+        Material.theme: sensetool.theme
+        Material.accent: sensetool.accent
+        model: window.prjSetModel
+        onCreate: (object) => {
+                      window.prjSetModel.addItem(object.name, object.value, object.desc, object.group, object.comment)
+                      window.historyModel.addHistory("Added", object.name, object.value, object.desc)
+                  }
+        onModify: (index, object) => {
+                      // Use the index the window was opened for, not the current selection.
+                      window.prjSetModel.edit(index, object.name, object.value, object.desc, object.group, object.comment)
+                      window.historyModel.addHistory("Modified", object.name, object.value, object.desc)
+                  }
+    }
+    Connections{
+        target: window.prjSetModel
+        function onModelReset(){ Qt.callLater(layout.applyFilter) }
+        function onRowsInserted(){ Qt.callLater(layout.applyFilter) }
+        function onDataChanged(){ if(layout.filtering) Qt.callLater(layout.applyFilter) }
+    }
+
+    // Keyboard: active only while this page is shown.
+    Shortcut{ sequences: [StandardKey.New]; enabled: layout.visible; onActivated: layout.addItem() }
+    Shortcut{ sequences: [StandardKey.Find]; enabled: layout.visible; onActivated: searchField.forceActiveFocus() }
+    Shortcut{ sequences: ["Ctrl+G"]; enabled: layout.visible; onActivated: layout.generate() }
+    Shortcut{
+        sequences: [StandardKey.Delete]
+        enabled: layout.visible && !searchField.activeFocus && selectedGroup.count > 0
+        onActivated: layout.deleteSelected()
+    }
+    Shortcut{
+        sequences: ["Return", "Enter", "F2"]
+        enabled: layout.visible && !searchField.activeFocus && selectedGroup.count === 1
+        onActivated: layout.editSelected()
+    }
+    Shortcut{
+        sequences: [StandardKey.SelectAll]
+        enabled: layout.visible && !searchField.activeFocus
+        onActivated: selectAll.setAll(selectAll.checkState !== Qt.Checked)
+    }
+
     MouseArea{
         anchors.fill: parent
-        onClicked:{
-            sidebar.folded = true
-        }
+        onClicked: sidebar.folded = true
     }
     ColumnLayout{
         anchors.fill: parent
         anchors.margins: 20
         spacing: 10
         //toolbar
+        Flow{
+            Layout.fillWidth: true
+            spacing: 6
+            ToolbarBtn{ text: qsTr("Import"); ToolTip.text: qsTr("Replace this list with a project-setting YAML or prjcfg.xlsx"); onClicked: dialogImport.open() }
+            ToolbarBtn{ text: qsTr("Export"); ToolTip.text: qsTr("Save only the project settings as YAML"); onClicked: dialogExport.open() }
+            ToolbarBtn{ text: qsTr("Add"); ToolTip.text: qsTr("Add an item (Ctrl+N)"); onClicked: layout.addItem() }
+            ToolbarBtn{ text: qsTr("Edit"); ToolTip.text: qsTr("Edit the selected item (Enter, or double-click a row)"); enabled: selectedGroup.count === 1; onClicked: layout.editSelected() }
+            ToolbarBtn{ text: qsTr("Delete"); ToolTip.text: qsTr("Delete the selected items (Del)"); enabled: selectedGroup.count > 0; onClicked: layout.deleteSelected() }
+            ToolbarBtn{ text: qsTr("Generate prjset.h"); ToolTip.text: qsTr("Write the C header (Ctrl+G)"); primary: true; onClicked: layout.generate() }
+        }
         RowLayout{
             Layout.fillWidth: true
-            ToolbarBtn{
-                text: qsTr("Import")
-                onClicked: {
-                    dialogImport.open()
-                }
-            }
-            FileDialog {
-                id: dialogImport
-                fileMode: FileDialog.OpenFile
-                nameFilters: [qsTr("Project setting (*.yaml *.yml *.xlsx)"), qsTr("YAML files (*.yaml *.yml)"), qsTr("prjcfg spreadsheet (*.xlsx)")]
-                onAccepted: {
-                    if(!layout.showError(window.prjSetModel.importFile(selectedFile)))
-                        window.historyModel.addHistory("Imported", selectedFile, "", "")
-                }
-            }
-            ToolbarBtn{
-                text: qsTr("Export")
-                onClicked: {
-                    dialogExport.open()
-                }
-            }
-            FileDialog {
-                id: dialogExport
-                fileMode: FileDialog.SaveFile
-                defaultSuffix: "yaml"
-                nameFilters: [qsTr("YAML files (*.yaml *.yml)")]
-                onAccepted: {
-                    if(!layout.showError(window.prjSetModel.exportYAML(selectedFile)))
-                        window.historyModel.addHistory("Exported", selectedFile, "", "")
-                }
-            }
-            ToolbarBtn{
-                text: qsTr("Generate prjset.h")
-                onClicked: {
-                    if(window.prjSetModel.issueCount > 0){
-                        layout.showError(qsTr("%1 item(s) have problems (shown in red). Fix them before generating the header.").arg(window.prjSetModel.issueCount))
-                    } else {
-                        dialogHeader.open()
-                    }
-                }
-            }
-            FileDialog {
-                id: dialogHeader
-                fileMode: FileDialog.SaveFile
-                defaultSuffix: "h"
-                nameFilters: [qsTr("C header (*.h)")]
-                onAccepted: {
-                    if(!layout.showError(window.prjSetModel.exportHeader(selectedFile)))
-                        window.historyModel.addHistory("Generated", selectedFile, "", "")
-                }
-            }
-            ToolbarBtn{
-                text: qsTr("Add")
-                onClicked: {
-                    prjSetWindow.manage(-1,null)
-                }
-            }
-            ToolbarBtn{
-                text: qsTr("Edit")
-                enabled: selectedGroup.count === 1
-                onClicked: {
-                    if(selectedGroup.count === 1){
-                        var selected = selectedGroup.get(0)
-                        prjSetWindow.manage(selected.itemsIndex, selected.model)
-                    }
-                }
-            }
-            ToolbarBtn{
-                text: qsTr("Delete")
-                enabled: selectedGroup.count > 0
-                onClicked: {
-                    for(let i = selectedGroup.count-1; i>=0; i--){
-                        let itemSelected = selectedGroup.get(i)
-                        var object = itemSelected.model
-                        window.historyModel.addHistory("Deleted", object.name, object.value, object.desc)
-                        window.prjSetModel.removeItem(itemSelected.itemsIndex)
-                    }
-                }
-            }
-            Item{
+            spacing: 12
+            TextField{
+                id: searchField
                 Layout.fillWidth: true
+                Layout.maximumWidth: 420
+                placeholderText: qsTr("Search name, value, description… (Ctrl+F)")
+                selectByMouse: true
+                onTextChanged: layout.applyFilter()
+                Keys.onEscapePressed: { text = ""; focus = false }
             }
-            ToolbarBtn{
-                text: qsTr("Select All")
-                onClicked: {
-                    for(var i=0; i< itemModel.items.count; i++){
-                        if(!itemModel.items.get(i).inSelected){
-                            itemModel.items.get(i).inSelected = true
-                        }
-                    }
-                }
+            CheckBox{
+                id: problemsOnly
+                text: qsTr("Problems only")
+                enabled: checked || (window.prjSetModel && window.prjSetModel.issueCount > 0)
+                onCheckedChanged: layout.applyFilter()
             }
-            ToolbarBtn{
-                text: qsTr("Deselect All")
-                onClicked: {
-                    for(var i=0; i< itemModel.items.count; i++){
-                        if(itemModel.items.get(i).inSelected){
-                            itemModel.items.get(i).inSelected = false
-                        }
-                    }
-                }
-            }
-            PrjSetWindow{
-                id: prjSetWindow
-                Material.theme: sensetool.theme
-                model: window.prjSetModel
-                onCreate: (object) => {
-                              window.prjSetModel.addItem(object.name, object.value, object.desc, object.group, object.comment)
-                              window.historyModel.addHistory("Added", object.name, object.value, object.desc)
-                          }
-                onModify: (index, object) => {
-                              // Use the index the window was opened for, not the current selection.
-                              window.prjSetModel.edit(index, object.name, object.value, object.desc, object.group, object.comment)
-                              window.historyModel.addHistory("Modified", object.name, object.value, object.desc)
-                          }
-            }
+            Item{ Layout.fillWidth: true }
         }
         //project set rect
         ShadowRect{
@@ -159,45 +182,33 @@ ShadowRect{
             Layout.fillWidth: true
             Layout.fillHeight: true
             ListView{
+                id: list
                 anchors.fill: parent
                 interactive: true
                 clip: true
-                highlightMoveDuration: 1000
-                //header
+                ScrollBar.vertical: ScrollBar{}
+                //header: same column widths as PrjSetItem
                 headerPositioning: ListView.OverlayHeader
                 header: RowLayout{
-                    id: workspace1Header
-                    width: parent.width
+                    width: ListView.view.width
                     height: 35
                     spacing: 0
                     z: 2
                     Rectangle{
-                        implicitWidth: 50
+                        Layout.preferredWidth: 40
                         Layout.fillHeight: true
                         color: Material.accent
-                    }
-                    Repeater{
-                        model: ["Item", "Value", "Description"]
-                        Rectangle{
-                            required property string modelData
-                            Layout.fillHeight: true
-                            Layout.fillWidth: modelData === "Description" ? false : true
-                            implicitWidth: modelData === "Description" ? parent.width*3/7 : 0
-                            color: Material.accent
-                            Text {
-                                text: parent.modelData
-                                anchors.centerIn: parent
-                                font.pointSize: 12
-                                font.family: "Montserrat SemiBold"
-                                color: Material.foreground
-                            }
+                        SelectAllBox{
+                            id: selectAll
+                            anchors.centerIn: parent
+                            rows: shownGroup
+                            selectedCount: selectedGroup.count
                         }
                     }
-                    Rectangle{
-                        implicitWidth: 50
-                        Layout.fillHeight: true
-                        color: Material.accent
-                    }
+                    HeaderCell{ text: qsTr("Item"); Layout.fillWidth: true; Layout.preferredWidth: 0; Layout.horizontalStretchFactor: 10 }
+                    HeaderCell{ text: qsTr("Value"); Layout.fillWidth: true; Layout.preferredWidth: 0; Layout.horizontalStretchFactor: 10 }
+                    HeaderCell{ text: qsTr("Description"); Layout.preferredWidth: list.width * 3/7 }
+                    HeaderCell{ Layout.preferredWidth: 45 }
                 }
                 //sections from the item's group
                 section.property: "group"
@@ -222,29 +233,49 @@ ShadowRect{
                 model: DelegateModel{
                     id: itemModel
                     model: window.prjSetModel
+                    filterOnGroup: "shown"
                     groups: [
-                        DelegateModelGroup {
-                            id: selectedGroup
-                            name: "selected"}
+                        DelegateModelGroup { id: selectedGroup; name: "selected" },
+                        DelegateModelGroup { id: shownGroup; name: "shown"; includeByDefault: true }
                     ]
                     delegate: dragDelegate
                 }
                 //footer
                 footerPositioning: ListView.OverlayFooter
                 footer: ShadowRect{
-                    id: workspace1Footer
-                    width: parent.width
+                    width: ListView.view.width
                     height: 35
                     color: Material.accent
                     z: 2
                     Text{
                         anchors.centerIn: parent
-                        text: selectedGroup.count + qsTr(" of ") + itemModel.count + qsTr(" selected")
-                              + (window.prjSetModel && window.prjSetModel.issueCount > 0 ? qsTr("  •  %1 with problems").arg(window.prjSetModel.issueCount) : "")
+                        text: {
+                            let m = window.prjSetModel
+                            let s = layout.filtering ? qsTr("Showing %1 of %2").arg(shownGroup.count).arg(itemModel.items.count)
+                                                     : qsTr("%1 items").arg(itemModel.items.count)
+                            s += qsTr("  •  %1 selected").arg(selectedGroup.count)
+                            if(m && m.rootIssueCount > 0) s += qsTr("  •  %1 problem(s)").arg(m.rootIssueCount)
+                            if(m && m.issueCount > m.rootIssueCount) s += qsTr(" (%1 more affected)").arg(m.issueCount - m.rootIssueCount)
+                            return s
+                        }
                         font.pointSize: 12
                         font.family: "Montserrat SemiBold"
-                        color: Material.foreground
+                        color: sensetool.onAccent
                     }
+                }
+                // Empty state
+                Text{
+                    anchors.centerIn: parent
+                    visible: list.count === 0
+                    width: parent.width * 0.6
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    text: layout.filtering ? qsTr("No items match the search.")
+                                           : qsTr("No project settings yet.\nOpen a project (Ctrl+O), import prjcfg.xlsx, or Add an item.")
+                    color: Material.foreground
+                    opacity: 0.6
+                    font.pixelSize: 16
+                    font.family: "Montserrat Medium"
                 }
                 Component {
                     id: dragDelegate
@@ -275,17 +306,19 @@ ShadowRect{
                                 right: parent.right
                             }
                             width: parent.width
+                            // reordering a filtered list would be confusing
+                            canDrag: !layout.filtering
                             name: model.name
                             value: model.value
                             desc: model.desc
                             comment: model.comment
                             resolved: model.resolved
                             issue: model.issue
+                            dependent: model.dependent
                             content: itemDel
-                            checkBox.checked: DelegateModel.inSelected
-                            onSelected: {
-                                DelegateModel.inSelected = !DelegateModel.inSelected
-                            }
+                            checkBox.checked: content.DelegateModel.inSelected
+                            onSelected: content.DelegateModel.inSelected = !content.DelegateModel.inSelected
+                            onActivated: prjSetWindow.manage(content.index, content.model)
                         }
                         DropArea {
                             anchors.fill: parent

@@ -3,40 +3,16 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import "../components"
 
+// Workspace switcher. Folded: icons only (with tooltips). Unfolded: icons and names.
 ShadowRect{
     id: sidebar
-    Layout.preferredWidth: 50
+    Layout.preferredWidth: folded ? 60 : 210
     Layout.fillHeight: true
-    transitions: [
-        Transition {
-            NumberAnimation {
-                properties: "x,visible"
-                duration: 200
-            }
-        }
-    ]
+    Behavior on Layout.preferredWidth { NumberAnimation { duration: 150 } }
     readonly property alias index: sidebarList.currentIndex
-    property bool folded: false
-    state: folded ? "Invisible" : "Visible"
-    states: [
-        State{
-            name: "Visible"
-            PropertyChanges{
-                target: sidebar
-                x: 0
-                visible: true
-            }
-        },
-        State{
-            name:"Invisible"
-            PropertyChanges{
-                target: sidebar
-                x: -sidebar.width
-                visible: false
-            }
-        }
-    ]
+    property bool folded: true
     SideBarList{
         id: sidebarList
+        folded: sidebar.folded
     }
 }

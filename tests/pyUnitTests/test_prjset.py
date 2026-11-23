@@ -35,8 +35,15 @@ class PrjSetExprTestCase(unittest.TestCase):
         res = prjset.analyze([("A", "B"), ("B", "A"), ("C", "X"), ("D", '"str"'), ("9X", "1")])
         self.assertIn("circular", res[0]["issue"])
         self.assertIn("undefined 'X'", res[2]["issue"])
-        self.assertEqual(res[3], {"resolved": "", "issue": ""})
+        self.assertEqual(res[3], {"resolved": "", "issue": "", "dependent": False})
         self.assertEqual(res[4]["issue"], "invalid name")
+
+    def test_problems_point_at_the_root_cause(self):
+        res = prjset.analyze([("A", "1 +"), ("B", "A * 2"), ("C", "B + 1"), ("D", "C")])
+        self.assertEqual([r["dependent"] for r in res], [False, True, True, True])
+        self.assertEqual(res[3]["issue"], "depends on 'A', which has a problem")
+        res = prjset.analyze([("A", "B"), ("B", "A"), ("C", "A")])
+        self.assertIn("circular", res[2]["issue"])
 
     def test_header_value_parenthesizes_compound_expressions(self):
         self.assertEqual(prjset.header_value("21"), "21")

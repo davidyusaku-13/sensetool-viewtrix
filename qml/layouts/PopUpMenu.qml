@@ -33,8 +33,8 @@ Item{
                         color: Material.accent
                         z: 2
                         Text{
-                            text: "Notification"
-                            color: Material.foreground
+                            text: qsTr("Activity")
+                            color: sensetool.onAccent
                             font.pixelSize: 20
                             font.family: "Montserrat SemiBold"
                             anchors.centerIn: parent
@@ -50,6 +50,18 @@ Item{
                         font.family: "Montserrat Medium"
                         padding: 10
                         wrapMode: Text.WordWrap
+                    }
+                    Text{
+                        anchors.centerIn: parent
+                        visible: parent.count === 0
+                        text: qsTr("No activity yet.\nImports, saves, edits and generated files show up here.")
+                        horizontalAlignment: Text.AlignHCenter
+                        width: parent.width * 0.85
+                        wrapMode: Text.Wrap
+                        color: Material.foreground
+                        opacity: 0.6
+                        font.pixelSize: 14
+                        font.family: "Montserrat Medium"
                     }
                 }
                 ToolbarBtn{
@@ -71,10 +83,10 @@ Item{
                     Layout.preferredHeight: 50
                     color: Material.accent
                     Text{
-                        text: qsTr("Setting")
+                        text: qsTr("Settings")
                         font.pixelSize: 20
                         font.family: "Montserrat SemiBold"
-                        color: Material.foreground
+                        color: sensetool.onAccent
                         anchors.centerIn: parent
                     }
                 }
@@ -83,16 +95,15 @@ Item{
                     implicitHeight: 50
                     Layout.margins: 10
                     Text{
-                        text: qsTr("Theme")
+                        text: qsTr("Dark mode")
                         font.family: "Montserrat"
                         font.pixelSize: 15
                         Layout.fillWidth: true
                         color: Material.foreground
                     }
+                    // On = dark. No state label: the switch itself is the state.
                     Switch{
                         id: themeToggle
-                        display: AbstractButton.TextBesideIcon
-                        text: checked ? qsTr("Dark") : qsTr("Light")
                     }
                 }
                 RowLayout{
@@ -106,14 +117,11 @@ Item{
                         Layout.fillWidth: true
                         color: Material.foreground
                     }
-                    Switch{
-                        id: langToggle
-                        display: AbstractButton.TextBesideIcon
-                        text: checked ? qsTr("Indonesia") : qsTr("English")
-                        onToggled: {
-                            let lang = text === qsTr("Indonesia") ? "id" : "en"
-                            translator.change_language(lang)
-                        }
+                    ComboBox{
+                        id: langChoice
+                        model: ["English", "Bahasa Indonesia"]
+                        implicitWidth: 190
+                        onActivated: (i) => translator.change_language(i === 1 ? "id" : "en")
                     }
                 }
                 Button{

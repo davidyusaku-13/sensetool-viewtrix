@@ -32,6 +32,7 @@ ShadowRect{
     function load(data){
         scanArrListColumn.index = -1
         scanArrListColumn.model = null
+        arrColumn.currentIndex = -1
         itemColumn.scanItemList.clear()
         arrColumn.scanArrList.clear()
         for(let it of data.scan_items){
@@ -109,76 +110,82 @@ ShadowRect{
             window.historyModel.addHistory("Exported", selectedFile, "", "")
         }
     }
+    ConfirmDialog{ id: confirmDelete; title: qsTr("Scan Arrangement") }
+    function generate(){
+        let issues = page.check()
+        if(issues.length > 0) page.showError(qsTr("Fix these problems first:\n\n") + issues.join("\n"))
+        else dialogGenerate.open()
+    }
+    // Keyboard shortcuts act on the column where something was last selected.
+    property var activeColumn: itemColumn
+    Shortcut{ sequences: [StandardKey.New]; enabled: page.visible; onActivated: page.activeColumn.addItem() }
+    Shortcut{ sequences: ["Ctrl+G"]; enabled: page.visible; onActivated: page.generate() }
+    Shortcut{ sequences: [StandardKey.SelectAll]; enabled: page.visible; onActivated: page.activeColumn.toggleAll() }
+    Shortcut{
+        sequences: [StandardKey.Delete]
+        enabled: page.visible && page.activeColumn.selectedCount > 0
+        onActivated: page.activeColumn.deleteSelected()
+    }
+    Shortcut{
+        sequences: ["Return", "Enter", "F2"]
+        enabled: page.visible && page.activeColumn.selectedCount === 1
+        onActivated: page.activeColumn.editSelected()
+    }
     ColumnLayout{
         anchors.fill: parent
-        // Import Export Row
-        RowLayout{
+        spacing: 0
+        Flow{
             Layout.fillWidth: true
-            Layout.preferredHeight: 35
             Layout.leftMargin: 20
             Layout.rightMargin: 20
             Layout.topMargin: 20
+            spacing: 6
+            ToolbarBtn{ text: qsTr("Import"); ToolTip.text: qsTr("Replace the scan items and arrangements with a YAML file or the ScanArrg sheet"); onClicked: dialogImport.open() }
+            ToolbarBtn{ text: qsTr("Export"); ToolTip.text: qsTr("Save only the scan arrangement as YAML"); onClicked: dialogExport.open() }
             ToolbarBtn{
-                Layout.fillWidth: true
-                text: qsTr("Import")
-                Material.background: Material.accent
-                onClicked: dialogImport.open()
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: qsTr("Export")
-                Material.background: Material.accent
-                onClicked: dialogExport.open()
-            }
-            ToolbarBtn{
-                Layout.fillWidth: true
                 text: qsTr("Check")
-                Material.background: Material.accent
+                ToolTip.text: qsTr("Look for problems without generating")
                 onClicked: {
                     let issues = page.check()
-                    page.showError(issues.length === 0 ? qsTr("No problems found.")
-                                                       : issues.join("\n"))
+                    page.showError(issues.length === 0 ? qsTr("No problems found.") : issues.join("\n"))
                 }
             }
-            ToolbarBtn{
-                Layout.fillWidth: true
-                text: qsTr("Generate afeScanArrg.c/.h")
-                Material.background: Material.accent
-                onClicked: {
-                    let issues = page.check()
-                    if(issues.length > 0){
-                        page.showError(qsTr("Fix these problems first:\n\n") + issues.join("\n"))
-                    } else {
-                        dialogGenerate.open()
-                    }
-                }
-            }
+            ToolbarBtn{ text: qsTr("Generate afeScanArrg.c/.h"); ToolTip.text: qsTr("Write the C files (Ctrl+G)"); primary: true; onClicked: page.generate() }
         }
         SplitView{
             Layout.fillWidth: true
             Layout.fillHeight: true
-            // Scan Items
+            Layout.margins: 8
             ScanItemColumn{
                 id: itemColumn
+                confirm: confirmDelete
                 onRenamed: (oldName, newName) => page.renameStep(oldName, newName)
+                onTouched: page.activeColumn = itemColumn
                 SplitView.fillHeight: true
-                SplitView.minimumWidth: popUp.visible ? parent.width * 6/15 : parent.width * 2/7
+                SplitView.minimumWidth: 230
+                SplitView.preferredWidth: page.width * 0.38
             }
-            // ScanArr Items
             ScanArrColumn{
                 id: arrColumn
+                confirm: confirmDelete
+                onTouched: page.activeColumn = arrColumn
                 SplitView.fillHeight: true
-                SplitView.minimumWidth: popUp.visible ? parent.width * 6/15  : parent.width * 3/7
+                SplitView.fillWidth: true
+                SplitView.minimumWidth: 240
                 onFocusIndex: (index, model) => {
+                                  arrColumn.currentIndex = index
                                   scanArrListColumn.index = index
                                   scanArrListColumn.model = model
+                                  page.activeColumn = scanArrListColumn
                               }
             }
-            // ScanArrList Column
             ScanArrListColumn{
                 id: scanArrListColumn
+                confirm: confirmDelete
+                onTouched: page.activeColumn = scanArrListColumn
                 SplitView.fillHeight: true
-                SplitView.minimumWidth: popUp.visible ? parent.width * 3/15  : parent.width * 1/7
+                SplitView.minimumWidth: 190
+                SplitView.preferredWidth: page.width * 0.28
             }
         }
     }

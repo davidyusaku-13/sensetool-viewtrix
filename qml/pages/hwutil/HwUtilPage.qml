@@ -51,7 +51,6 @@ Item{
                     RowLayout{
                         Layout.preferredHeight: 4
                         ToolbarBtn{
-                            Layout.fillWidth: true
                             text: qsTr("Import")
                             onClicked: {
                                 importWinCoef.open()
@@ -78,7 +77,6 @@ Item{
                             }
                         }
                         ToolbarBtn{
-                            Layout.fillWidth: true
                             text: qsTr("Export")
                             onClicked: {
                                 exportWinCoef.open()
@@ -106,10 +104,10 @@ Item{
                         id: win
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        emptyText: qsTr("Enter the sample number and a0 below, then press Plot.\nOr Import a window coefficient file.")
                     }
                     RowLayout{
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
                         Layout.margins: 20
                         spacing: 20
                         Repeater{
@@ -124,28 +122,31 @@ Item{
                                 }
                             }
                             
-                            delegate: TextField{
+                            delegate: LabeledField{
                                 required property var model
                                 required property int index
                                 Layout.fillWidth: true
-                                placeholderText: model.text
+                                label: model.text
                                 validator: RegularExpressionValidator {
                                     regularExpression: /[0-9.]+/
                                 }
                             }
                         }
-                        ComboBox {
-                            id: winLength
+                        ColumnLayout{
                             Layout.fillWidth: true
-                            model: [ "Half", "Full" ]
-                        }
-                        Button{
-                            id: winBtn
-                            implicitWidth: 80
-                            text: "OK"
-                            HoverHandler{
-                                cursorShape: Qt.PointingHandCursor
+                            spacing: 2
+                            Label{ text: qsTr("Window length"); opacity: 0.7; font.pixelSize: 12 }
+                            ComboBox {
+                                id: winLength
+                                Layout.fillWidth: true
+                                model: [ "Half", "Full" ]
                             }
+                        }
+                        ToolbarBtn{
+                            id: winBtn
+                            Layout.alignment: Qt.AlignBottom
+                            text: qsTr("Plot")
+                            primary: true
                             onClicked: {
                                 win.clear()
                                 win.createWin(winFields.itemAt(0).text, winFields.itemAt(1).text, winLength.textAt(winLength.currentIndex))
@@ -160,7 +161,6 @@ Item{
                         Layout.preferredHeight: 4
                         ToolbarBtn{
                             text: qsTr("Import")
-                            Layout.fillWidth: true
                             onClicked: {
                                 importDemoCoef.open()
                             }
@@ -189,7 +189,6 @@ Item{
                         }
                         ToolbarBtn{
                             text: qsTr("Export")
-                            Layout.fillWidth: true
                             onClicked: {
                                 exportDemoCoef.open()
                             }
@@ -216,10 +215,10 @@ Item{
                         id: demo
                         Layout.fillWidth: true
                         Layout.fillHeight: true
+                        emptyText: qsTr("Enter step, sample, cycle and ADC frequency below, then press Plot.\nOr Import a demodulator coefficient file.")
                     }
                     RowLayout{
                         Layout.fillWidth: true
-                        Layout.fillHeight: true
                         Layout.margins: 20
                         spacing: 20
                         Repeater{
@@ -240,20 +239,18 @@ Item{
                                 }
                             }
                             
-                            delegate: TextField{
+                            delegate: LabeledField{
                                 required property var model
                                 Layout.fillWidth: true
-                                placeholderText: model.text
+                                label: model.text
                                 validator: RegularExpressionValidator { regularExpression: /[0-9.]+/ }
                             }
                         }
-                        Button{
+                        ToolbarBtn{
                             id: demoBtn
-                            implicitWidth: 80
-                            text: qsTr("OK")
-                            HoverHandler{
-                                cursorShape: Qt.PointingHandCursor
-                            }
+                            Layout.alignment: Qt.AlignBottom
+                            text: qsTr("Plot")
+                            primary: true
                             onClicked: {
                                 demo.clear()
                                 demo.createDemo(demoFields.itemAt(0).text, demoFields.itemAt(1).text, demoFields.itemAt(2).text, demoFields.itemAt(3).text)

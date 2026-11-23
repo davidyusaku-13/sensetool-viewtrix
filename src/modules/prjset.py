@@ -25,6 +25,17 @@ class ExprError(Exception):
     pass
 
 
+class CircularError(ExprError):
+    pass
+
+
+class DependentError(ExprError):
+    """The expression is fine, but an item it refers to has a problem."""
+    def __init__(self, root):
+        super().__init__(f"depends on '{root}', which has a problem")
+        self.root = root
+
+
 class NotNumeric(Exception):
     """Value is valid but not a numeric expression (e.g. a string literal)."""
 
@@ -175,7 +186,9 @@ def _fully_parenthesized(t):
 
 def analyze(items):
     """items: list of (name, value). Returns a list (same order) of
-    dicts {"resolved": str, "issue": str}."""
+    dicts {"resolved": str, "issue": str, "dependent": bool}. `dependent` is
+    true when the item's own value is fine but something it refers to is not,
+    so the UI can point at the root cause."""
     names = [n for n, _ in items]
     counts = {}
     for n in names:
@@ -187,22 +200,31 @@ def analyze(items):
 
     cache, stack = {}, []
 
+    def _blame(name, err):
+        # Errors in a referenced item surface as "depends on <root cause>".
+        if isinstance(err, (CircularError, DependentError, NotNumeric)):
+            return err
+        return DependentError(name)
+
     def resolve(name):
         if name in cache:
             res = cache[name]
             if isinstance(res, Exception):
-                raise res
+                raise _blame(name, res)
             return res
         if name not in defs:
             raise ExprError(f"undefined '{name}'")
         if name in stack:
-            raise ExprError("circular reference: " + " -> ".join(stack[stack.index(name):] + [name]))
+            raise CircularError("circular reference: " + " -> ".join(stack[stack.index(name):] + [name]))
         stack.append(name)
         try:
             res = evaluate(defs[name], resolve)
-        except (ExprError, NotNumeric) as e:
+        except NotNumeric as e:
             cache[name] = e
             raise
+        except ExprError as e:
+            cache[name] = e
+            raise _blame(name, e)
         finally:
             stack.pop()
         cache[name] = res
@@ -210,7 +232,7 @@ def analyze(items):
 
     out = []
     for n, v in items:
-        issue, resolved = "", ""
+        issue, resolved, dependent = "", "", False
         if not IDENT_RE.match(n or ""):
             issue = "invalid name"
         elif counts[n] > 1:
@@ -226,10 +248,11 @@ def analyze(items):
             except NotNumeric:
                 pass
             except ExprError as e:
-                issue = issue or str(e)
+                if not issue:
+                    issue, dependent = str(e), isinstance(e, DependentError)
             except RecursionError:
                 issue = issue or "expression too deeply nested"
-        out.append({"resolved": resolved, "issue": issue})
+        out.append({"resolved": resolved, "issue": issue, "dependent": dependent})
     return out
 
 

@@ -126,6 +126,46 @@ class PrjCfgTestCase(unittest.TestCase):
         out = subprocess.run([self.tmp("t")], capture_output=True, text=True).stdout
         self.assertEqual(out.strip(), "840 1684 150 2")
 
+    # ---- the app's project file handling (Open / Save / undo) ------------
+    def test_open_save_round_trip(self):
+        logic, p, a = AppLogic(), PrjSetModel(), AppSetModel()
+        r = logic.openProject(URL, p, a)
+        self.assertEqual(r["error"], "")
+        self.assertEqual((p.rowCount(), a.rowCount(), len(r["scan_items"])), (140, 16, 16))
+        out = QUrl.fromLocalFile(self.tmp("saved.yaml"))
+        self.assertEqual(logic.saveProject(out, p, a, r["scan_items"], r["arrangements"]), "")
+        with open(self.tmp("saved.yaml"), encoding="utf-8") as f, open(PRJCFG, encoding="utf-8") as g:
+            self.assertEqual(f.read(), g.read(), "open + save must not change the file")
+
+    def test_restore_is_the_inverse_of_project_text(self):
+        logic, p, a = AppLogic(), PrjSetModel(), AppSetModel()
+        r = logic.openProject(URL, p, a)
+        before = logic.projectText(p, a, r["scan_items"], r["arrangements"])
+        p.edit(0, "TX_LEN", "22", "", "Project Information", "")
+        a.removeItem(0)
+        self.assertNotEqual(logic.projectText(p, a, r["scan_items"], r["arrangements"]), before)
+        r2 = logic.restoreProject(before, p, a)
+        self.assertEqual(r2["error"], "")
+        self.assertEqual(logic.projectText(p, a, r2["scan_items"], r2["arrangements"]), before)
+
+    def test_open_rejects_single_workspace_files_without_changing_anything(self):
+        logic, p, a = AppLogic(), PrjSetModel(), AppSetModel()
+        logic.openProject(URL, p, a)
+        r = logic.openProject(QUrl.fromLocalFile(os.path.join(ROOT, "yaml", "appset.yaml")), p, a)
+        self.assertIn("not a project file", r["error"])
+        self.assertEqual((p.rowCount(), a.rowCount()), (140, 16))
+        self.assertIn("Could not open", logic.openProject(QUrl.fromLocalFile(self.tmp("missing.yaml")), p, a)["error"])
+
+    def test_live_register_check(self):
+        a = AppSetModel()
+        a.importFile(URL)
+        i = a.indexOfName("tch_in_dly", -1)
+        reg = a.get(i)
+        self.assertEqual(a.checkRegister(i, reg), "")
+        reg["fields"][0]["msb"] = "9"
+        self.assertIn("bits must satisfy", a.checkRegister(i, reg))
+        self.assertIn("overlaps", a.checkRegister(-1, dict(reg, name="new_reg")))
+
     # ---- it is still an exact conversion of the spreadsheet ------------
     @unittest.skipUnless(os.path.exists(XLSX), "prjcfg.xlsx not present")
     def test_matches_spreadsheet(self):

@@ -17,6 +17,7 @@ GROUP_ROLE = Qt.UserRole + 3
 COMMENT_ROLE = Qt.UserRole + 4
 RESOLVED_ROLE = Qt.UserRole + 5
 ISSUE_ROLE = Qt.UserRole + 6
+DEPENDENT_ROLE = Qt.UserRole + 7
 
 @QmlElement
 class PrjSetModel(QAbstractListModel):
@@ -27,6 +28,7 @@ class PrjSetModel(QAbstractListModel):
         self._items = []
         self._analysis = []
         self._issue_count = 0
+        self._root_issue_count = 0
 
     # ---- model basics -------------------------------------------------
     def rowCount(self, parent=QModelIndex()):
@@ -49,6 +51,9 @@ class PrjSetModel(QAbstractListModel):
         if role in (RESOLVED_ROLE, ISSUE_ROLE):
             info = self._analysis[index.row()] if index.row() < len(self._analysis) else {}
             return info.get("resolved" if role == RESOLVED_ROLE else "issue", "")
+        if role == DEPENDENT_ROLE:
+            info = self._analysis[index.row()] if index.row() < len(self._analysis) else {}
+            return bool(info.get("dependent"))
         return None
 
     def roleNames(self):
@@ -61,6 +66,7 @@ class PrjSetModel(QAbstractListModel):
             COMMENT_ROLE: b"comment",
             RESOLVED_ROLE: b"resolved",
             ISSUE_ROLE: b"issue",
+            DEPENDENT_ROLE: b"dependent",
         })
         return roles
 
@@ -79,15 +85,21 @@ class PrjSetModel(QAbstractListModel):
         self._analysis = prjset.analyze([(i.name, i.value) for i in self._items])
         if self._items:
             self.dataChanged.emit(self.index(0, 0), self.index(len(self._items) - 1, 0),
-                                  [RESOLVED_ROLE, ISSUE_ROLE])
+                                  [RESOLVED_ROLE, ISSUE_ROLE, DEPENDENT_ROLE])
         count = sum(1 for a in self._analysis if a["issue"])
-        if count != self._issue_count:
-            self._issue_count = count
+        roots = sum(1 for a in self._analysis if a["issue"] and not a["dependent"])
+        if (count, roots) != (self._issue_count, self._root_issue_count):
+            self._issue_count, self._root_issue_count = count, roots
             self.issueCountChanged.emit()
 
     @Property(int, notify=issueCountChanged)
     def issueCount(self):
         return self._issue_count
+
+    @Property(int, notify=issueCountChanged)
+    def rootIssueCount(self):
+        """Items whose own value is wrong (the rest only depend on one of these)."""
+        return self._root_issue_count
 
     # ---- moving -------------------------------------------------------
     @Slot(int, int, result=bool)
@@ -217,20 +229,31 @@ class PrjSetModel(QAbstractListModel):
         path = file.toLocalFile()
         try:
             with open(path, "r", encoding="utf-8") as f:
-                data = prjcfg.section(yaml.safe_load(f), "prjset")
-            if not isinstance(data, dict) or not isinstance(data.get("data"), list):
-                raise ValueError("expected a mapping with a 'data' list")
-            items = []
-            for n, entry in enumerate(data["data"], 1):
-                if not isinstance(entry, dict) or "name" not in entry or "value" not in entry:
-                    raise ValueError(f"entry {n} needs 'name' and 'value'")
-                items.append(entry)
-        except (OSError, yaml.YAMLError, ValueError) as e:
+                data = yaml.safe_load(f)
+        except (OSError, yaml.YAMLError) as e:
             logger.log(f"Failed to import {path}: {e}", "ERROR")
             return f"Could not import {path}:\n{e}"
-        self._set_items(items)
+        err = self.loadData(data)
+        if err:
+            logger.log(f"Failed to import {path}: {err}", "ERROR")
+            return f"Could not import {path}:\n{err}"
         logger.log(f"Imported file: {path}", "INFO")
         return ""
+
+    def loadData(self, data):
+        """Replace the list from parsed YAML (a project-setting file or a combined
+        prjcfg.yaml). Returns an error message, or "" on success."""
+        data = prjcfg.section(data, "prjset")
+        if not isinstance(data, dict) or not isinstance(data.get("data"), list):
+            return "expected a mapping with a 'data' list"
+        for n, entry in enumerate(data["data"], 1):
+            if not isinstance(entry, dict) or "name" not in entry or "value" not in entry:
+                return f"entry {n} needs 'name' and 'value'"
+        self._set_items(data["data"])
+        return ""
+
+    def document(self):
+        return prjcfg.prjset_doc([i.to_dict() for i in self._items])
 
     @Slot(QUrl, result=str)
     def importXLSX(self, file: QUrl):
@@ -247,7 +270,7 @@ class PrjSetModel(QAbstractListModel):
     @Slot(QUrl, result=str)
     def exportYAML(self, file: QUrl):
         path = file.toLocalFile()
-        yaml_data = prjcfg.prjset_doc([i.to_dict() for i in self._items])
+        yaml_data = self.document()
         try:
             with open(path, "w", encoding="utf-8") as f:
                 prjcfg.dump(yaml_data, f)

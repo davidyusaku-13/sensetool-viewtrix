@@ -153,34 +153,58 @@ class AppSetModel(QAbstractListModel):
     # ---- files --------------------------------------------------------
     @Slot(QUrl, result=str)
     def importFile(self, file: QUrl):
-        """Import a .yaml/.yml application setting or the AppSet sheet of prjcfg.xlsx.
-        Replaces the current table. Returns an error message, or "" on success."""
+        """Import a .yaml/.yml application setting (or combined prjcfg.yaml) or the
+        AppSet sheet of prjcfg.xlsx. Replaces the current table. Returns an error
+        message, or "" on success."""
         path = file.toLocalFile()
         try:
             if path.lower().endswith((".xlsx", ".xlsm")):
-                regs = appset.read_appset_xlsx(path)
+                self._set(appset.read_appset_xlsx(path))
+                err = ""
             else:
                 with open(path, "r", encoding="utf-8") as f:
-                    data = prjcfg.section(yaml.safe_load(f), "appset")
-                if not isinstance(data, dict) or not isinstance(data.get("registers"), list):
-                    raise ValueError("expected a mapping with a 'registers' list")
-                regs = data["registers"]
-                for n, r in enumerate(regs, 1):
-                    if not isinstance(r, dict) or "name" not in r or "addr" not in r:
-                        raise ValueError(f"register {n} needs 'name' and 'addr'")
-                    if not isinstance(r.get("fields") or [], list):
-                        raise ValueError(f"register {n}: 'fields' must be a list")
+                    err = self.loadData(yaml.safe_load(f))
         except Exception as e:  # file, YAML and openpyxl errors
-            logger.log(f"Failed to import {path}: {e}", "ERROR")
-            return f"Could not import {path}:\n{e}"
-        self._set(regs)
+            err = str(e)
+        if err:
+            logger.log(f"Failed to import {path}: {err}", "ERROR")
+            return f"Could not import {path}:\n{err}"
         logger.log(f"Imported application setting: {path}", "INFO")
         return ""
+
+    def loadData(self, data):
+        """Replace the table from parsed YAML. Returns an error, or "" on success."""
+        data = prjcfg.section(data, "appset")
+        if not isinstance(data, dict) or not isinstance(data.get("registers"), list):
+            return "expected a mapping with a 'registers' list"
+        for n, r in enumerate(data["registers"], 1):
+            if not isinstance(r, dict) or "name" not in r or "addr" not in r:
+                return f"register {n} needs 'name' and 'addr'"
+            if not isinstance(r.get("fields") or [], list):
+                return f"register {n}: 'fields' must be a list"
+        self._set(data["registers"])
+        return ""
+
+    def document(self):
+        return prjcfg.appset_doc(self._regs)
+
+    @Slot(int, "QVariantMap", result=str)
+    def checkRegister(self, index, reg):
+        """Problems `reg` would have if saved at row `index` (-1 = new), for live
+        feedback in the edit window."""
+        regs = [dict(r) for r in self._regs]
+        reg = _clean(reg)
+        if 0 <= index < len(regs):
+            regs[index] = reg
+        else:
+            regs.append(reg)
+            index = len(regs) - 1
+        return appset.analyze(regs)[index]["issue"]
 
     @Slot(QUrl, result=str)
     def exportYAML(self, file: QUrl):
         path = file.toLocalFile()
-        data = prjcfg.appset_doc(self._regs)
+        data = self.document()
         try:
             with open(path, "w", encoding="utf-8") as f:
                 prjcfg.dump(data, f)

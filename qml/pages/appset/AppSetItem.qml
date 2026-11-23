@@ -18,6 +18,8 @@ ShadowRect{
     property string issue: ""
     property alias checkBox: checkBox
     signal selected(bool status)
+    signal activated()
+    TapHandler{ onDoubleTapped: root.activated() }
 
     component Cell: ShadowRect{
         Layout.fillHeight: true

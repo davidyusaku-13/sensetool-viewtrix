@@ -7,6 +7,7 @@ RoundButton{
     implicitWidth: 45
     implicitHeight: 45
     property bool isHeaderBtn: false
+    property bool showToolTip: true
     highlighted: false
     display: AbstractButton.IconOnly
     icon.source: "images/plus"
@@ -14,7 +15,7 @@ RoundButton{
         cursorShape: Qt.PointingHandCursor
     }
     ToolTip{
-        visible: button.hovered
+        visible: button.showToolTip && button.hovered
         text: button.text
         x: isHeaderBtn ? 0 : (button.width+5)
         y: isHeaderBtn ? button.height : (button.height/2 - implicitHeight/2)

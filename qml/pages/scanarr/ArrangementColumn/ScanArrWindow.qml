@@ -32,16 +32,6 @@ Window {
         index = i
         root.show()
     }
-    ConfirmWindow{
-        id: confirmWindow
-        onSaved: (state) => {
-                     if(state === true){
-                         root.modify(root.index, root.object.get())
-                         root.object.reset()
-                         root.close()
-                     }
-                 }
-    }
     ColumnLayout{
         anchors.fill: parent
         spacing: 20
@@ -140,7 +130,9 @@ Window {
                 }
                 onClicked: {
                     if(root.isEdit == true){
-                        confirmWindow.show()
+                        root.modify(root.index, root.object.get())
+                        root.object.reset()
+                        root.close()
                     }else{
                         root.create(root.object)
                         root.object.reset()
