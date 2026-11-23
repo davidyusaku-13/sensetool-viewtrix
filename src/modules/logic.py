@@ -2,6 +2,7 @@ from PySide6.QtCore import Signal, Slot, QObject, QUrl, Property, QThread
 from PySide6.QtQml import QmlElement
 import yaml, math, requests, os, re
 from src.modules.logger import AppLogger
+from src.modules import scanarr
 
 # Init LOGGER
 logger = AppLogger.get_instance()
@@ -217,35 +218,83 @@ class AppLogic(QObject):
         return result
 
     # ---- scan arrangement --------------------------------------------
+    @staticmethod
+    def _clean_scan_arr(scan_items, arrangements):
+        items = [{'name': str(i.get('name') or '').strip(), 'desc': str(i.get('desc') or '')}
+                 for i in scan_items]
+        arrs = [{'id': str(a.get('id', '')).strip(), 'name': str(a.get('name') or '').strip(),
+                 'desc': str(a.get('desc') or ''), 'scans': [str(x) for x in a.get('scans') or []]}
+                for a in arrangements]
+        return items, arrs
+
     @Slot(QUrl, list, list, result=str)
     def exportScanArr(self, fname, scan_items, arrangements):
-        """scan_items: [{name, desc}], arrangements: [{name, desc, scans: [name]}]."""
+        """scan_items: [{name, desc}] in enum order,
+        arrangements: [{id, name, desc, scans: [name]}]."""
         file_name = fname.toLocalFile()
+        items, arrs = self._clean_scan_arr(scan_items, arrangements)
         yaml_data = {
             'title': 'Scan Arrangement',
-            'scan_items': [{'name': i.get('name', ''), 'desc': i.get('desc') or None} for i in scan_items],
-            'arrangements': [{'name': a.get('name', ''), 'desc': a.get('desc') or None,
-                              'scans': list(a.get('scans') or [])} for a in arrangements],
+            'desc': "Scan items are the eAfeScanID_t enum in value order (the first is 0). "
+                    "afeScanArrg.c and afeScanArrg.h are generated from this file.",
+            'scan_items': [{'name': i['name'], 'desc': i['desc'] or None} for i in items],
+            'arrangements': [{'id': scanarr.parse_id(a['id']) if scanarr.parse_id(a['id']) is not None else a['id'],
+                              'name': a['name'], 'desc': a['desc'] or None, 'scans': a['scans']}
+                             for a in arrs],
         }
         return self._write_yaml(file_name, yaml_data, "scan arrangement")
 
     @Slot(QUrl, result=dict)
     def importScanArr(self, fname):
-        """Returns {scan_items, arrangements}, or {} on failure (see lastError)."""
+        """Import a scan arrangement YAML, or the ScanArrg sheet of prjcfg.xlsx.
+        Returns {scan_items, arrangements, skipped}, or {} on failure (see lastError)."""
         file_name = fname.toLocalFile()
-        data = self._read_yaml(file_name)
-        if data is None:
-            return {}
+        if file_name.lower().endswith(('.xlsx', '.xlsm')):
+            try:
+                data = scanarr.read_scanarrg_xlsx(file_name)
+            except Exception as e:  # openpyxl raises a variety of exception types
+                return self._fail(f"Could not import {file_name}:\n{e}", {})
+        else:
+            data = self._read_yaml(file_name)
+            if data is None:
+                return {}
+            data = dict(data, skipped=[])
         try:
-            items = [{'name': str(i['name']), 'desc': str(i.get('desc') or '')}
-                     for i in data.get('scan_items') or []]
-            arrs = [{'name': str(a['name']), 'desc': str(a.get('desc') or ''),
-                     'scans': [str(s) for s in a.get('scans') or []]}
-                    for a in data.get('arrangements') or []]
+            raw_items = data.get('scan_items') or []
+            raw_arrs = data.get('arrangements') or []
+            if any('name' not in i for i in raw_items) or any('name' not in a for a in raw_arrs):
+                raise KeyError('name')
+            # Files written before arrangement IDs existed: number them in order.
+            raw_arrs = [dict(a, id=a.get('id', n)) for n, a in enumerate(raw_arrs, 1)]
+            items, arrs = self._clean_scan_arr(raw_items, raw_arrs)
         except (KeyError, TypeError, AttributeError):
             return self._fail(f"{file_name}: expected 'scan_items' and 'arrangements' lists with a 'name' on every entry", {})
+        self._last_error = ""
         logger.log(f"Imported scan arrangement {file_name}", "INFO")
-        return {'scan_items': items, 'arrangements': arrs}
+        return {'scan_items': items, 'arrangements': arrs, 'skipped': list(data.get('skipped') or [])}
+
+    @Slot(list, list, result=list)
+    def checkScanArr(self, scan_items, arrangements):
+        """Problems that would make the generated C wrong; empty when it is safe."""
+        return scanarr.analyze(*self._clean_scan_arr(scan_items, arrangements))
+
+    @Slot(QUrl, list, list, result=str)
+    def generateScanArr(self, folder, scan_items, arrangements):
+        """Write afeScanArrg.h and afeScanArrg.c into `folder`. Returns an error or ""."""
+        items, arrs = self._clean_scan_arr(scan_items, arrangements)
+        issues = scanarr.analyze(items, arrs)
+        if issues:
+            return "Fix these problems first:\n\n" + "\n".join(issues)
+        out_dir = folder.toLocalFile()
+        try:
+            for name, text in (("afeScanArrg.h", scanarr.generate_header(items, arrs)),
+                               ("afeScanArrg.c", scanarr.generate_source(arrs))):
+                with open(os.path.join(out_dir, name), 'w', encoding='utf-8', newline='\n') as f:
+                    f.write(text)
+        except OSError as e:
+            return self._fail(f"Could not write to {out_dir}: {e}", f"Could not write to {out_dir}: {e}")
+        logger.log(f"Generated afeScanArrg.c/.h in {out_dir}", "INFO")
+        return ""
 
     # ---- helpers ------------------------------------------------------
     def _read_yaml(self, file_name):

@@ -1,0 +1,63 @@
+title: Scan Arrangement
+desc: Scan items are the eAfeScanID_t enum in value order (the first is 0). afeScanArrg.c
+  and afeScanArrg.h are generated from this file.
+scan_items:
+- name: AFE_END
+  desc: To set a flag to indicate the end of a frame request.
+- name: AFE_OFF
+  desc: To Turn OFF AFE.
+- name: AFE_ON
+  desc: To Turn ON AFE.
+- name: AFE_MS_ACTIVE
+  desc: To execute mutual scan in active state.
+- name: AFE_MS_IDLE
+  desc: To execute mutual scan in idle state.
+- name: AFE_MS_LP
+  desc: To execute mutual scan in detect state.
+- name: AFE_MS_F0
+  desc: 'To execute mutual scan in frequency #0.'
+- name: AFE_MS_F1
+  desc: To execute mutual scan without post process (eg, no DTO process, no digital
+    accumulation).
+- name: AFE_MS_RAW
+  desc: To execute mutual scan with customized configuration for specific purposed.
+- name: AFE_MS_CUST1
+  desc: To execute mutual scan with customized configuration for specific purposed.
+- name: AFE_SSTX_ACTIVE
+  desc: To execute self tx scan in active state.
+- name: AFE_SSRX_ACTIVE
+  desc: To execute self rx scan in active state.
+- name: AFE_SSTX_IDLE
+  desc: To execute self tx scan in idle / detect state.
+- name: AFE_SSRX_IDLE
+  desc: To execute self rx scan in idle / detect state.
+- name: AFE_MSN_ACTIVE
+  desc: To execute mutual noise scan.
+- name: AFE_PROC_DATA
+  desc: To set a flag to have application callback for received frame processing.
+arrangements:
+- id: 1
+  name: AFE_SCAN_ACTIVE
+  desc: For ScanState Active
+  scans:
+  - AFE_ON
+  - AFE_MSN_ACTIVE
+  - AFE_PROC_DATA
+  - AFE_SSTX_ACTIVE
+  - AFE_SSRX_ACTIVE
+  - AFE_PROC_DATA
+  - AFE_MS_ACTIVE
+  - AFE_PROC_DATA
+  - AFE_OFF
+  - AFE_END
+- id: 2
+  name: AFE_SCAN_IDLE
+  desc: For ScanState Idle
+  scans:
+  - AFE_ON
+  - AFE_MSN_ACTIVE
+  - AFE_PROC_DATA
+  - AFE_SSTX_IDLE
+  - AFE_PROC_DATA
+  - AFE_OFF
+  - AFE_END

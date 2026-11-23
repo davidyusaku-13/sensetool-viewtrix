@@ -4,7 +4,17 @@ import QtQuick.Layouts
 import "../../../components"
 
 Item{
+    id: root
     property alias scanItemList: scanItemList
+    // Emitted when a scan item is renamed so arrangements can follow.
+    signal renamed(string oldName, string newName)
+    function moveSelected(delta){
+        if(selectedScanItem.count !== 1) return
+        let i = selectedScanItem.get(0).itemsIndex
+        let j = i + delta
+        if(j < 0 || j >= scanItemList.count) return
+        scanItemList.move(i, j, 1)
+    }
     MouseArea{
         anchors.fill: parent
         onClicked:{
@@ -44,10 +54,21 @@ Item{
                 onClicked: {
                     for(let i = selectedScanItem.count-1; i>=0; i--){
                         let itemSelected = selectedScanItem.get(i)
-                        var object = scanItemList.get(itemSelected.itemsIndex)
                         scanItemList.remove(itemSelected.itemsIndex)
                     }
                 }
+            }
+            ToolbarBtn{
+                Layout.fillWidth: true
+                text: "\u25B2"
+                enabled: selectedScanItem.count === 1
+                onClicked: root.moveSelected(-1)
+            }
+            ToolbarBtn{
+                Layout.fillWidth: true
+                text: "\u25BC"
+                enabled: selectedScanItem.count === 1
+                onClicked: root.moveSelected(1)
             }
             ToolbarBtn{
                 Layout.fillWidth: true
@@ -77,7 +98,9 @@ Item{
                               scanItemList.append(object);
                           }
                 onModify: (index, object) => {
+                              let oldName = scanItemList.get(index).name
                               scanItemList.set(index, object);
+                              if(oldName !== object.name) root.renamed(oldName, object.name)
                           }
             }
         }
@@ -100,6 +123,18 @@ Item{
                     height: 35
                     spacing: 0
                     z: 2
+                    Rectangle{
+                        Layout.fillHeight: true
+                        Layout.preferredWidth: 80
+                        color: Material.accent
+                        Text {
+                            text: "Value"
+                            anchors.centerIn: parent
+                            font.pointSize: 12
+                            font.family: "Montserrat SemiBold"
+                            color: Material.foreground
+                        }
+                    }
                     Repeater{
                         model: ["Scan Name", "Description"]
                         Rectangle{
@@ -134,6 +169,8 @@ Item{
                     delegate: ScanItem{
                         id: scanItemDel
                         required property var model
+                        required property int index
+                        value: index
                         name: model.name
                         desc: model.desc
                         width: ListView.view.width

@@ -8,7 +8,7 @@ Item{
     id: root
     height: desc.lineCount > 1 ? desc.lineCount*25 : 35
     required property var scanArrList
-    property int itemID: 1
+    property string itemID: "1"
     property string name: "AFE_END"
     property string desc: "To set a flag to indicate the end of a frame request"
     property alias dragArea: dragArea

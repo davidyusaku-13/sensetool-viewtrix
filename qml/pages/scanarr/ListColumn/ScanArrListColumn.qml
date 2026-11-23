@@ -8,6 +8,23 @@ Item{
     id: root
     property int index: -1
     property var model: null
+    readonly property int stepCount: model ? model.scans.count : 0
+
+    // Where new steps go: after the single selected step, otherwise just before
+    // the terminating AFE_END (or at the end if there is none).
+    function insertPosition(){
+        let scans = root.model.scans
+        if(selectedChoose.count === 1) return selectedChoose.get(0).itemsIndex + 1
+        if(scans.count > 0 && scans.get(scans.count-1).name === "AFE_END") return scans.count - 1
+        return scans.count
+    }
+    function moveSelected(delta){
+        if(!root.model || selectedChoose.count !== 1) return
+        let i = selectedChoose.get(0).itemsIndex
+        let j = i + delta
+        if(j < 0 || j >= root.model.scans.count) return
+        root.model.scans.move(i, j, 1)
+    }
     //scan list rect
     ShadowRect{
         anchors.fill: parent
@@ -30,7 +47,7 @@ Item{
                     implicitHeight: 35
                     color: Material.accent
                     Text {
-                        text: "Scan List " + ((root.index+1) === 0 ? "" : (root.index+1))
+                        text: root.model ? (root.model.name + "  (" + root.stepCount + "/10)") : "Scan List"
                         font.pointSize: 12
                         font.family: "Montserrat SemiBold"
                         anchors.centerIn: parent
@@ -72,6 +89,8 @@ Item{
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
+                        ToolTip.visible: hovered
+                        ToolTip.text: qsTr("Select / deselect all steps")
                         // Select all, or deselect all when everything is selected.
                         onClicked: {
                             let all = selectedChoose.count === scanArrChooseModel.items.count
@@ -88,18 +107,35 @@ Item{
                         HoverHandler{
                             cursorShape: Qt.PointingHandCursor
                         }
+                        ToolTip.visible: hovered
+                        ToolTip.text: qsTr("Remove selected steps")
                         onClicked: {
                             for(let i = selectedChoose.count-1; i>=0; i--){
                                 root.model.scans.remove(selectedChoose.get(i).itemsIndex)
                             }
                         }
                     }
+                    RoundButton{
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 35
+                        text: "\u25B2"
+                        enabled: selectedChoose.count === 1
+                        onClicked: root.moveSelected(-1)
+                    }
+                    RoundButton{
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 35
+                        text: "\u25BC"
+                        enabled: selectedChoose.count === 1
+                        onClicked: root.moveSelected(1)
+                    }
                     ScanArrListWindow{
                         id: scanArrListWindow
                         onCreate: (object) => {
                                       if(!root.model) return
+                                      let at = root.insertPosition()
                                       for(let i=0; i<object.names.length; i++){
-                                          root.model.scans.append(object.get(i));
+                                          root.model.scans.insert(at + i, object.get(i));
                                       }
                                   }
                     }
@@ -118,7 +154,8 @@ Item{
                 delegate: ScanArrListItem{
                     id: scanArrChooseDel
                     required property var model
-                    name: model.name
+                    required property int index
+                    name: "#" + (index + 1) + "   " + model.name
                     width: ListView.view.width
                     checkBox.checked: scanArrChooseDel.DelegateModel.inSelected
                     onSelected: {

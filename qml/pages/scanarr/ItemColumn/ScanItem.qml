@@ -8,6 +8,7 @@ Item{
     id: root
     height: desc.lineCount > 1 ? desc.lineCount*25 : 35
     property string name: "AFE_END"
+    property int value: 0
     property string desc: "To set a flag to indicate the end of a frame request"
     property alias dragArea: dragArea
     property alias checkBox: checkBox
@@ -25,6 +26,18 @@ Item{
                 onClicked: {
                     root.selected(checked)
                 }
+            }
+        }
+        //enum value
+        ShadowRect{
+            Layout.preferredWidth: 45
+            Layout.fillHeight: true
+            Text{
+                anchors.centerIn: parent
+                text: root.value
+                font.pixelSize: 15
+                font.family: "Montserrat Medium"
+                color: Material.foreground
             }
         }
         //scan arr name
@@ -68,7 +81,7 @@ Item{
                 id: drag
                 anchors.centerIn: parent
                 flat: true
-                icon.source: "qrc:/images/drag.png"
+                icon.source: "qrc:/images/drag"
                 icon.color: Material.foreground
                 padding: 0
                 MouseArea {

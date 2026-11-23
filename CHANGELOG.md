@@ -4,7 +4,9 @@ What's new in this update:
 - Project Setting: import the legacy `prjcfg.xlsx` spreadsheet (PrjSet sheet)
 - Project Setting: items are grouped into sections, with a review comment per item
 - Project Setting: expression values are evaluated (e.g. `FRM_SZ = 840`), and duplicate names, undefined references and circular references are flagged
-- Scan Arrangement: Import/Export to YAML; scan lists per arrangement can be added to and removed from
+- Scan Arrangement replaces the ScanArrg sheet: generate `afeScanArrg.c` / `afeScanArrg.h`, import the ScanArrg sheet of `prjcfg.xlsx`, Import/Export to YAML
+- Scan Arrangement: scan items are the `eAfeScanID_t` enum with their values shown and can be reordered; arrangements have an editable ID; step sequences can be inserted into, reordered and repeated
+- Scan Arrangement: Check finds unknown steps, missing `AFE_END`, more than 10 steps, duplicate names/IDs; renaming a scan item updates every arrangement
 
 Bugfixes:
 
@@ -16,3 +18,4 @@ Bugfixes:
 - Update check no longer blocks or crashes startup when offline, and compares versions numerically
 - Coefficient import/export errors are shown instead of crashing; window coefficient export failed
 - History entries all showed the app start time
+- Scan item drag icon did not load

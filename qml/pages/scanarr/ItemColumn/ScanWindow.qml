@@ -9,7 +9,7 @@ Window {
     minimumWidth: 500
     minimumHeight: 400
     maximumWidth: 500
-    maximumHeight: 00
+    maximumHeight: 400
     color: Material.background
 
     signal create(var object)
@@ -67,7 +67,7 @@ Window {
                     font.pixelSize: 17
                     wrapMode: Text.Wrap
                     selectByMouse: true
-                    validator: RegularExpressionValidator {regularExpression: /[0-9A-Z_]+/}
+                    validator: RegularExpressionValidator {regularExpression: /[A-Z_][0-9A-Z_]*/}
                     HoverHandler{
                         cursorShape: Qt.IBeamCursor
                     }
@@ -117,7 +117,7 @@ Window {
                     if(root.isEdit == true){
                         confirmWindow.show()
                     }else{
-                        root.create(root.object)
+                        root.create(root.object.get())
                         root.object.reset()
                         root.close()
                     }

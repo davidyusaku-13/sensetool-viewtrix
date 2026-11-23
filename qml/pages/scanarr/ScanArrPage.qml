@@ -25,7 +25,7 @@ ShadowRect{
             for(let j=0; j<a.scans.count; j++){
                 scans.push(a.scans.get(j).name)
             }
-            arrs.push({"name": a.name, "desc": a.desc, "scans": scans})
+            arrs.push({"id": a.arrId, "name": a.name, "desc": a.desc, "scans": scans})
         }
         return [items, arrs]
     }
@@ -38,13 +38,38 @@ ShadowRect{
             itemColumn.scanItemList.append({"name": it.name, "desc": it.desc})
         }
         for(let a of data.arrangements){
-            arrColumn.scanArrList.append({"name": a.name, "desc": a.desc,
+            arrColumn.scanArrList.append({"arrId": a.id, "name": a.name, "desc": a.desc,
                                           "scans": a.scans.map(n => ({"name": n}))})
         }
     }
     function showError(message){
         errorDialog.text = message
         errorDialog.open()
+    }
+    function renameStep(oldName, newName){
+        for(let i=0; i<arrColumn.scanArrList.count; i++){
+            let scans = arrColumn.scanArrList.get(i).scans
+            for(let j=0; j<scans.count; j++){
+                if(scans.get(j).name === oldName) scans.setProperty(j, "name", newName)
+            }
+        }
+    }
+    function check(){
+        let d = page.collect()
+        return window.logic.checkScanArr(d[0], d[1])
+    }
+    FolderDialog {
+        id: dialogGenerate
+        title: qsTr("Folder for afeScanArrg.c and afeScanArrg.h")
+        onAccepted: {
+            let d = page.collect()
+            let err = window.logic.generateScanArr(selectedFolder, d[0], d[1])
+            if(err !== ""){
+                page.showError(err)
+                return
+            }
+            window.historyModel.addHistory("Generated", selectedFolder + "/afeScanArrg.c, afeScanArrg.h", "", "")
+        }
     }
     MessageDialog {
         id: errorDialog
@@ -54,7 +79,7 @@ ShadowRect{
     FileDialog {
         id: dialogImport
         fileMode: FileDialog.OpenFile
-        nameFilters: [qsTr("YAML files (*.yaml *.yml)")]
+        nameFilters: [qsTr("Scan arrangement (*.yaml *.yml *.xlsx)"), qsTr("YAML files (*.yaml *.yml)"), qsTr("prjcfg spreadsheet (*.xlsx)")]
         onAccepted: {
             let data = window.logic.importScanArr(selectedFile)
             if(data.scan_items === undefined){
@@ -63,6 +88,10 @@ ShadowRect{
             }
             page.load(data)
             window.historyModel.addHistory("Imported", selectedFile, "", "")
+            if(data.skipped.length > 0){
+                page.showError(qsTr("Imported. These arrangement rows have no name or scan steps yet and were skipped:\n\n")
+                               + data.skipped.join("\n"))
+            }
         }
     }
     FileDialog {
@@ -101,6 +130,29 @@ ShadowRect{
                 Material.background: Material.accent
                 onClicked: dialogExport.open()
             }
+            ToolbarBtn{
+                Layout.fillWidth: true
+                text: qsTr("Check")
+                Material.background: Material.accent
+                onClicked: {
+                    let issues = page.check()
+                    page.showError(issues.length === 0 ? qsTr("No problems found.")
+                                                       : issues.join("\n"))
+                }
+            }
+            ToolbarBtn{
+                Layout.fillWidth: true
+                text: qsTr("Generate afeScanArrg.c/.h")
+                Material.background: Material.accent
+                onClicked: {
+                    let issues = page.check()
+                    if(issues.length > 0){
+                        page.showError(qsTr("Fix these problems first:\n\n") + issues.join("\n"))
+                    } else {
+                        dialogGenerate.open()
+                    }
+                }
+            }
         }
         SplitView{
             Layout.fillWidth: true
@@ -108,6 +160,7 @@ ShadowRect{
             // Scan Items
             ScanItemColumn{
                 id: itemColumn
+                onRenamed: (oldName, newName) => page.renameStep(oldName, newName)
                 SplitView.fillHeight: true
                 SplitView.minimumWidth: popUp.visible ? parent.width * 6/15 : parent.width * 2/7
             }

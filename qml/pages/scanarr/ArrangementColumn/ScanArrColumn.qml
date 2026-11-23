@@ -26,7 +26,11 @@ Item{
                 Layout.fillWidth: true
                 text: "Add"
                 onClicked: {
-                    scanArrWindow.manage(-1,null)
+                    let next = 1
+                    for(let i=0; i<scanArrList.count; i++){
+                        next = Math.max(next, (parseInt(scanArrList.get(i).arrId) || 0) + 1)
+                    }
+                    scanArrWindow.manage(-1, null, String(next))
                 }
             }
             ToolbarBtn{
@@ -81,10 +85,12 @@ Item{
             ScanArrWindow{
                 id: scanArrWindow
                 onCreate: (object) => {
-                              scanArrList.append({"name": object.name, "desc": object.desc, "scans": []});
+                              scanArrList.append({"arrId": object.arrId, "name": object.name, "desc": object.desc,
+                                                  "scans": [{"name": "AFE_END"}]});
                           }
                 onModify: (index, object) => {
                               // Only rename/redescribe; keep the arrangement's scan list.
+                              scanArrList.setProperty(index, "arrId", object.arrId);
                               scanArrList.setProperty(index, "name", object.name);
                               scanArrList.setProperty(index, "desc", object.desc);
                           }
@@ -153,7 +159,7 @@ Item{
                         required property int index
                         required property var model
                         scanArrList: scanArrListColumn
-                        itemID: index+1
+                        itemID: model.arrId
                         name: model.name
                         desc: model.desc
                         width: ListView.view.width

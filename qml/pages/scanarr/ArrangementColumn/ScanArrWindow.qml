@@ -7,9 +7,9 @@ Window {
     id: root
     title: isEdit === false ? "Add File" : "Edit File"
     minimumWidth: 500
-    minimumHeight: 400
+    minimumHeight: 520
     maximumWidth: 500
-    maximumHeight: 00
+    maximumHeight: 520
     color: Material.background
 
     signal create(var object)
@@ -20,13 +20,14 @@ Window {
     property HoverHandler cursor: HoverHandler{
         cursorShape: Qt.IBeamCursor
     }
-    function manage(i: int, model: var){
+    function manage(i: int, model: var, nextId){
         if(i !== -1){
             isEdit = true
             object.set(model)
         }else {
             isEdit = false
             root.object.reset()
+            root.object.arrId = nextId ?? ""
         }
         index = i
         root.show()
@@ -45,6 +46,30 @@ Window {
         anchors.fill: parent
         spacing: 20
         anchors.margins: 20
+        //id
+        ColumnLayout{
+            Layout.fillWidth: true
+            Text{
+                text: "ID"
+                font.pixelSize: 20
+                font.family: "Montserrat Medium"
+                color: Material.foreground
+            }
+            Frame{
+                Layout.fillWidth: true
+                TextInput{
+                    id: idInput
+                    anchors.fill: parent
+                    text: root.object.arrId
+                    onTextChanged: root.object.arrId = text
+                    color: Material.foreground
+                    font.family: "Montserrat"
+                    font.pixelSize: 17
+                    selectByMouse: true
+                    validator: RegularExpressionValidator {regularExpression: /[0-9]+/}
+                }
+            }
+        }
         //item
         ColumnLayout{
             Layout.fillWidth: true
@@ -67,7 +92,7 @@ Window {
                     font.pixelSize: 17
                     wrapMode: Text.Wrap
                     selectByMouse: true
-                    validator: RegularExpressionValidator {regularExpression: /[0-9A-Z_]+/}
+                    validator: RegularExpressionValidator {regularExpression: /[A-Z_][0-9A-Z_]*/}
                     HoverHandler{
                         cursorShape: Qt.IBeamCursor
                     }
@@ -109,7 +134,7 @@ Window {
             RoundButton{
                 implicitWidth: 80
                 text: root.isEdit ? "Save" : "Add"
-                enabled: (text === "Add" && root.object.name === "") ? false : true
+                enabled: itemInput.acceptableInput && idInput.acceptableInput
                 HoverHandler{
                     cursorShape: Qt.PointingHandCursor
                 }

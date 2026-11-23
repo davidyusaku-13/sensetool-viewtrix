@@ -86,13 +86,29 @@ class AppLogicTestCase(unittest.TestCase):
 
   def test_logic_scan_arr_round_trip(self):
     items = [{"name": "MS", "desc": "mutual"}, {"name": "SS", "desc": ""}]
-    arrs = [{"name": "Normal", "desc": "d", "scans": ["MS", "SS", "MS"]}]
+    arrs = [{"id": "3", "name": "Normal", "desc": "d", "scans": ["MS", "SS", "MS"]}]
     with tempfile.TemporaryDirectory() as d:
       url = QUrl.fromLocalFile(os.path.join(d, "scan.yaml"))
       self.assertEqual(self._model.exportScanArr(url, items, arrs), "")
       data = self._model.importScanArr(url)
+      # files without arrangement IDs get them numbered in order
+      old = os.path.join(d, "old.yaml")
+      with open(old, "w") as f:
+        f.write("scan_items: []\narrangements:\n- name: A\n- name: B\n")
+      ids = [a["id"] for a in self._model.importScanArr(QUrl.fromLocalFile(old))["arrangements"]]
     self.assertEqual(data["scan_items"], items)
     self.assertEqual(data["arrangements"], arrs)
+    self.assertEqual(ids, ["1", "2"])
+
+  def test_logic_generate_scan_arr(self):
+    items = [{"name": "AFE_END", "desc": ""}, {"name": "AFE_ON", "desc": "on"}]
+    arrs = [{"id": "1", "name": "AFE_SCAN_ACTIVE", "desc": "", "scans": ["AFE_ON", "AFE_END"]}]
+    with tempfile.TemporaryDirectory() as d:
+      self.assertEqual(self._model.generateScanArr(QUrl.fromLocalFile(d), items, arrs), "")
+      self.assertTrue(os.path.isfile(os.path.join(d, "afeScanArrg.h")))
+      self.assertTrue(os.path.isfile(os.path.join(d, "afeScanArrg.c")))
+      bad = [dict(arrs[0], scans=["AFE_ON"])]
+      self.assertIn("must end with AFE_END", self._model.generateScanArr(QUrl.fromLocalFile(d), items, bad))
 
   def tearDown(self):
     del self._model
