@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt, QAbstractListModel, Slot, Signal, Property, QModelIndex, QUrl
 from PySide6.QtQml import QmlElement
 from ..modules.logger import AppLogger
-from ..modules import appset
+from ..modules import appset, prjcfg
 import os
 import yaml
 
@@ -14,22 +14,7 @@ ROLES = ["name", "addr", "addrHex", "size", "category", "desc", "fields",
          "layout", "defaultValue", "issue"]
 ROLE_IDS = {name: Qt.UserRole + 1 + i for i, name in enumerate(ROLES)}
 
-YAML_DESC = ("Application Setting includes the dynamic settings which can be changed during runtime. "
-             "appset.h and appset.c are generated from this file.")
-
-
-def _clean(reg):
-    """Normalise a register coming from QML or a file: every value is text."""
-    s = appset._s
-    return {
-        "addr": s(reg.get("addr")),
-        "name": s(reg.get("name")),
-        "size": s(reg.get("size")) or "1",
-        "category": s(reg.get("category")),
-        "desc": s(reg.get("desc")),
-        "fields": [{"name": s(f.get("name")), "msb": s(f.get("msb")), "lsb": s(f.get("lsb")),
-                    "default": s(f.get("default"))} for f in (reg.get("fields") or [])],
-    }
+_clean = prjcfg.appset_clean
 
 
 @QmlElement
@@ -176,7 +161,7 @@ class AppSetModel(QAbstractListModel):
                 regs = appset.read_appset_xlsx(path)
             else:
                 with open(path, "r", encoding="utf-8") as f:
-                    data = yaml.safe_load(f)
+                    data = prjcfg.section(yaml.safe_load(f), "appset")
                 if not isinstance(data, dict) or not isinstance(data.get("registers"), list):
                     raise ValueError("expected a mapping with a 'registers' list")
                 regs = data["registers"]
@@ -195,24 +180,10 @@ class AppSetModel(QAbstractListModel):
     @Slot(QUrl, result=str)
     def exportYAML(self, file: QUrl):
         path = file.toLocalFile()
-
-        def num(v):
-            n = appset.to_int(v)
-            return n if n is not None and str(n) == v else (v or None)
-
-        data = {"title": "Application Settings", "desc": YAML_DESC, "size": appset.APPSET_SIZE,
-                "registers": []}
-        for r in self._regs:
-            data["registers"].append({
-                "addr": num(r["addr"]), "name": r["name"], "size": num(r["size"]),
-                "category": r["category"] or None, "desc": r["desc"] or None,
-                # defaults stay text so hex stays hex
-                "fields": [{"name": f["name"], "msb": num(f["msb"]), "lsb": num(f["lsb"]),
-                            "default": f["default"] or None} for f in r["fields"]],
-            })
+        data = prjcfg.appset_doc(self._regs)
         try:
             with open(path, "w", encoding="utf-8") as f:
-                yaml.dump(data, f, sort_keys=False, allow_unicode=True)
+                prjcfg.dump(data, f)
         except OSError as e:
             logger.log(f"Failed to export {path}: {e}", "ERROR")
             return f"Could not write {path}:\n{e}"

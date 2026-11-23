@@ -9,6 +9,7 @@ What's new in this update:
 - Scan Arrangement replaces the ScanArrg sheet: generate `afeScanArrg.c` / `afeScanArrg.h`, import the ScanArrg sheet of `prjcfg.xlsx`, Import/Export to YAML
 - Scan Arrangement: scan items are the `eAfeScanID_t` enum with their values shown and can be reordered; arrangements have an editable ID; step sequences can be inserted into, reordered and repeated
 - Scan Arrangement: Check finds unknown steps, missing `AFE_END`, more than 10 steps, duplicate names/IDs; renaming a scan item updates every arrangement
+- `yaml/prjcfg.yaml` replaces `prjcfg.xlsx`: one file with all three sheets (plus the ReadMe revision history) that every workspace can import; convert an updated spreadsheet with `uv run python -m src.modules.prjcfg prjcfg.xlsx yaml/prjcfg.yaml`
 
 Bugfixes:
 

@@ -2,7 +2,7 @@ from PySide6.QtCore import Signal, Slot, QObject, QUrl, Property, QThread
 from PySide6.QtQml import QmlElement
 import yaml, math, requests, os, re
 from src.modules.logger import AppLogger
-from src.modules import scanarr
+from src.modules import scanarr, prjcfg
 
 # Init LOGGER
 logger = AppLogger.get_instance()
@@ -233,15 +233,7 @@ class AppLogic(QObject):
         arrangements: [{id, name, desc, scans: [name]}]."""
         file_name = fname.toLocalFile()
         items, arrs = self._clean_scan_arr(scan_items, arrangements)
-        yaml_data = {
-            'title': 'Scan Arrangement',
-            'desc': "Scan items are the eAfeScanID_t enum in value order (the first is 0). "
-                    "afeScanArrg.c and afeScanArrg.h are generated from this file.",
-            'scan_items': [{'name': i['name'], 'desc': i['desc'] or None} for i in items],
-            'arrangements': [{'id': scanarr.parse_id(a['id']) if scanarr.parse_id(a['id']) is not None else a['id'],
-                              'name': a['name'], 'desc': a['desc'] or None, 'scans': a['scans']}
-                             for a in arrs],
-        }
+        yaml_data = prjcfg.scanarr_doc(items, arrs)
         return self._write_yaml(file_name, yaml_data, "scan arrangement")
 
     @Slot(QUrl, result=dict)
@@ -258,7 +250,7 @@ class AppLogic(QObject):
             data = self._read_yaml(file_name)
             if data is None:
                 return {}
-            data = dict(data, skipped=[])
+            data = dict(prjcfg.section(data, 'scanarr'), skipped=[])
         try:
             raw_items = data.get('scan_items') or []
             raw_arrs = data.get('arrangements') or []
