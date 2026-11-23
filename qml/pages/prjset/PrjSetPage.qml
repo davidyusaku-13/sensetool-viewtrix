@@ -240,7 +240,7 @@ ShadowRect{
                     Text{
                         anchors.centerIn: parent
                         text: selectedGroup.count + qsTr(" of ") + itemModel.count + qsTr(" selected")
-                              + (window.prjSetModel.issueCount > 0 ? qsTr("  •  %1 with problems").arg(window.prjSetModel.issueCount) : "")
+                              + (window.prjSetModel && window.prjSetModel.issueCount > 0 ? qsTr("  •  %1 with problems").arg(window.prjSetModel.issueCount) : "")
                         font.pointSize: 12
                         font.family: "Montserrat SemiBold"
                         color: Material.foreground
