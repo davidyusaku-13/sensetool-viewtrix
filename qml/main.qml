@@ -1,59 +1,49 @@
-// The Python-registered types (PrjSetModel, ...) are invisible to qmllint.
-// qmllint disable unresolved-type
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Dialogs
 import QtCore
-import PrjSetModel
-import AppSetModel
-import ScanArrModel
-import HistoryModel
-import ProjectController
-import UpdateChecker
-import Coefficients
 import "components"
 
-// Composition root: creates the models and services once and hands them down.
-// Project logic (open/save, unsaved changes, undo) is in ProjectController;
-// this file only adds the dialogs around it.
+// The main window. Models and services are created in Python (src/app.py) and
+// passed in, then handed down to the pages. Project logic (open/save, unsaved
+// changes, undo) is in ProjectController; this file only adds the dialogs.
 ApplicationWindow {
     id: window
     // provided by main.py (QQmlApplicationEngine.setInitialProperties)
-    required property var translator     // Translator
-    required property var updateManager  // UpdateManager
-
-    PrjSetModel { id: prjSet }
-    AppSetModel { id: appSet }
-    ScanArrModel { id: scanArr }
-    HistoryModel { id: history }
-    UpdateChecker { id: updateChecker }
-    CoefficientGenerator { id: coefficientGen }
-    ProjectController { id: projectCtl }
+    required property var prjSet          // PrjSetModel
+    required property var appSet          // AppSetModel
+    required property var scanArr         // ScanArrModel
+    required property var history         // HistoryModel
+    required property var updateChecker   // UpdateChecker
+    required property var coefficientGen  // CoefficientGenerator
+    required property var projectCtl      // ProjectController
+    required property var translator      // Translator
+    required property var updateManager   // UpdateManager
 
     property bool quitting: false
 
     function openProject(url){
-        if(errors.show(projectCtl.open(url))) return
-        history.addHistory(projectCtl.hasPath ? "Opened" : "Imported", url, "", "")
-        let skipped = projectCtl.lastSkipped()
+        if(errors.show(window.projectCtl.open(url))) return
+        window.history.addHistory(window.projectCtl.hasPath ? "Opened" : "Imported", url, "", "")
+        let skipped = window.projectCtl.lastSkipped()
         if(skipped.length > 0)
             errors.show(qsTr("Imported. These ScanArrg rows had no name and were skipped:\n") + skipped.join("\n"))
     }
     function openProjectDialog(){
-        if(projectCtl.dirty) askUnsaved(() => projectOpenDialog.open())
+        if(window.projectCtl.dirty) askUnsaved(() => projectOpenDialog.open())
         else projectOpenDialog.open()
     }
     // then: run after a successful save (e.g. quit or open another project)
     property var afterSave: null
     function saveProject(asAs, then){
         afterSave = then || null
-        if(asAs || !projectCtl.hasPath){ projectSaveDialog.open(); return }
-        finishSave(projectCtl.save())
+        if(asAs || !window.projectCtl.hasPath){ projectSaveDialog.open(); return }
+        finishSave(window.projectCtl.save())
     }
     function finishSave(err){
         if(errors.show(err)){ afterSave = null; return }
-        history.addHistory("Saved", projectCtl.path, "", "")
+        window.history.addHistory("Saved", window.projectCtl.path, "", "")
         if(afterSave){ let f = afterSave; afterSave = null; f() }
     }
     function askUnsaved(proceed){
@@ -61,8 +51,8 @@ ApplicationWindow {
         unsavedDialog.open()
     }
 
-    title: qsTr("SenseTool") + "-v" + updateChecker.version() + "  —  "
-           + (projectCtl.name !== "" ? projectCtl.name : qsTr("Untitled project")) + (projectCtl.dirty ? " *" : "")
+    title: qsTr("SenseTool") + "-v" + window.updateChecker.version() + "  —  "
+           + (window.projectCtl.name !== "" ? window.projectCtl.name : qsTr("Untitled project")) + (window.projectCtl.dirty ? " *" : "")
     visible: true
     width: 1280
     height: 720
@@ -70,23 +60,22 @@ ApplicationWindow {
     minimumHeight: 600
 
     Component.onCompleted: {
-        for(let w of [prjSet, appSet, scanArr]) projectCtl.addWorkspace(w)
         // Reopen the last project, so work carries over between sessions.
-        projectCtl.openLast()
+        window.projectCtl.openLast()
         // In the background, so a slow or missing network never blocks startup.
-        updateChecker.checkAsync()
+        window.updateChecker.checkAsync()
     }
 
     SenseTool{
         id: sensetool
         anchors.fill: parent
-        prjSetModel: prjSet
-        appSetModel: appSet
-        scanArrModel: scanArr
-        historyModel: history
-        project: projectCtl
-        updates: updateChecker
-        coefficients: coefficientGen
+        prjSetModel: window.prjSet
+        appSetModel: window.appSet
+        scanArrModel: window.scanArr
+        historyModel: window.history
+        project: window.projectCtl
+        updates: window.updateChecker
+        coefficients: window.coefficientGen
         translator: window.translator
         onOpenRequested: window.openProjectDialog()
         onSaveRequested: window.saveProject(false)
@@ -94,12 +83,12 @@ ApplicationWindow {
     }
     UpdateWindow{
         id: updateWindow
-        updates: updateChecker
+        updates: window.updateChecker
         downloader: window.updateManager
     }
 
     onClosing: (close) => {
-        if(projectCtl.dirty && !quitting){
+        if(window.projectCtl.dirty && !quitting){
             close.accepted = false
             askUnsaved(() => { window.quitting = true; window.close() })
         }
@@ -108,8 +97,8 @@ ApplicationWindow {
     Shortcut{ sequences: [StandardKey.Open]; onActivated: window.openProjectDialog() }
     Shortcut{ sequences: [StandardKey.Save]; onActivated: window.saveProject(false) }
     Shortcut{ sequences: [StandardKey.SaveAs, "Ctrl+Shift+S"]; onActivated: window.saveProject(true) }
-    Shortcut{ sequences: [StandardKey.Undo]; onActivated: projectCtl.undo() }
-    Shortcut{ sequences: [StandardKey.Redo, "Ctrl+Shift+Z"]; onActivated: projectCtl.redo() }
+    Shortcut{ sequences: [StandardKey.Undo]; onActivated: window.projectCtl.undo() }
+    Shortcut{ sequences: [StandardKey.Redo, "Ctrl+Shift+Z"]; onActivated: window.projectCtl.redo() }
 
     FileDialog{
         id: projectOpenDialog
@@ -124,7 +113,7 @@ ApplicationWindow {
         fileMode: FileDialog.SaveFile
         defaultSuffix: "yaml"
         nameFilters: [qsTr("Project YAML (*.yaml *.yml)")]
-        onAccepted: window.finishSave(projectCtl.saveAs(selectedFile))
+        onAccepted: window.finishSave(window.projectCtl.saveAs(selectedFile))
         onRejected: window.afterSave = null
     }
     ErrorDialog{ id: errors; title: qsTr("SenseTool") }
@@ -132,7 +121,7 @@ ApplicationWindow {
         id: unsavedDialog
         property var proceed: null
         title: qsTr("Unsaved changes")
-        text: qsTr("Save changes to %1?").arg(projectCtl.name !== "" ? projectCtl.name : qsTr("this project"))
+        text: qsTr("Save changes to %1?").arg(window.projectCtl.name !== "" ? window.projectCtl.name : qsTr("this project"))
         informativeText: qsTr("Your changes will be lost if you don't save them.")
         buttons: MessageDialog.Save | MessageDialog.Discard | MessageDialog.Cancel
         onButtonClicked: (button, role) => {
@@ -144,7 +133,7 @@ ApplicationWindow {
     }
 
     Connections {
-        target: updateChecker
+        target: window.updateChecker
         function onUpdateChecked(available, version, changelog, link) {
             if (available) updateWindow.show()
         }

@@ -31,8 +31,10 @@ push and pull request; pushes to `main` also build and release the Windows app.
     following the small workspace interface in `workspace.py`;
   - `ProjectController`, which owns opening and saving `prjcfg.yaml`, unsaved changes and undo/redo across all
     workspaces.
-- `qml/` contains only presentation code. `main.qml` creates the models and services once and passes them down, and
-  pages receive them as properties rather than reaching for globals. Shared
+- `src/app.py` creates the models and services once, and `main.py` passes them into `main.qml`. They outlive
+  the QML engine, so shutdown is clean.
+- `qml/` contains only presentation code. `main.qml` hands the models and services down, and pages receive them as
+  properties rather than reaching for globals. Shared
   pieces live in `qml/components` (`SelectableTable` + `TableRow`/`TableCell`,
   `EditWindow`, `PageShortcuts`, `ErrorDialog`, `Theme`).
 

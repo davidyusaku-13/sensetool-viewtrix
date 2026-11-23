@@ -1,15 +1,14 @@
+import gc
 import sys
 import os
 import resource_rc  # noqa: F401  (registers the qrc:/images resources)
 from pathlib import Path
 from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import qInstallMessageHandler, qFormatLogMessage
+from PySide6.QtCore import QTimer, qInstallMessageHandler, qFormatLogMessage
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 from src.modules.logger import AppLogger
-# Importing these registers their QML types (PrjSetModel, ScanArrModel, ...).
-from src.models import appsetmodel, historymodel, prjsetmodel, project, scanarrmodel  # noqa: F401
-from src.modules import coefficients, updatecheck  # noqa: F401
+from src.app import create_services
 from src.modules.translator import Translator
 from src.modules.updater import UpdateManager
 
@@ -34,30 +33,41 @@ def restart_application():
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
-if __name__ == "__main__":
+def main(argv, organization="Viewtrix", close_after_ms=None):
+    """Run the app; returns its exit code. close_after_ms closes the window by
+    itself (used by the shutdown test)."""
     qInstallMessageHandler(qt_message_handler)
-    app = QApplication(sys.argv)
-
-    app.setOrganizationName("Viewtrix")
-    app.setOrganizationDomain("Viewtrix")
+    app = QApplication(argv)
+    app.setOrganizationName(organization)
+    app.setOrganizationDomain(organization)
 
     engine = QQmlApplicationEngine()
     QQuickStyle.setStyle("Material")
 
-    # Passed to main.qml as properties rather than global context properties.
+    # Everything main.qml works with is created here and passed in as properties.
     translator = Translator(app, engine)
     updateManager = UpdateManager()
     updateManager.restartApplication.connect(restart_application)
-    engine.setInitialProperties({"translator": translator, "updateManager": updateManager})
+    services = create_services()
+    engine.setInitialProperties(dict(services, translator=translator, updateManager=updateManager))
 
     logger.log("App opened", "INFO")
     engine.load(QML_FILE)
-
     if not engine.rootObjects():
-        sys.exit(-1)
+        return -1
+    if close_after_ms is not None:
+        QTimer.singleShot(close_after_ms, engine.rootObjects()[0].close)
 
-    app.exec()
+    try:
+        return app.exec()
+    finally:
+        # Destroy the QML first, while the models it binds to still exist. The
+        # translator holds the engine too, so it has to go for the engine to go.
+        del translator, engine
+        gc.collect()
+        logger.log("App closed", "INFO")
+        del services, updateManager
 
-    # LOG EXITAPP
-    logger.log("App closed", "INFO")
-    sys.exit()
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

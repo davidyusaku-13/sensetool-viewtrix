@@ -57,5 +57,20 @@ class UpdateCheckTestCase(unittest.TestCase):
         self.assertEqual(checker.version(), "1.0.0")
 
 
+    def test_background_check_reports_back(self):
+        from PySide6.QtCore import QCoreApplication, QEventLoop, QTimer
+        app = QCoreApplication.instance() or QCoreApplication([])
+        release = {"tag_name": "v9.0.0", "assets": [{"browser_download_url": "https://x/a.exe"}]}
+        checker = UpdateChecker(version="1.0.0", get=lambda url, timeout: FakeResponse(release))
+        got = []
+        loop = QEventLoop()
+        checker.updateChecked.connect(lambda *a: (got.append(a), loop.quit()))
+        QTimer.singleShot(3000, loop.quit)
+        checker.checkAsync()
+        loop.exec()
+        self.assertEqual(got, [(True, "v9.0.0", "", "https://x/a.exe")])
+        self.assertEqual(checker.updateLink(), "https://x/a.exe")
+        self.assertIsNotNone(app)
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,8 +1,9 @@
 """Checking GitHub for a newer SenseTool release."""
 import os
 import re
+import threading
 import requests
-from PySide6.QtCore import QObject, QThread, Signal, Slot
+from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtQml import QmlElement
 from .logger import AppLogger
 
@@ -56,20 +57,10 @@ def fetch_update_info(current_version, timeout=5, get=requests.get):
     return result
 
 
-class _CheckThread(QThread):
-    done = Signal(dict)
-
-    def __init__(self, fetch, parent=None):
-        super().__init__(parent)
-        self._fetch = fetch
-
-    def run(self):
-        self.done.emit(self._fetch())
-
-
 @QmlElement
 class UpdateChecker(QObject):
     updateChecked = Signal(bool, str, str, str)  # available, version, changelog, link
+    _fetched = Signal(dict)  # from the worker thread; queued to this object's thread
 
     def __init__(self, parent=None, version=None, get=requests.get):
         super().__init__(parent)
@@ -77,6 +68,7 @@ class UpdateChecker(QObject):
         self._get = get
         self._link = ""
         self._thread = None
+        self._fetched.connect(self._on_checked)
 
     def _fetch(self):
         return fetch_update_info(self._version, get=self._get)
@@ -95,10 +87,11 @@ class UpdateChecker(QObject):
     @Slot()
     def checkAsync(self):
         """Background check at startup, so a slow or missing network never blocks."""
-        if self._thread and self._thread.isRunning():
+        if self._thread and self._thread.is_alive():
             return
-        self._thread = _CheckThread(self._fetch, self)
-        self._thread.done.connect(self._on_checked)
+        # A daemon thread: if the app closes while the request is still waiting,
+        # it simply ends with the app (a running QThread aborted the app on exit).
+        self._thread = threading.Thread(target=lambda: self._fetched.emit(self._fetch()), daemon=True)
         self._thread.start()
 
     def _on_checked(self, info):
