@@ -4,6 +4,8 @@ What's new in this update:
 - Project Setting: import the legacy `prjcfg.xlsx` spreadsheet (PrjSet sheet)
 - Project Setting: items are grouped into sections, with a review comment per item
 - Project Setting: expression values are evaluated (e.g. `FRM_SZ = 840`), and duplicate names, undefined references and circular references are flagged
+- New App Setting workspace replaces the AppSet sheet: a 1 KB register map with bit fields and defaults; generate `appset.c` / `appset.h`, import the AppSet sheet of `prjcfg.xlsx`, Import/Export to YAML
+- App Setting: overlapping registers or bit fields, defaults that don't fit, bad sizes and duplicate names are flagged
 - Scan Arrangement replaces the ScanArrg sheet: generate `afeScanArrg.c` / `afeScanArrg.h`, import the ScanArrg sheet of `prjcfg.xlsx`, Import/Export to YAML
 - Scan Arrangement: scan items are the `eAfeScanID_t` enum with their values shown and can be reordered; arrangements have an editable ID; step sequences can be inserted into, reordered and repeated
 - Scan Arrangement: Check finds unknown steps, missing `AFE_END`, more than 10 steps, duplicate names/IDs; renaming a scan item updates every arrangement

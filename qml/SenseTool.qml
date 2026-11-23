@@ -7,6 +7,7 @@ import QtQuick.Controls.Material
 import "components"
 import "layouts"
 import "pages/prjset"
+import "pages/appset"
 import "pages/scanarr"
 import "pages/hwutil"
 
@@ -45,6 +46,7 @@ Rectangle{
                     SplitView.fillWidth: true
                     currentIndex: sidebar.index
                     PrjSetPage{}
+                    AppSetPage{}
                     ScanArrPage{}
                     HwUtilPage{}
                 }

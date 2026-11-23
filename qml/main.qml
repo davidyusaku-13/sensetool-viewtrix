@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Dialogs
 import PrjSetModel
+import AppSetModel
 import HistoryModel
 import AppLogic
 import QtCore
@@ -10,6 +11,7 @@ ApplicationWindow {
     id: window
     
     property PrjSetModel prjSetModel: PrjSetModel {}
+    property AppSetModel appSetModel: AppSetModel {}
     property HistoryModel historyModel: HistoryModel{}
     property AppLogic logic: AppLogic{
         parent: window

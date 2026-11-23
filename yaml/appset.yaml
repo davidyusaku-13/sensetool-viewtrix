@@ -1,0 +1,188 @@
+title: Application Settings
+desc: Application Setting includes the dynamic settings which can be changed during
+  runtime. appset.h and appset.c are generated from this file.
+size: 1024
+registers:
+- addr: 0
+  name: ScanState_Ctrl
+  size: 1
+  category: Core
+  desc: '[sstat_idle_en] Enable scan state idle; 0: Disable 1: Enable'
+  fields:
+  - name: sstat_idle_en
+    msb: 0
+    lsb: 0
+    default: '0x1'
+- addr: 1
+  name: sstat_active_fr
+  size: 1
+  category: Core
+  desc: unit in ms
+  fields:
+  - name: sstat_active_fr
+    msb: 7
+    lsb: 0
+    default: '0x8'
+- addr: 2
+  name: sstat_idle_fr
+  size: 1
+  category: Core
+  desc: unit in ms
+  fields:
+  - name: sstat_idle_fr
+    msb: 7
+    lsb: 0
+    default: '0x10'
+- addr: 3
+  name: sstat_idle_to
+  size: 1
+  category: Core
+  desc: 'unit in count of frame. Eg: Scan state active will transit to scan state
+    idle in 10 frame if no touch is detected'
+  fields:
+  - name: sstat_idle_to
+    msb: 7
+    lsb: 0
+    default: '0xA'
+- addr: 4
+  name: sstat_stdby_to
+  size: 1
+  category: Core
+  desc: 'unit in count of frame. Eg: Scan state active will transit to scan state
+    idle in 16 frame if no touch is detected'
+  fields:
+  - name: sstat_stdby_to
+    msb: 7
+    lsb: 0
+    default: '0x10'
+- addr: 5
+  name: tch_det_thres
+  size: 2
+  category: Frame
+  desc: 1st pass touch detection threshold. This threshold will be used to generate
+    island as well.
+  fields:
+  - name: tch_det_thres
+    msb: 15
+    lsb: 0
+    default: '0x96'
+- addr: 7
+  name: coor_hm_thres
+  size: 1
+  category: Island
+  desc: threshold for the heatmap to be included in coordinate calculation
+  fields:
+  - name: coor_hm_thres
+    msb: 7
+    lsb: 0
+    default: '0x32'
+- addr: 8
+  name: trk_dist_thres
+  size: 2
+  category: Tracking
+  desc: null
+  fields:
+  - name: trk_dist_thres
+    msb: 15
+    lsb: 0
+    default: '0x12C'
+- addr: 10
+  name: tch_in_dly
+  size: 1
+  category: StateControl
+  desc: null
+  fields:
+  - name: tch_out_dly
+    msb: 3
+    lsb: 2
+    default: null
+  - name: tch_in_dly
+    msb: 1
+    lsb: 0
+    default: null
+- addr: 11
+  name: flat_tch_cntr
+  size: 1
+  category: null
+  desc: null
+  fields:
+  - name: flat_tch_cntr
+    msb: 7
+    lsb: 0
+    default: '0x1'
+- addr: 12
+  name: flat_det_thres
+  size: 2
+  category: Frame
+  desc: frame flatness delta threshold
+  fields:
+  - name: flat_det_thres
+    msb: 15
+    lsb: 0
+    default: '0x64'
+- addr: 14
+  name: bl_recovery
+  size: 1
+  category: Frame
+  desc: baseline recovery feature enable flag
+  fields:
+  - name: fcal_m_flatness_en
+    msb: 3
+    lsb: 3
+    default: null
+  - name: fcal_varn_chk_en
+    msb: 2
+    lsb: 2
+    default: null
+  - name: fcal_false_m_chk_en
+    msb: 1
+    lsb: 1
+    default: null
+  - name: fcal_m_neg_det_en
+    msb: 0
+    lsb: 0
+    default: '0x1'
+- addr: 15
+  name: edge_weight_ctrl
+  size: 1
+  category: Frame
+  desc: 'edge touch strength improvement control; 0: disable 1: enable'
+  fields:
+  - name: tx_edge_weight_en
+    msb: 1
+    lsb: 1
+    default: null
+  - name: rx_edge_weight_en
+    msb: 0
+    lsb: 0
+    default: null
+- addr: 16
+  name: edge_weight_coef1
+  size: 1
+  category: Frame
+  desc: unit in const. this value divide 10 by FW
+  fields:
+  - name: edge_weight_coef1
+    msb: 7
+    lsb: 0
+    default: '0x1'
+- addr: 17
+  name: edge_weight_coef2
+  size: 1
+  category: Frame
+  desc: unit in const. this value divide 10 by FW
+  fields:
+  - name: edge_weight_coef2
+    msb: 7
+    lsb: 0
+    default: '0x4'
+- addr: 18
+  name: edge_weight_coef3
+  size: 1
+  category: Frame
+  desc: unit in const. this value divide 10 by FW
+  fields:
+  - name: edge_weight_coef3
+    msb: 7
+    lsb: 0
+    default: '0x9'

@@ -25,6 +25,10 @@ ListView {
             icon: "qrc:/images/import"
         }
         ListElement {
+            name: "App Setting"
+            icon: "qrc:/images/setting"
+        }
+        ListElement {
             name: "Scan Arrangement"
             icon: "qrc:/images/scanarr"
         }

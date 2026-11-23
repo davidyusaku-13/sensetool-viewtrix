@@ -5,6 +5,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 from src.modules.logger import AppLogger
 from src.models.prjsetmodel import PrjSetModel
+from src.models.appsetmodel import AppSetModel
 from src.models.historymodel import HistoryModel
 from src.modules.logic import AppLogic
 from src.modules.translator import Translator
