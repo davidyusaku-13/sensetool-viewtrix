@@ -9,3 +9,5 @@ test_logic_export_win_coef.yaml
 src/modules/tes.py
 main.exe
 prjcfg.xlsx
+
+.venv/
