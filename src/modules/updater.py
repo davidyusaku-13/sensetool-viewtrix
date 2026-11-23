@@ -1,6 +1,8 @@
 from PySide6.QtCore import QObject, Signal, Slot, QThread
 from src.modules.logger import AppLogger
-import requests, os, sys
+import requests
+import os
+import sys
 
 # Init LOGGER
 logger = AppLogger.get_instance()
@@ -30,11 +32,11 @@ class DownloadThread(QThread):
             self.progress = 100
             self.progressChanged.emit(100)
             self.downloadCompleted.emit()
-            logger.log(f"Successfully downloaded newest version", "INFO")
-        except Exception as e:
+            logger.log("Successfully downloaded newest version", "INFO")
+        except Exception:
             self.progress = 0
             self.progressChanged.emit(0)
-            logger.log(f"Failed to download the newest version", "ERROR")
+            logger.log("Failed to download the newest version", "ERROR")
 
 class UpdateManager(QObject):
     progressChanged = Signal(int)

@@ -1,9 +1,10 @@
-from PySide6.QtCore import Qt, QAbstractListModel, Slot, Signal, Property, QModelIndex, QUrl
+from PySide6.QtCore import Qt, Slot, Signal, Property, QModelIndex, QUrl
 from PySide6.QtQml import QmlElement
 from ..modules.logger import AppLogger
 from ..modules import appset, prjcfg
+from ..modules.fileio import UserError, local_path, message, write_text
+from .workspace import WorkspaceListModel, logged
 import os
-import yaml
 
 QML_IMPORT_NAME = "AppSetModel"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -18,15 +19,15 @@ _clean = prjcfg.appset_clean
 
 
 @QmlElement
-class AppSetModel(QAbstractListModel):
-    issueCountChanged = Signal()
+class AppSetModel(WorkspaceListModel):
+    """App Setting workspace: the AppSet sheet, generates appset.c/.h."""
+    SECTION = "appset"
     bytesUsedChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._regs = []
         self._info = []
-        self._issue_count = 0
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._regs)
@@ -66,14 +67,7 @@ class AppSetModel(QAbstractListModel):
         self._info = appset.analyze(self._regs)
         self.endResetModel()
         self.bytesUsedChanged.emit()
-        count = sum(1 for i in self._info if i["issue"])
-        if count != self._issue_count:
-            self._issue_count = count
-            self.issueCountChanged.emit()
-
-    @Property(int, notify=issueCountChanged)
-    def issueCount(self):
-        return self._issue_count
+        self._set_issue_count(sum(1 for i in self._info if i["issue"]))
 
     # ---- editing ------------------------------------------------------
     @Slot(int, result="QVariantMap")
@@ -150,27 +144,9 @@ class AppSetModel(QAbstractListModel):
     def tableSize(self):
         return appset.APPSET_SIZE
 
-    # ---- files --------------------------------------------------------
-    @Slot(QUrl, result=str)
-    def importFile(self, file: QUrl):
-        """Import a .yaml/.yml application setting (or combined prjcfg.yaml) or the
-        AppSet sheet of prjcfg.xlsx. Replaces the current table. Returns an error
-        message, or "" on success."""
-        path = file.toLocalFile()
-        try:
-            if path.lower().endswith((".xlsx", ".xlsm")):
-                self._set(appset.read_appset_xlsx(path))
-                err = ""
-            else:
-                with open(path, "r", encoding="utf-8") as f:
-                    err = self.loadData(yaml.safe_load(f))
-        except Exception as e:  # file, YAML and openpyxl errors
-            err = str(e)
-        if err:
-            logger.log(f"Failed to import {path}: {err}", "ERROR")
-            return f"Could not import {path}:\n{err}"
-        logger.log(f"Imported application setting: {path}", "INFO")
-        return ""
+    # ---- files (import/export come from WorkspaceListModel) -------------
+    def readSpreadsheet(self, path):
+        return {"registers": appset.read_appset_xlsx(path)}
 
     def loadData(self, data):
         """Replace the table from parsed YAML. Returns an error, or "" on success."""
@@ -202,34 +178,16 @@ class AppSetModel(QAbstractListModel):
         return appset.analyze(regs)[index]["issue"]
 
     @Slot(QUrl, result=str)
-    def exportYAML(self, file: QUrl):
-        path = file.toLocalFile()
-        data = self.document()
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                prjcfg.dump(data, f)
-        except OSError as e:
-            logger.log(f"Failed to export {path}: {e}", "ERROR")
-            return f"Could not write {path}:\n{e}"
-        logger.log(f"Exported application setting: {path}", "INFO")
-        return ""
-
-    @Slot(QUrl, result=str)
     def generate(self, folder: QUrl):
         """Write appset.h and appset.c into `folder`. Returns an error or ""."""
-        if self._issue_count:
-            return (f"{self._issue_count} register(s) have problems (shown in red). "
-                    "Fix them before generating.")
-        if not self._regs:
-            return "There are no registers to generate."
-        out_dir = folder.toLocalFile()
-        try:
-            for name, text in (("appset.h", appset.generate_header(self._regs)),
-                               ("appset.c", appset.generate_source(self._regs))):
-                with open(os.path.join(out_dir, name), "w", encoding="utf-8", newline="\n") as f:
-                    f.write(text)
-        except OSError as e:
-            logger.log(f"Failed to generate appset in {out_dir}: {e}", "ERROR")
-            return f"Could not write to {out_dir}:\n{e}"
-        logger.log(f"Generated appset.c/.h in {out_dir}", "INFO")
-        return ""
+        def run():
+            if self._issue_count:
+                raise UserError(f"{self._issue_count} register(s) have problems (shown in red). "
+                                "Fix them before generating.")
+            if not self._regs:
+                raise UserError("There are no registers to generate.")
+            out_dir = local_path(folder)
+            write_text(os.path.join(out_dir, "appset.h"), appset.generate_header(self._regs))
+            write_text(os.path.join(out_dir, "appset.c"), appset.generate_source(self._regs))
+            logger.log(f"Generated appset.c/.h in {out_dir}", "INFO")
+        return logged(message(run))

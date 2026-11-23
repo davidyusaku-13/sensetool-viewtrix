@@ -1,14 +1,15 @@
-import sys, os, resource_rc
+import sys
+import os
+import resource_rc  # noqa: F401  (registers the qrc:/images resources)
 from pathlib import Path
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import qInstallMessageHandler, qFormatLogMessage
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 from src.modules.logger import AppLogger
-from src.models.prjsetmodel import PrjSetModel
-from src.models.appsetmodel import AppSetModel
-from src.models.historymodel import HistoryModel
-from src.modules.logic import AppLogic
+# Importing these registers their QML types (PrjSetModel, ScanArrModel, ...).
+from src.models import appsetmodel, historymodel, prjsetmodel, project, scanarrmodel  # noqa: F401
+from src.modules import coefficients, updatecheck  # noqa: F401
 from src.modules.translator import Translator
 from src.modules.updater import UpdateManager
 
@@ -43,12 +44,11 @@ if __name__ == "__main__":
     engine = QQmlApplicationEngine()
     QQuickStyle.setStyle("Material")
 
+    # Passed to main.qml as properties rather than global context properties.
     translator = Translator(app, engine)
-    engine.rootContext().setContextProperty("translator", translator)
-
     updateManager = UpdateManager()
     updateManager.restartApplication.connect(restart_application)
-    engine.rootContext().setContextProperty("updateManager", updateManager)
+    engine.setInitialProperties({"translator": translator, "updateManager": updateManager})
 
     logger.log("App opened", "INFO")
     engine.load(QML_FILE)

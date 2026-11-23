@@ -2,97 +2,47 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtQuick.Controls.Material
 import "../../components"
-import "./ArrangementColumn"
-import "./ItemColumn"
-import "./ListColumn"
 
+// Scan Arrangement workspace: replaces the ScanArrg sheet of prjcfg.xlsx.
+// All state and rules are in ScanArrModel (Python); this page only presents them.
 ShadowRect{
     id: page
     Layout.fillWidth: true
     Layout.fillHeight: true
 
-    function collect(){
-        let items = []
-        for(let i=0; i<itemColumn.scanItemList.count; i++){
-            let it = itemColumn.scanItemList.get(i)
-            items.push({"name": it.name, "desc": it.desc})
-        }
-        let arrs = []
-        for(let i=0; i<arrColumn.scanArrList.count; i++){
-            let a = arrColumn.scanArrList.get(i)
-            let scans = []
-            for(let j=0; j<a.scans.count; j++){
-                scans.push(a.scans.get(j).name)
-            }
-            arrs.push({"id": a.arrId, "name": a.name, "desc": a.desc, "scans": scans})
-        }
-        return [items, arrs]
+    // dependencies, passed in by SenseTool
+    required property var scanArr   // ScanArrModel
+    required property var history   // HistoryModel
+
+    // Keyboard shortcuts act on the column where something was last selected.
+    property var active: items
+
+    function generate(){
+        let issues = page.scanArr.check()
+        if(issues.length > 0) errors.show(qsTr("Fix these problems first:\n\n") + issues.join("\n"))
+        else dialogGenerate.open()
     }
-    function load(data){
-        scanArrListColumn.index = -1
-        scanArrListColumn.model = null
-        arrColumn.currentIndex = -1
-        itemColumn.scanItemList.clear()
-        arrColumn.scanArrList.clear()
-        for(let it of data.scan_items){
-            itemColumn.scanItemList.append({"name": it.name, "desc": it.desc})
-        }
-        for(let a of data.arrangements){
-            arrColumn.scanArrList.append({"arrId": a.id, "name": a.name, "desc": a.desc,
-                                          "scans": a.scans.map(n => ({"name": n}))})
-        }
-    }
-    function showError(message){
-        errorDialog.text = message
-        errorDialog.open()
-    }
-    function renameStep(oldName, newName){
-        for(let i=0; i<arrColumn.scanArrList.count; i++){
-            let scans = arrColumn.scanArrList.get(i).scans
-            for(let j=0; j<scans.count; j++){
-                if(scans.get(j).name === oldName) scans.setProperty(j, "name", newName)
-            }
-        }
-    }
-    function check(){
-        let d = page.collect()
-        return window.logic.checkScanArr(d[0], d[1])
-    }
+
+    ErrorDialog{ id: errors; title: qsTr("Scan Arrangement") }
+    ConfirmDialog{ id: confirmDelete; title: qsTr("Scan Arrangement") }
     FolderDialog {
         id: dialogGenerate
         title: qsTr("Folder for afeScanArrg.c and afeScanArrg.h")
-        onAccepted: {
-            let d = page.collect()
-            let err = window.logic.generateScanArr(selectedFolder, d[0], d[1])
-            if(err !== ""){
-                page.showError(err)
-                return
-            }
-            window.historyModel.addHistory("Generated", selectedFolder + "/afeScanArrg.c, afeScanArrg.h", "", "")
-        }
-    }
-    MessageDialog {
-        id: errorDialog
-        title: qsTr("Scan Arrangement")
-        buttons: MessageDialog.Ok
+        onAccepted: if(!errors.show(page.scanArr.generate(selectedFolder)))
+                        page.history.addHistory("Generated", selectedFolder + "/afeScanArrg.c, afeScanArrg.h", "", "")
     }
     FileDialog {
         id: dialogImport
         fileMode: FileDialog.OpenFile
         nameFilters: [qsTr("Scan arrangement (*.yaml *.yml *.xlsx)"), qsTr("YAML files (*.yaml *.yml)"), qsTr("prjcfg spreadsheet (*.xlsx)")]
         onAccepted: {
-            let data = window.logic.importScanArr(selectedFile)
-            if(data.scan_items === undefined){
-                page.showError(window.logic.lastError())
-                return
-            }
-            page.load(data)
-            window.historyModel.addHistory("Imported", selectedFile, "", "")
-            if(data.skipped.length > 0){
-                page.showError(qsTr("Imported. These arrangement rows have no name or scan steps yet and were skipped:\n\n")
-                               + data.skipped.join("\n"))
-            }
+            if(errors.show(page.scanArr.importFile(selectedFile))) return
+            page.history.addHistory("Imported", selectedFile, "", "")
+            let skipped = page.scanArr.skippedRows()
+            if(skipped.length > 0)
+                errors.show(qsTr("Imported. These arrangement rows have no name or scan steps yet and were skipped:\n\n") + skipped.join("\n"))
         }
     }
     FileDialog {
@@ -100,37 +50,79 @@ ShadowRect{
         fileMode: FileDialog.SaveFile
         defaultSuffix: "yaml"
         nameFilters: [qsTr("YAML files (*.yaml *.yml)")]
-        onAccepted: {
-            let d = page.collect()
-            let err = window.logic.exportScanArr(selectedFile, d[0], d[1])
-            if(err !== ""){
-                page.showError(err)
-                return
-            }
-            window.historyModel.addHistory("Exported", selectedFile, "", "")
+        onAccepted: if(!errors.show(page.scanArr.exportYAML(selectedFile))) page.history.addHistory("Exported", selectedFile, "", "")
+    }
+    ScanItemWindow{
+        id: itemEditor
+        apply: (i, name, desc) => i === -1 ? page.scanArr.addItem(name, desc) : page.scanArr.editItem(i, name, desc)
+    }
+    ArrangementWindow{
+        id: arrEditor
+        apply: (i, id, name, desc) => i === -1 ? page.scanArr.addArrangement(id, name, desc)
+                                               : page.scanArr.editArrangement(i, id, name, desc)
+    }
+    StepPickerWindow{
+        id: stepPicker
+        items: page.scanArr.items
+        apply: (names) => {
+            let sel = steps.table.selectedIndexes()
+            page.scanArr.insertSteps(names, sel.length === 1 ? sel[0] : -1)
+            return ""
         }
     }
-    ConfirmDialog{ id: confirmDelete; title: qsTr("Scan Arrangement") }
-    function generate(){
-        let issues = page.check()
-        if(issues.length > 0) page.showError(qsTr("Fix these problems first:\n\n") + issues.join("\n"))
-        else dialogGenerate.open()
+    PageShortcuts{
+        active: page.visible
+        selectedCount: page.active.table.selectedCount
+        onAdd: page.active.add()
+        onEdit: page.active.edit()
+        onRemove: page.active.remove()
+        onSelectAll: page.active.table.toggleAll()
+        onGenerate: page.generate()
     }
-    // Keyboard shortcuts act on the column where something was last selected.
-    property var activeColumn: itemColumn
-    Shortcut{ sequences: [StandardKey.New]; enabled: page.visible; onActivated: page.activeColumn.addItem() }
-    Shortcut{ sequences: ["Ctrl+G"]; enabled: page.visible; onActivated: page.generate() }
-    Shortcut{ sequences: [StandardKey.SelectAll]; enabled: page.visible; onActivated: page.activeColumn.toggleAll() }
-    Shortcut{
-        sequences: [StandardKey.Delete]
-        enabled: page.visible && page.activeColumn.selectedCount > 0
-        onActivated: page.activeColumn.deleteSelected()
+
+    // A titled column: a toolbar over a table.
+    component Panel: ColumnLayout{
+        id: panel
+        property alias title: titleText.text
+        property alias note: noteText.text
+        readonly property SelectableTable table: tableItem
+        default property alias tools: toolbar.data
+        // what Ctrl+N / Enter / Del do in this column
+        property var add: function(){}
+        property var edit: function(){}
+        property var remove: function(){}
+        // something was selected here: page shortcuts should act on this column
+        signal used()
+        spacing: 10
+        RowLayout{
+            Layout.fillWidth: true
+            Text{
+                id: titleText
+                Layout.fillWidth: true
+                elide: Text.ElideRight
+                font.family: "Montserrat SemiBold"
+                font.pixelSize: 15
+                color: Material.foreground
+            }
+            Text{
+                id: noteText
+                visible: text !== ""
+                font.family: "Montserrat Medium"
+                font.pixelSize: 13
+                color: Material.foreground
+                opacity: 0.7
+            }
+        }
+        // Wraps onto a second line when the column is narrow instead of squashing buttons.
+        Flow{ id: toolbar; Layout.fillWidth: true; spacing: 6 }
+        SelectableTable{
+            id: tableItem
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            onSelectedCountChanged: if(selectedCount > 0) panel.used()
+        }
     }
-    Shortcut{
-        sequences: ["Return", "Enter", "F2"]
-        enabled: page.visible && page.activeColumn.selectedCount === 1
-        onActivated: page.activeColumn.editSelected()
-    }
+
     ColumnLayout{
         anchors.fill: parent
         spacing: 0
@@ -146,8 +138,8 @@ ShadowRect{
                 text: qsTr("Check")
                 ToolTip.text: qsTr("Look for problems without generating")
                 onClicked: {
-                    let issues = page.check()
-                    page.showError(issues.length === 0 ? qsTr("No problems found.") : issues.join("\n"))
+                    let issues = page.scanArr.check()
+                    errors.show(issues.length === 0 ? qsTr("No problems found.") : issues.join("\n"))
                 }
             }
             ToolbarBtn{ text: qsTr("Generate afeScanArrg.c/.h"); ToolTip.text: qsTr("Write the C files (Ctrl+G)"); primary: true; onClicked: page.generate() }
@@ -156,36 +148,87 @@ ShadowRect{
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.margins: 8
-            ScanItemColumn{
-                id: itemColumn
-                confirm: confirmDelete
-                onRenamed: (oldName, newName) => page.renameStep(oldName, newName)
-                onTouched: page.activeColumn = itemColumn
+            Panel{
+                id: items
+                onUsed: page.active = items
                 SplitView.fillHeight: true
                 SplitView.minimumWidth: 230
                 SplitView.preferredWidth: page.width * 0.38
+                title: qsTr("Scan Items")
+                table.model: page.scanArr.items
+                table.columns: [{title: "#", width: 36}, {title: qsTr("Name"), stretch: 12}, {title: qsTr("Description"), stretch: 10}]
+                table.row: Component{ ScanItemRow{} }
+                table.emptyText: qsTr("No scan items. The first one must be AFE_END (value 0).")
+                table.onActivated: (i) => itemEditor.open(i, page.scanArr.items.get(i))
+                add: () => itemEditor.open(-1, null)
+                edit: () => { if(table.selectedCount === 1) itemEditor.open(table.selectedIndexes()[0], page.scanArr.items.get(table.selectedIndexes()[0])) }
+                remove: () => {
+                    let rows = table.selectedIndexes()
+                    if(rows.length) confirmDelete.ask(qsTr("Delete %1 scan item(s)?").arg(rows.length), () => page.scanArr.removeItems(rows))
+                }
+                function moveSelected(delta){
+                    let j = page.scanArr.moveItem(table.selectedIndexes()[0], delta)
+                    table.select([j])
+                }
+                ToolbarBtn{ text: qsTr("Add"); ToolTip.text: qsTr("Add a scan item (Ctrl+N)"); onClicked: items.add() }
+                ToolbarBtn{ text: qsTr("Edit"); ToolTip.text: qsTr("Edit (Enter, or double-click)"); enabled: items.table.selectedCount === 1; onClicked: items.edit() }
+                ToolbarBtn{ text: qsTr("Delete"); ToolTip.text: qsTr("Delete (Del)"); enabled: items.table.selectedCount > 0; onClicked: items.remove() }
+                ToolbarBtn{ text: "▲"; ToolTip.text: qsTr("Move up (lowers its value)"); enabled: items.table.selectedCount === 1; onClicked: items.moveSelected(-1) }
+                ToolbarBtn{ text: "▼"; ToolTip.text: qsTr("Move down"); enabled: items.table.selectedCount === 1; onClicked: items.moveSelected(1) }
             }
-            ScanArrColumn{
-                id: arrColumn
-                confirm: confirmDelete
-                onTouched: page.activeColumn = arrColumn
+            Panel{
+                id: arrangements
+                onUsed: page.active = arrangements
                 SplitView.fillHeight: true
                 SplitView.fillWidth: true
                 SplitView.minimumWidth: 240
-                onFocusIndex: (index, model) => {
-                                  arrColumn.currentIndex = index
-                                  scanArrListColumn.index = index
-                                  scanArrListColumn.model = model
-                                  page.activeColumn = scanArrListColumn
-                              }
+                title: qsTr("Arrangements")
+                table.model: page.scanArr.arrangements
+                table.columns: [{title: qsTr("ID"), width: 44}, {title: qsTr("Name"), stretch: 12}, {title: qsTr("Description"), stretch: 10}]
+                table.row: Component{ ArrangementRow{} }
+                table.currentIndex: page.scanArr.current
+                table.emptyText: qsTr("No arrangements yet. Add one, then click it to choose its scan steps.")
+                table.footerText: qsTr("%1 arrangements  •  %2 selected").arg(table.totalCount).arg(table.selectedCount)
+                table.onTapped: (i) => { page.scanArr.setCurrent(i); page.active = steps }
+                table.onActivated: (i) => arrEditor.open(i, page.scanArr.arrangements.get(i))
+                add: () => arrEditor.open(-1, null, page.scanArr.nextArrangementId())
+                edit: () => { if(table.selectedCount === 1) arrEditor.open(table.selectedIndexes()[0], page.scanArr.arrangements.get(table.selectedIndexes()[0])) }
+                remove: () => {
+                    let rows = table.selectedIndexes()
+                    if(rows.length) confirmDelete.ask(qsTr("Delete %1 arrangement(s) and their steps?").arg(rows.length), () => page.scanArr.removeArrangements(rows))
+                }
+                ToolbarBtn{ text: qsTr("Add"); ToolTip.text: qsTr("Add an arrangement (Ctrl+N)"); onClicked: arrangements.add() }
+                ToolbarBtn{ text: qsTr("Edit"); ToolTip.text: qsTr("Edit ID, name, description (Enter, or double-click)"); enabled: arrangements.table.selectedCount === 1; onClicked: arrangements.edit() }
+                ToolbarBtn{ text: qsTr("Delete"); ToolTip.text: qsTr("Delete (Del)"); enabled: arrangements.table.selectedCount > 0; onClicked: arrangements.remove() }
             }
-            ScanArrListColumn{
-                id: scanArrListColumn
-                confirm: confirmDelete
-                onTouched: page.activeColumn = scanArrListColumn
+            Panel{
+                id: steps
+                onUsed: page.active = steps
                 SplitView.fillHeight: true
                 SplitView.minimumWidth: 190
                 SplitView.preferredWidth: page.width * 0.28
+                readonly property bool hasArrangement: page.scanArr.current !== -1
+                title: hasArrangement ? page.scanArr.currentName : qsTr("Scan List")
+                note: hasArrangement ? qsTr("%1 / %2 steps").arg(table.totalCount).arg(page.scanArr.stepLimit) : ""
+                table.model: page.scanArr.steps
+                table.columns: [{title: "#", width: 46}, {title: qsTr("Scan step"), stretch: 1}]
+                table.row: Component{ StepRow{} }
+                table.emptyText: hasArrangement ? "" : qsTr("Click an arrangement to see and edit its scan steps.")
+                table.footerText: qsTr("%1 of %2 selected").arg(table.selectedCount).arg(table.totalCount)
+                add: () => { if(hasArrangement) stepPicker.open() }
+                remove: () => {
+                    let rows = table.selectedIndexes()
+                    if(rows.length) confirmDelete.ask(qsTr("Remove %1 step(s) from %2?").arg(rows.length).arg(page.scanArr.currentName),
+                                                      () => page.scanArr.removeSteps(rows))
+                }
+                function moveSelected(delta){
+                    let j = page.scanArr.moveStep(table.selectedIndexes()[0], delta)
+                    table.select([j])
+                }
+                ToolbarBtn{ text: qsTr("Add"); ToolTip.text: qsTr("Insert steps after the selected one, or before AFE_END (Ctrl+N)"); enabled: steps.hasArrangement; onClicked: steps.add() }
+                ToolbarBtn{ text: qsTr("Remove"); ToolTip.text: qsTr("Remove the selected steps (Del)"); enabled: steps.table.selectedCount > 0; onClicked: steps.remove() }
+                ToolbarBtn{ text: "▲"; ToolTip.text: qsTr("Move up"); enabled: steps.table.selectedCount === 1; onClicked: steps.moveSelected(-1) }
+                ToolbarBtn{ text: "▼"; ToolTip.text: qsTr("Move down"); enabled: steps.table.selectedCount === 1; onClicked: steps.moveSelected(1) }
             }
         }
     }

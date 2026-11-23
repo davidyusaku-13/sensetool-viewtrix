@@ -17,3 +17,22 @@ dependencies = [
 
 [tool.uv]
 package = false
+
+[dependency-groups]
+dev = [
+    "coverage>=7.10.7",
+    "ruff>=0.17.6",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+extend-exclude = ["resource_rc.py", "env"]
+
+[tool.ruff.lint]
+# pyflakes, pycodestyle errors, import sorting is not enforced
+select = ["F", "E", "W", "B"]
+ignore = [
+    "E731",  # small lambdas are used for readability in tests
+    "B008",  # parent=QModelIndex() defaults are the Qt idiom
+]

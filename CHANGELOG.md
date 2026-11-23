@@ -17,6 +17,7 @@ What's new in this update:
 - App Setting: the register window shows problems while you type and the address in both hex and decimal
 - Keyboard: Ctrl+N add, Enter/F2 or double-click edit, Del delete, Ctrl+A select all, Ctrl+G generate; header checkbox selects all rows
 - One look across pages: shared toolbar style with Generate as the main action, Viewtrix orange accent with readable text in light and dark themes, sidebar labels (menu button) and distinct icons, empty-state hints, labelled Hardware Utilities inputs, clearer Settings (Dark mode switch, language list)
+- Edit windows check names as you save (e.g. a duplicate scan item) and keep the window open with the reason; Esc cancels, Ctrl+Enter saves
 
 Bugfixes:
 
@@ -29,3 +30,11 @@ Bugfixes:
 - Coefficient import/export errors are shown instead of crashing; window coefficient export failed
 - History entries all showed the app start time
 - Scan item drag icon did not load
+
+Under the hood:
+
+- Scan Arrangement data and rules moved from QML into a Python model, and project open/save, unsaved changes and undo into a Python controller, so they are unit-tested
+- AppLogic split into focused pieces (coefficients, update check, project); shared C-generation, file and table code written once
+- Pages get their data passed in instead of reaching for globals; one table, edit window and shortcut component shared by every page
+- CI lints (ruff, qmllint) and runs the Python and QML tests on every push and pull request
+

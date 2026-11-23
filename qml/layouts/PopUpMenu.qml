@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material
@@ -5,6 +6,12 @@ import QtQuick.Layouts
 import "../components"
 
 Item{
+    id: popUp
+    // dependencies
+    property var history: null    // HistoryModel
+    property var updates: null    // UpdateChecker
+    property var translator: null // Translator
+    signal updateAvailable()
     property alias currentIndex: popUpLayout.currentIndex
     property alias isDarkTheme: themeToggle.checked
     property alias languageIndex: langChoice.currentIndex
@@ -25,7 +32,7 @@ Item{
                     Layout.fillWidth: true
                     clip: true
                     // model: historyList
-                    model: window.historyModel
+                    model: popUp.history
                     //header
                     headerPositioning: ListView.OverlayHeader
                     header: Rectangle{
@@ -35,7 +42,7 @@ Item{
                         z: 2
                         Text{
                             text: qsTr("Activity")
-                            color: sensetool.onAccent
+                            color: Theme.onAccent
                             font.pixelSize: 20
                             font.family: "Montserrat SemiBold"
                             anchors.centerIn: parent
@@ -70,7 +77,7 @@ Item{
                     Layout.margins: 10
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
                     onClicked: {
-                        window.historyModel.clear()
+                        popUp.history.clear()
                     }
                 }
             }
@@ -87,7 +94,7 @@ Item{
                         text: qsTr("Settings")
                         font.pixelSize: 20
                         font.family: "Montserrat SemiBold"
-                        color: sensetool.onAccent
+                        color: Theme.onAccent
                         anchors.centerIn: parent
                     }
                 }
@@ -122,7 +129,7 @@ Item{
                         id: langChoice
                         model: ["English", "Bahasa Indonesia"]
                         implicitWidth: 190
-                        onActivated: (i) => translator.change_language(i === 1 ? "id" : "en")
+                        onActivated: (i) => popUp.translator.change_language(i === 1 ? "id" : "en")
                     }
                 }
                 Button{
@@ -134,8 +141,8 @@ Item{
                         cursorShape: Qt.PointingHandCursor
                     }
                     onClicked: {
-                        if(logic.checkUpdate()["status"]){
-                            update_window.show()
+                        if(popUp.updates.checkNow()["status"]){
+                            popUp.updateAvailable()
                         }
                     }
                 }

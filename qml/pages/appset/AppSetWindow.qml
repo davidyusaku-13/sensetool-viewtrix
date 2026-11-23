@@ -1,23 +1,24 @@
+pragma ComponentBehavior: Bound
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
+import QtQuick.Controls.Material
 import "../../components"
 
 // Add / edit one register and its bit fields.
-Window {
+EditWindow {
     id: root
     title: isEdit ? qsTr("Edit Register") : qsTr("Add Register")
     minimumWidth: 640
     minimumHeight: 640
-    modality: Qt.ApplicationModal
-    color: Material.background
 
-    signal create(var reg)
-    signal modify(int index, var reg)
-
+    // The AppSetModel being edited (suggestions, duplicate and live checks).
     property var model: null
     property int index: -1
-    property bool isEdit: false
+    // Called with (index, register) when saved; -1 means a new one. Returns "" or an error.
+    property var apply: null
+    canSave: addrInput.acceptableInput && nameInput.acceptableInput && !isDuplicate
+    save: () => apply ? apply(index, result()) : ""
     property var categoryNames: []
     // Bumped on every edit so the live problem check re-runs.
     property int rev: 0
@@ -30,7 +31,7 @@ Window {
     readonly property bool isDuplicate: model !== null && nameInput.text !== ""
                                         && model.indexOfName(nameInput.text, index) !== -1
 
-    function manage(i, reg){
+    function open(i, reg){
         isEdit = i !== -1
         index = i
         categoryNames = model ? model.categories() : []
@@ -46,6 +47,7 @@ Window {
         }
         if(!reg) fieldList.append({"name": "", "msb": "7", "lsb": "0", "dflt": ""})
         root.show()
+        nameInput.forceActiveFocus()
     }
     function result(){
         let fields = []
@@ -63,21 +65,15 @@ Window {
         onCountChanged: root.rev++
     }
 
-    component FormLabel: Text{
-        font.family: "Montserrat Medium"
-        font.pixelSize: 16
-        color: Material.foreground
-    }
-
     ColumnLayout{
-        anchors.fill: parent
-        anchors.margins: 20
+        Layout.fillWidth: true
+        Layout.fillHeight: true
         spacing: 10
         GridLayout{
             Layout.fillWidth: true
             columns: 4
             columnSpacing: 12
-            FormLabel{ text: qsTr("Address") }
+            FieldLabel{ text: qsTr("Address") }
             TextField{
                 id: addrInput
                 Layout.fillWidth: true
@@ -97,14 +93,14 @@ Window {
                     font.pixelSize: 13
                 }
             }
-            FormLabel{ text: qsTr("Size (bytes)") }
+            FieldLabel{ text: qsTr("Size (bytes)") }
             ComboBox{
                 id: sizeInput
                 Layout.fillWidth: true
                 model: ["1", "2", "4"]
                 onCurrentIndexChanged: root.rev++
             }
-            FormLabel{ text: qsTr("Name") }
+            FieldLabel{ text: qsTr("Name") }
             TextField{
                 id: nameInput
                 Layout.fillWidth: true
@@ -112,7 +108,7 @@ Window {
                 validator: RegularExpressionValidator { regularExpression: /[A-Za-z_][A-Za-z0-9_]*/ }
                 selectByMouse: true
             }
-            FormLabel{ text: qsTr("Category") }
+            FieldLabel{ text: qsTr("Category") }
             ComboBox{
                 id: categoryInput
                 Layout.fillWidth: true
@@ -120,7 +116,7 @@ Window {
                 editable: true
                 model: root.categoryNames
             }
-            FormLabel{ text: qsTr("Description") }
+            FieldLabel{ text: qsTr("Description") }
             TextField{
                 id: descInput
                 Layout.fillWidth: true
@@ -131,13 +127,13 @@ Window {
         Text{
             visible: root.isDuplicate
             text: qsTr("A register with this name already exists")
-            color: "#E53935"
+            color: Theme.error
             font.family: "Montserrat"
             font.pixelSize: 13
         }
         RowLayout{
             Layout.fillWidth: true
-            FormLabel{ text: qsTr("Bit fields"); Layout.fillWidth: true }
+            FieldLabel{ text: qsTr("Bit fields"); Layout.fillWidth: true }
             Text{
                 text: qsTr("bits %1..0, unused bits are reserved").arg(parseInt(sizeInput.currentText) * 8 - 1)
                 color: Material.foreground
@@ -172,40 +168,41 @@ Window {
             spacing: 4
             model: fieldList
             delegate: RowLayout{
+                id: fieldRow
                 required property int index
                 required property var model
                 width: ListView.view.width
                 spacing: 6
                 TextField{
                     Layout.fillWidth: true
-                    text: model.name
-                    onTextEdited: fieldList.setProperty(index, "name", text)
+                    text: fieldRow.model.name
+                    onTextEdited: fieldList.setProperty(fieldRow.index, "name", text)
                     validator: RegularExpressionValidator { regularExpression: /[A-Za-z_][A-Za-z0-9_]*/ }
                     selectByMouse: true
                 }
                 TextField{
                     Layout.preferredWidth: 60
-                    text: model.msb
-                    onTextEdited: fieldList.setProperty(index, "msb", text)
+                    text: fieldRow.model.msb
+                    onTextEdited: fieldList.setProperty(fieldRow.index, "msb", text)
                     validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
                 }
                 TextField{
                     Layout.preferredWidth: 60
-                    text: model.lsb
-                    onTextEdited: fieldList.setProperty(index, "lsb", text)
+                    text: fieldRow.model.lsb
+                    onTextEdited: fieldList.setProperty(fieldRow.index, "lsb", text)
                     validator: RegularExpressionValidator { regularExpression: /[0-9]{1,2}/ }
                 }
                 TextField{
                     Layout.preferredWidth: 90
-                    text: model.dflt
-                    onTextEdited: fieldList.setProperty(index, "dflt", text)
+                    text: fieldRow.model.dflt
+                    onTextEdited: fieldList.setProperty(fieldRow.index, "dflt", text)
                     validator: RegularExpressionValidator { regularExpression: /(0[xX][0-9A-Fa-f]*|0[bB][01]*|[0-9]*)/ }
                 }
                 RoundButton{
                     Layout.preferredWidth: 40
                     icon.source: "qrc:/images/trash"
                     flat: true
-                    onClicked: fieldList.remove(index)
+                    onClicked: fieldList.remove(fieldRow.index)
                 }
             }
         }
@@ -215,28 +212,9 @@ Window {
             visible: root.liveIssue !== ""
             text: "\u26A0 " + root.liveIssue
             wrapMode: Text.Wrap
-            color: "#E53935"
+            color: Theme.error
             font.family: "Montserrat Medium"
             font.pixelSize: 13
-        }
-        RowLayout{
-            Layout.alignment: Qt.AlignRight
-            spacing: 5
-            RoundButton{
-                implicitWidth: 80
-                text: root.isEdit ? qsTr("Save") : qsTr("Add")
-                enabled: addrInput.acceptableInput && nameInput.acceptableInput && !root.isDuplicate
-                onClicked: {
-                    if(root.isEdit) root.modify(root.index, root.result())
-                    else root.create(root.result())
-                    root.close()
-                }
-            }
-            RoundButton{
-                implicitWidth: 80
-                text: qsTr("Cancel")
-                onClicked: root.close()
-            }
         }
     }
 }

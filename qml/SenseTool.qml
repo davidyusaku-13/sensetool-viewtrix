@@ -1,6 +1,5 @@
 import QtQuick
 import QtCore
-import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Material
@@ -11,62 +10,76 @@ import "pages/appset"
 import "pages/scanarr"
 import "pages/hwutil"
 
+// The main window's content: header, workspace sidebar, the workspace pages and
+// the activity/settings panel. Everything it needs is passed in.
 Rectangle{
     id: root
-    property int theme: settings.isDarkTheme ? Material.Dark : Material.Light
-    // One brand colour (Viewtrix orange), tuned per theme for contrast:
-    // white text on the darker orange (light theme), dark text on the lighter one (dark theme).
-    readonly property color accent: theme === Material.Dark ? "#F5A04D" : "#C45500"
-    readonly property color onAccent: theme === Material.Dark ? "#1C1B1F" : "#FFFFFF"
-    property alias scanArrPage: scanArrPage
+    required property var prjSetModel
+    required property var appSetModel
+    required property var scanArrModel
+    required property var historyModel
+    required property var project
+    required property var updates
+    required property var coefficients
+    required property var translator
+    signal openRequested()
+    signal saveRequested()
+    signal updateAvailable()
     property alias currentPage: pages.currentIndex
-    Material.theme: theme
-    Material.accent: accent
-    // Apply the saved language once Settings has restored it.
-    Component.onCompleted: Qt.callLater(() => { if(popUp.languageIndex === 1) translator.change_language("id") })
+
+    Material.theme: Theme.theme
+    Material.accent: Theme.accent
+    color: Material.background
+    Binding { target: Theme; property: "dark"; value: popUp.isDarkTheme }
+
     Settings{
         id: settings
         property alias isDarkTheme: popUp.isDarkTheme
         property alias sidebarFolded: sidebar.folded
         property alias languageIndex: popUp.languageIndex
     }
-    ListModel{
-        id: historyList
-    }
+    // Apply the saved language once Settings has restored it.
+    Component.onCompleted: Qt.callLater(() => { if(popUp.languageIndex === 1) root.translator.change_language("id") })
+
     ColumnLayout{
         anchors.fill: parent
         spacing: 1
-        //header rect
         Header{
             id: header
+            project: root.project
+            folded: sidebar.folded
+            onToggleSidebar: sidebar.folded = !sidebar.folded
+            onOpenRequested: root.openRequested()
+            onSaveRequested: root.saveRequested()
         }
-        //sidebar + workspace
         RowLayout{
             Layout.fillHeight: true
             spacing: 0
-            //sidebar
             SideBar{
                 id: sidebar
             }
-            //workspace and pop-up
             SplitView{
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                //content
                 StackLayout{
                     id: pages
                     SplitView.fillHeight: true
                     SplitView.fillWidth: true
                     SplitView.minimumWidth: 600
                     currentIndex: sidebar.index
-                    PrjSetPage{}
-                    AppSetPage{}
-                    ScanArrPage{ id: scanArrPage }
-                    HwUtilPage{}
+                    // clicking empty workspace space hides the sidebar labels
+                    TapHandler{ onTapped: sidebar.folded = true }
+                    PrjSetPage{ model: root.prjSetModel; history: root.historyModel }
+                    AppSetPage{ model: root.appSetModel; history: root.historyModel }
+                    ScanArrPage{ scanArr: root.scanArrModel; history: root.historyModel }
+                    HwUtilPage{ coefficients: root.coefficients; history: root.historyModel }
                 }
-                //pop-up
                 PopUpMenu{
                     id: popUp
+                    history: root.historyModel
+                    updates: root.updates
+                    translator: root.translator
+                    onUpdateAvailable: root.updateAvailable()
                     SplitView.fillHeight: true
                     SplitView.preferredWidth: 320
                     SplitView.maximumWidth: 500

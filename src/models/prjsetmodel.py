@@ -1,9 +1,10 @@
-from PySide6.QtCore import Qt, QAbstractListModel, Slot, Signal, Property, QModelIndex, QObject, QUrl
+from PySide6.QtCore import Qt, Slot, Signal, Property, QModelIndex, QObject, QUrl
 from PySide6.QtQml import QmlElement
 from ..modules.logger import AppLogger
 from ..modules import prjset, prjcfg
+from ..modules.fileio import UserError, local_path, message, write_text
 from .prjsetmodelitem import PrjSetModelItem
-import yaml
+from .workspace import WorkspaceListModel, logged
 
 QML_IMPORT_NAME = "PrjSetModel"
 QML_IMPORT_MAJOR_VERSION = 1
@@ -20,14 +21,16 @@ ISSUE_ROLE = Qt.UserRole + 6
 DEPENDENT_ROLE = Qt.UserRole + 7
 
 @QmlElement
-class PrjSetModel(QAbstractListModel):
-    issueCountChanged = Signal()
+class PrjSetModel(WorkspaceListModel):
+    """Project Setting workspace: the PrjSet sheet, generates prjset.h."""
+    SECTION = "prjset"
+    # its own signal: a Property notifying through a base-class signal crashes QML registration
+    rootIssueCountChanged = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._items = []
         self._analysis = []
-        self._issue_count = 0
         self._root_issue_count = 0
 
     # ---- model basics -------------------------------------------------
@@ -76,10 +79,6 @@ class PrjSetModel(QAbstractListModel):
             flag |= Qt.ItemIsDragEnabled
         return flag | Qt.ItemIsDropEnabled
 
-    @property
-    def itemsData(self):
-        return [(item.name, item.value, item.desc) for item in self._items]
-
     def _refresh(self):
         """Re-run validation/evaluation; every item can depend on any other."""
         self._analysis = prjset.analyze([(i.name, i.value) for i in self._items])
@@ -88,15 +87,12 @@ class PrjSetModel(QAbstractListModel):
                                   [RESOLVED_ROLE, ISSUE_ROLE, DEPENDENT_ROLE])
         count = sum(1 for a in self._analysis if a["issue"])
         roots = sum(1 for a in self._analysis if a["issue"] and not a["dependent"])
-        if (count, roots) != (self._issue_count, self._root_issue_count):
-            self._issue_count, self._root_issue_count = count, roots
-            self.issueCountChanged.emit()
+        self._set_issue_count(count)
+        if roots != self._root_issue_count:
+            self._root_issue_count = roots
+            self.rootIssueCountChanged.emit()
 
-    @Property(int, notify=issueCountChanged)
-    def issueCount(self):
-        return self._issue_count
-
-    @Property(int, notify=issueCountChanged)
+    @Property(int, notify=rootIssueCountChanged)
     def rootIssueCount(self):
         """Items whose own value is wrong (the rest only depend on one of these)."""
         return self._root_issue_count
@@ -214,32 +210,7 @@ class PrjSetModel(QAbstractListModel):
         self.endResetModel()
         self._refresh()
 
-    # ---- files --------------------------------------------------------
-    @Slot(QUrl, result=str)
-    def importFile(self, file: QUrl):
-        """Import a .yaml/.yml project setting or the legacy prjcfg .xlsx.
-        Replaces the current list. Returns an error message, or "" on success."""
-        path = file.toLocalFile()
-        if path.lower().endswith((".xlsx", ".xlsm")):
-            return self.importXLSX(file)
-        return self.importYAML(file)
-
-    @Slot(QUrl, result=str)
-    def importYAML(self, file: QUrl):
-        path = file.toLocalFile()
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = yaml.safe_load(f)
-        except (OSError, yaml.YAMLError) as e:
-            logger.log(f"Failed to import {path}: {e}", "ERROR")
-            return f"Could not import {path}:\n{e}"
-        err = self.loadData(data)
-        if err:
-            logger.log(f"Failed to import {path}: {err}", "ERROR")
-            return f"Could not import {path}:\n{err}"
-        logger.log(f"Imported file: {path}", "INFO")
-        return ""
-
+    # ---- files (import/export come from WorkspaceListModel) -------------
     def loadData(self, data):
         """Replace the list from parsed YAML (a project-setting file or a combined
         prjcfg.yaml). Returns an error message, or "" on success."""
@@ -255,45 +226,21 @@ class PrjSetModel(QAbstractListModel):
     def document(self):
         return prjcfg.prjset_doc([i.to_dict() for i in self._items])
 
-    @Slot(QUrl, result=str)
-    def importXLSX(self, file: QUrl):
-        path = file.toLocalFile()
-        try:
-            items = prjset.read_prjcfg_xlsx(path)
-        except Exception as e:  # openpyxl raises a variety of exception types
-            logger.log(f"Failed to import {path}: {e}", "ERROR")
-            return f"Could not import {path}:\n{e}"
-        self._set_items(items)
-        logger.log(f"Imported spreadsheet: {path}", "INFO")
-        return ""
-
-    @Slot(QUrl, result=str)
-    def exportYAML(self, file: QUrl):
-        path = file.toLocalFile()
-        yaml_data = self.document()
-        try:
-            with open(path, "w", encoding="utf-8") as f:
-                prjcfg.dump(yaml_data, f)
-        except OSError as e:
-            logger.log(f"Failed to export {path}: {e}", "ERROR")
-            return f"Could not write {path}:\n{e}"
-        logger.log(f"Exported file: {path}", "INFO")
-        return ""
+    def readSpreadsheet(self, path):
+        return {"data": prjset.read_prjcfg_xlsx(path)}
 
     @Slot(QUrl, result=str)
     def exportHeader(self, file: QUrl):
         """Write prjset.h. Refuses while there are validation issues, since
         the header would not compile (or would silently be wrong)."""
-        path = file.toLocalFile()
-        if self._issue_count:
-            return (f"{self._issue_count} item(s) have problems (shown in red). "
-                    "Fix them before generating the header.")
-        try:
-            text = prjset.generate_header([i.to_dict() for i in self._items])
-            with open(path, "w", encoding="utf-8", newline="\n") as f:
-                f.write(text)
-        except (OSError, prjset.ExprError) as e:
-            logger.log(f"Failed to export {path}: {e}", "ERROR")
-            return f"Could not write {path}:\n{e}"
-        logger.log(f"Exported header: {path}", "INFO")
-        return ""
+        def run():
+            if self._issue_count:
+                raise UserError(f"{self._issue_count} item(s) have problems (shown in red). "
+                                "Fix them before generating the header.")
+            try:
+                text = prjset.generate_header([i.to_dict() for i in self._items])
+            except prjset.ExprError as e:
+                raise UserError(f"Could not generate prjset.h:\n{e}") from e
+            write_text(local_path(file), text)
+            logger.log(f"Exported header: {local_path(file)}", "INFO")
+        return logged(message(run))

@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts
+import QtQuick.Controls.Material
 import "../components"
 
 ShadowRect{
@@ -9,6 +10,12 @@ ShadowRect{
     Layout.preferredHeight: 56
     Layout.maximumHeight: 56
     readonly property alias index: headerList.currentIndex
+    // dependencies
+    property var project: null     // ProjectController
+    property bool folded: true
+    signal toggleSidebar()
+    signal openRequested()
+    signal saveRequested()
     color: Material.background
 
     component HeaderBtn: ToolbarBtn{
@@ -26,10 +33,8 @@ ShadowRect{
             id: menuBtn
             display: AbstractButton.IconOnly
             icon.source: "qrc:/images/menu-icon2"
-            text: sidebar.folded ? qsTr("Show workspace names") : qsTr("Hide workspace names")
-            onClicked: {
-                sidebar.folded = !sidebar.folded
-            }
+            text: header.folded ? qsTr("Show workspace names") : qsTr("Hide workspace names")
+            onClicked: header.toggleSidebar()
         }
         Text{
             text: qsTr("Sense Tool")
@@ -41,8 +46,8 @@ ShadowRect{
         Text{
             Layout.leftMargin: 16
             Layout.fillWidth: true
-            text: (window.projectName !== "" ? window.projectName : qsTr("Untitled project"))
-                  + (window.dirty ? "  ●" : "")
+            text: (header.project.name !== "" ? header.project.name : qsTr("Untitled project"))
+                  + (header.project.dirty ? "  ●" : "")
             elide: Text.ElideMiddle
             color: Material.foreground
             opacity: 0.75
@@ -50,33 +55,33 @@ ShadowRect{
             font.pixelSize: 15
             HoverHandler{ id: fileHover }
             ToolTip.visible: fileHover.hovered
-            ToolTip.text: (window.projectPath !== "" ? window.projectPath : qsTr("Not saved yet"))
-                          + (window.dirty ? qsTr("\nUnsaved changes") : "")
+            ToolTip.text: (header.project.path !== "" ? header.project.path : qsTr("Not saved yet"))
+                          + (header.project.dirty ? qsTr("\nUnsaved changes") : "")
         }
         HeaderBtn{
             text: qsTr("Open")
             ToolTip.text: qsTr("Open a project: prjcfg.yaml, or import prjcfg.xlsx (Ctrl+O)")
-            onClicked: window.openProjectDialog()
+            onClicked: header.openRequested()
         }
         HeaderBtn{
             text: qsTr("Save")
             ToolTip.text: qsTr("Save the project (Ctrl+S). Save As: Ctrl+Shift+S")
-            primary: window.dirty
-            onClicked: window.saveProject(false)
+            primary: header.project.dirty
+            onClicked: header.saveRequested()
         }
         HeaderBtn{
             text: "↶"
             font.pixelSize: 20
-            enabled: window.canUndo
+            enabled: header.project.canUndo
             ToolTip.text: qsTr("Undo (Ctrl+Z)")
-            onClicked: window.undo()
+            onClicked: header.project.undo()
         }
         HeaderBtn{
             text: "↷"
             font.pixelSize: 20
-            enabled: window.canRedo
+            enabled: header.project.canRedo
             ToolTip.text: qsTr("Redo (Ctrl+Shift+Z)")
-            onClicked: window.redo()
+            onClicked: header.project.redo()
         }
         HeaderList{
             id: headerList

@@ -83,7 +83,7 @@ class PrjSetModelTestCase(unittest.TestCase):
         path = os.path.join(self._tmp.name, "in.yaml")
         with open(path, "w") as f:
             yaml.dump({"data": [{"name": "TX_LEN", "value": 21, "desc": None}]}, f)
-        self.assertEqual(self._model.importYAML(QUrl.fromLocalFile(path)), "")
+        self.assertEqual(self._model.importFile(QUrl.fromLocalFile(path)), "")
         self.assertEqual(self._model.get(0).value, "21")
         self.assertEqual(self._model.get(0).desc, "")
 
@@ -95,11 +95,11 @@ class PrjSetModelTestCase(unittest.TestCase):
         self.assertEqual(self._model.issueCount, 0)
 
     def test_import_errors_are_reported(self):
-        self.assertNotEqual(self._model.importYAML(self.url("missing.yaml")), "")
+        self.assertNotEqual(self._model.importFile(self.url("missing.yaml")), "")
         path = os.path.join(self._tmp.name, "bad.yaml")
         with open(path, "w") as f:
             f.write("data:\n- value: 1\n")
-        self.assertIn("name", self._model.importYAML(QUrl.fromLocalFile(path)))
+        self.assertIn("name", self._model.importFile(QUrl.fromLocalFile(path)))
         self.assertEqual(self._model.rowCount(), 1, "failed import must not touch the list")
 
     @unittest.skipUnless(os.path.exists(os.path.join(ROOT, "prjcfg.xlsx")), "prjcfg.xlsx not present")
@@ -121,7 +121,7 @@ class PrjSetModelTestCase(unittest.TestCase):
         self.assertEqual(data[0]["value"], 21)
         self.assertEqual(data[1]["value"], "0x10")
         other = PrjSetModel()
-        self.assertEqual(other.importYAML(self.url("out.yaml")), "")
+        self.assertEqual(other.importFile(self.url("out.yaml")), "")
         self.assertEqual([other.get(i).to_dict() for i in range(2)],
                          [self._model.get(i).to_dict() for i in range(2)])
 

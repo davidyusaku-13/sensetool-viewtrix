@@ -1,0 +1,17 @@
+singleton Theme 1.0 Theme.qml
+ConfirmDialog 1.0 ConfirmDialog.qml
+EditWindow 1.0 EditWindow.qml
+ErrorDialog 1.0 ErrorDialog.qml
+FieldLabel 1.0 FieldLabel.qml
+HeaderCell 1.0 HeaderCell.qml
+HoverTip 1.0 HoverTip.qml
+LabeledField 1.0 LabeledField.qml
+MyButton 1.0 MyButton.qml
+PageShortcuts 1.0 PageShortcuts.qml
+SelectAllBox 1.0 SelectAllBox.qml
+SelectableTable 1.0 SelectableTable.qml
+ShadowRect 1.0 ShadowRect.qml
+TableCell 1.0 TableCell.qml
+TableRow 1.0 TableRow.qml
+TableText 1.0 TableText.qml
+ToolbarBtn 1.0 ToolbarBtn.qml

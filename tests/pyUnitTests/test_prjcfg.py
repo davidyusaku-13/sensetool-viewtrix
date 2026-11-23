@@ -9,7 +9,7 @@ import unittest
 import yaml
 from PySide6.QtCore import QUrl
 from src.modules import prjcfg, prjset
-from src.modules.logic import AppLogic
+from src.models.scanarrmodel import ScanArrModel
 from src.models.appsetmodel import AppSetModel
 from src.models.prjsetmodel import PrjSetModel
 
@@ -60,12 +60,10 @@ class PrjCfgTestCase(unittest.TestCase):
         self.assertEqual((m.rowCount(), m.issueCount, m.bytesUsed), (16, 0, 19))
 
     def test_scan_arrangement(self):
-        logic = AppLogic()
-        d = logic.importScanArr(URL)
-        self.assertEqual(logic.lastError(), "")
-        self.assertEqual(len(d["scan_items"]), 16)
-        self.assertEqual([a["name"] for a in d["arrangements"]], ["AFE_SCAN_ACTIVE", "AFE_SCAN_IDLE"])
-        self.assertEqual(logic.checkScanArr(d["scan_items"], d["arrangements"]), [])
+        s = ScanArrModel()
+        self.assertEqual(s.importFile(URL), "")
+        self.assertEqual((s.items.rowCount(), s.arrangements.rowCount()), (16, 2))
+        self.assertEqual(s.check(), [])
 
     # ---- it agrees with the single-workspace files ---------------------
     def test_sections_match_bundled_files(self):
@@ -92,10 +90,9 @@ class PrjCfgTestCase(unittest.TestCase):
         self.assertEqual(a.exportYAML(QUrl.fromLocalFile(self.tmp("a.yaml"))), "")
         self.assertEqual(load(self.tmp("a.yaml")), data["appset"])
 
-        logic = AppLogic()
-        d = logic.importScanArr(URL)
-        self.assertEqual(logic.exportScanArr(QUrl.fromLocalFile(self.tmp("s.yaml")),
-                                             d["scan_items"], d["arrangements"]), "")
+        s = ScanArrModel()
+        s.importFile(URL)
+        self.assertEqual(s.exportYAML(QUrl.fromLocalFile(self.tmp("s.yaml"))), "")
         self.assertEqual(load(self.tmp("s.yaml")), data["scanarr"])
 
     def test_single_workspace_file_still_accepted_by_section(self):
@@ -110,9 +107,9 @@ class PrjCfgTestCase(unittest.TestCase):
         a = AppSetModel()
         a.importFile(URL)
         self.assertEqual(a.generate(QUrl.fromLocalFile(d)), "")
-        logic = AppLogic()
-        s = logic.importScanArr(URL)
-        self.assertEqual(logic.generateScanArr(QUrl.fromLocalFile(d), s["scan_items"], s["arrangements"]), "")
+        s = ScanArrModel()
+        s.importFile(URL)
+        self.assertEqual(s.generate(QUrl.fromLocalFile(d)), "")
         with open(self.tmp("main.c"), "w") as f:
             f.write('#include <stdio.h>\n#include "prjset.h"\n#include "appset.h"\n#include "afeScanArrg.h"\n'
                     "int main(void) {\n    appSetReset();\n"
@@ -126,36 +123,7 @@ class PrjCfgTestCase(unittest.TestCase):
         out = subprocess.run([self.tmp("t")], capture_output=True, text=True).stdout
         self.assertEqual(out.strip(), "840 1684 150 2")
 
-    # ---- the app's project file handling (Open / Save / undo) ------------
-    def test_open_save_round_trip(self):
-        logic, p, a = AppLogic(), PrjSetModel(), AppSetModel()
-        r = logic.openProject(URL, p, a)
-        self.assertEqual(r["error"], "")
-        self.assertEqual((p.rowCount(), a.rowCount(), len(r["scan_items"])), (140, 16, 16))
-        out = QUrl.fromLocalFile(self.tmp("saved.yaml"))
-        self.assertEqual(logic.saveProject(out, p, a, r["scan_items"], r["arrangements"]), "")
-        with open(self.tmp("saved.yaml"), encoding="utf-8") as f, open(PRJCFG, encoding="utf-8") as g:
-            self.assertEqual(f.read(), g.read(), "open + save must not change the file")
-
-    def test_restore_is_the_inverse_of_project_text(self):
-        logic, p, a = AppLogic(), PrjSetModel(), AppSetModel()
-        r = logic.openProject(URL, p, a)
-        before = logic.projectText(p, a, r["scan_items"], r["arrangements"])
-        p.edit(0, "TX_LEN", "22", "", "Project Information", "")
-        a.removeItem(0)
-        self.assertNotEqual(logic.projectText(p, a, r["scan_items"], r["arrangements"]), before)
-        r2 = logic.restoreProject(before, p, a)
-        self.assertEqual(r2["error"], "")
-        self.assertEqual(logic.projectText(p, a, r2["scan_items"], r2["arrangements"]), before)
-
-    def test_open_rejects_single_workspace_files_without_changing_anything(self):
-        logic, p, a = AppLogic(), PrjSetModel(), AppSetModel()
-        logic.openProject(URL, p, a)
-        r = logic.openProject(QUrl.fromLocalFile(os.path.join(ROOT, "yaml", "appset.yaml")), p, a)
-        self.assertIn("not a project file", r["error"])
-        self.assertEqual((p.rowCount(), a.rowCount()), (140, 16))
-        self.assertIn("Could not open", logic.openProject(QUrl.fromLocalFile(self.tmp("missing.yaml")), p, a)["error"])
-
+    # (project open/save/undo: see test_project.py)
     def test_live_register_check(self):
         a = AppSetModel()
         a.importFile(URL)
@@ -170,7 +138,8 @@ class PrjCfgTestCase(unittest.TestCase):
     @unittest.skipUnless(os.path.exists(XLSX), "prjcfg.xlsx not present")
     def test_matches_spreadsheet(self):
         doc, skipped = prjcfg.from_xlsx(XLSX)
-        self.assertEqual(doc, load(PRJCFG), "regenerate: uv run python -m src.modules.prjcfg prjcfg.xlsx yaml/prjcfg.yaml")
+        self.assertEqual(doc, load(PRJCFG),
+                         "regenerate: uv run python -m src.modules.prjcfg prjcfg.xlsx yaml/prjcfg.yaml")
         self.assertEqual(skipped, ["For ScanState Idle (Use mutual)"])
 
     def test_converter_usage(self):

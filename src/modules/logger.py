@@ -1,4 +1,6 @@
-import threading, logging, logging.config, os
+import threading
+import logging
+import logging.config
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -6,7 +8,7 @@ from pathlib import Path
 LOG_DIR = Path('./logs')
 if not LOG_DIR.exists():
     LOG_DIR.mkdir(parents=True, exist_ok=True)
-    
+
 class AppLogger:
     _instance = None
     _lock = threading.Lock()
@@ -23,7 +25,8 @@ class AppLogger:
         self.logger = logging.getLogger(__name__)
         self.configure_logging()
 
-    def configure_logging(self, level="INFO", format="[%(asctime)s] ___ %(levelname)s ___ %(message)s", output=LOG_DIR / 'app.log'):
+    def configure_logging(self, level="INFO", format="[%(asctime)s] ___ %(levelname)s ___ %(message)s",
+                          output=LOG_DIR / 'app.log'):
         level_map = {
             "INFO": logging.INFO,
             "DEBUG": logging.DEBUG,
@@ -33,7 +36,7 @@ class AppLogger:
         }
         if level not in level_map:
             raise ValueError(f"Invalid log level: {level}")
-        
+
         self.logger.setLevel(level_map[level])
         formatter = logging.Formatter(f"{format}", datefmt='%d-%m-%Y %H:%M:%S')
         handler = RotatingFileHandler(output, maxBytes=1e6, backupCount=5)

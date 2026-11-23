@@ -17,7 +17,7 @@ RoundButton{
     ToolTip{
         visible: button.showToolTip && button.hovered
         text: button.text
-        x: isHeaderBtn ? 0 : (button.width+5)
-        y: isHeaderBtn ? button.height : (button.height/2 - implicitHeight/2)
+        x: button.isHeaderBtn ? 0 : (button.width+5)
+        y: button.isHeaderBtn ? button.height : (button.height/2 - implicitHeight/2)
     }
 }

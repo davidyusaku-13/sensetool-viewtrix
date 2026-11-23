@@ -2,15 +2,49 @@ name: SenseTool CI/CD
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "develop"]
+  pull_request:
 
 permissions:
   packages: write
   contents: write
 
 jobs:
+  test:
+    name: Lint & tests
+    runs-on: ubuntu-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Libraries Qt needs to run headless
+        run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libfontconfig1 libdbus-1-3
+
+      - name: Install dependencies
+        run: uv sync --frozen --python 3.12
+
+      - name: Lint Python
+        run: uv run ruff check .
+
+      - name: Lint QML
+        run: uv run pyside6-qmllint $(find qml -name '*.qml')
+
+      - name: Python tests (with coverage)
+        run: |
+          uv run coverage run --source=src -m unittest -v
+          uv run coverage report
+
+      - name: QML tests
+        run: uv run python tests/run_qml_tests.py
+
   build:
-    name: SenseTool Testing & Deployment
+    name: SenseTool Deployment
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,14 +86,6 @@ jobs:
           curl -Lo dumpbin.zip https://github.com/Delphier/dumpbin/releases/download/v14.40.33811/dumpbin-14.40.33811-x64.zip
           7z x dumpbin.zip -odumpbin
           echo "${{ github.workspace }}\dumpbin" >> $env:GITHUB_PATH
-
-      - name: add qmltestrunner to path
-        run: |
-          echo "${{ github.workspace }}\Qt\6.7.0\win64_mingw\bin" >> $env:GITHUB_PATH
-
-      - name: Testing pyUnit and QMLUnit
-        run: |
-          invoke test
 
       - name: Save CHANGELOG.md to GITHUB_ENV
         run: |

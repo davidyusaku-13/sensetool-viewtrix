@@ -2,12 +2,19 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtQuick.Controls.Material
 import "components"
 
 Window {
+    id: root
     width: 400
     height: 300
     title: qsTr("New update available")
+    // dependencies
+    property var updates: null        // UpdateChecker
+    property var downloader: null     // UpdateManager
+    Material.theme: Theme.theme
+    Material.accent: Theme.accent
     property alias progressBar: progressBar
     property alias progressText: progressText
     property alias restartDialog: restartDialog
@@ -20,7 +27,7 @@ Window {
                 text: qsTr("App Update Required!")
                 font.family: "Richard Clean Personal Use"
                 font.pixelSize: 30
-                color: "#F08519"
+                color: Theme.accent
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
             Frame{
@@ -57,7 +64,7 @@ Window {
                 text: qsTr("Download")
                 font.family: "Montserrat"
                 onClicked: {
-                    updateManager.download_update(window.logic.updateLink())
+                    root.downloader.download_update(root.updates.updateLink())
                 }
             }
         }
@@ -67,7 +74,7 @@ Window {
             text: qsTr("The download is complete. Would you like to restart the application now?")
             buttons: MessageDialog.Yes | MessageDialog.No
             onAccepted: {
-                updateManager.restartApplication()
+                root.downloader.restartApplication()
             }
         }
     }

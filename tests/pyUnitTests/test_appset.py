@@ -14,7 +14,7 @@ BUNDLED = QUrl.fromLocalFile(os.path.join(ROOT, "yaml", "appset.yaml"))
 
 def reg(addr, name, size, *fields):
     return {"addr": str(addr), "name": name, "size": str(size), "category": "", "desc": "",
-            "fields": [{"name": n, "msb": str(m), "lsb": str(l), "default": d} for n, m, l, d in fields]}
+            "fields": [{"name": n, "msb": str(msb), "lsb": str(lsb), "default": d} for n, msb, lsb, d in fields]}
 
 
 def bundled():
@@ -89,6 +89,34 @@ class AppSetTestCase(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             self.assertIn("problems", m.generate(QUrl.fromLocalFile(d)))
             self.assertFalse(os.path.exists(os.path.join(d, "appset.h")))
+
+    def test_what_the_table_shows(self):
+        m, _ = bundled()
+        roles = {v.decode(): k for k, v in m.roleNames().items()}
+        row = {name: m.data(m.index(0), rid) for name, rid in roles.items()}
+        self.assertEqual((row["addrHex"], row["name"], row["defaultValue"], row["issue"]),
+                         ("0x000", "ScanState_Ctrl", "0x01", ""))
+        self.assertEqual(row["layout"], "[0] sstat_idle_en = 0x1")
+        self.assertIsNone(m.data(m.index(99), roles["name"]))
+        self.assertIn("Core", m.categories())
+        self.assertEqual(len(m.categories()), len(set(m.categories())))
+
+    def test_bad_input_is_refused(self):
+        m, _ = bundled()
+        self.assertEqual(m.editRegister(99, reg(0, "x", 1)), -1)
+        m.removeItem(99)
+        self.assertEqual(m.rowCount(), 16)
+        with tempfile.TemporaryDirectory() as d:
+            bad = os.path.join(d, "bad.yaml")
+            for body, why in [("registers: 3\n", "registers"), ("registers:\n- name: a\n", "addr"),
+                              ("registers:\n- {name: a, addr: 0, fields: 3}\n", "fields"), ("- 1\n", "mapping")]:
+                with open(bad, "w") as f:
+                    f.write(body)
+                self.assertIn(why, m.importFile(QUrl.fromLocalFile(bad)))
+            self.assertEqual(m.rowCount(), 16, "a failed import changes nothing")
+        m.clear()
+        with tempfile.TemporaryDirectory() as d:
+            self.assertIn("no registers", m.generate(QUrl.fromLocalFile(d)))
 
     @unittest.skipUnless(shutil.which("gcc"), "gcc not available")
     def test_generated_code_compiles_and_has_right_defaults(self):

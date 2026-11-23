@@ -20,5 +20,5 @@ class Translator(QObject):
             self.app.installTranslator(self.translator)
         else:
             self.app.removeTranslator(self.translator)
-            logger.log(f"Translation file could not be loaded", "ERROR")
+            logger.log("Translation file could not be loaded", "ERROR")
         self.engine.retranslate()

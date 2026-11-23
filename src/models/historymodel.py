@@ -2,7 +2,6 @@ from PySide6.QtCore import Qt, QAbstractListModel, Slot, QModelIndex
 from PySide6.QtQml import QmlElement
 from ..modules.logger import AppLogger
 from .historymodelitem import HistoryModelItem
-import yaml
 import datetime
 
 QML_IMPORT_NAME = "HistoryModel"
@@ -49,10 +48,7 @@ class HistoryModel(QAbstractListModel):
 
     @Slot(str, str, str, str)
     def addHistory(self, action, name="", value="", desc=""):
-        action = action if action != None else ""
-        name = name if name != None else ""
-        value = value if value != None else ""
-        desc = desc if desc != None else ""
+        action, name, value, desc = ("" if v is None else v for v in (action, name, value, desc))
         current_time = datetime.datetime.now().strftime("%A, %d-%m-%Y %H:%M:%S")
         tmp = f"{action}: {name} - {value} - {desc} on {current_time}"
         self.beginInsertRows(QModelIndex(), len(self._items), len(self._items))

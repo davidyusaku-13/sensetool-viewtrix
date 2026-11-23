@@ -11,3 +11,4 @@ main.exe
 prjcfg.xlsx
 
 .venv/
+.coverage

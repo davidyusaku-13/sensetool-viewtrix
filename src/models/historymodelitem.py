@@ -1,4 +1,4 @@
-from PySide6.QtCore import Property, Slot, QModelIndex, QObject
+from PySide6.QtCore import Property, QObject
 from PySide6.QtQml import QmlElement
 
 QML_IMPORT_NAME = "HistoryModelItem"

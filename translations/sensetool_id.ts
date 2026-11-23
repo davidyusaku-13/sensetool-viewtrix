@@ -4,7 +4,7 @@
 <context>
     <name>AppSetPage</name>
     <message>
-        <location filename="../qml/pages/appset/AppSetPage.qml" line="+35"/>
+        <location filename="../qml/pages/appset/AppSetPage.qml" line="+23"/>
         <source>Delete %1 register(s)?</source>
         <translation>Hapus %1 register?</translation>
     </message>
@@ -14,34 +14,34 @@
         <translation>%1 register bermasalah (ditandai merah). Perbaiki dulu sebelum membuat kode.</translation>
     </message>
     <message>
-        <location line="+9"/>
-        <location line="+3"/>
+        <location line="+5"/>
+        <location line="+1"/>
         <source>Application Setting</source>
         <translation>Pengaturan Aplikasi</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+4"/>
         <source>Application setting (*.yaml *.yml *.xlsx)</source>
         <translation>Pengaturan aplikasi (*.yaml *.yml *.xlsx)</translation>
     </message>
     <message>
         <location line="+0"/>
-        <location line="+10"/>
+        <location line="+7"/>
         <source>YAML files (*.yaml *.yml)</source>
         <translation>Berkas YAML (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location line="-10"/>
+        <location line="-7"/>
         <source>prjcfg spreadsheet (*.xlsx)</source>
         <translation>Spreadsheet prjcfg (*.xlsx)</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+12"/>
         <source>Folder for appset.c and appset.h</source>
         <translation>Folder untuk appset.c dan appset.h</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+34"/>
         <source>Import</source>
         <translation>Impor</translation>
     </message>
@@ -101,17 +101,17 @@
         <translation>Tulis berkas C (Ctrl+G)</translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+7"/>
         <source>Addr</source>
         <translation>Alamat</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>Name</source>
         <translation>Nama</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>Size</source>
         <translation>Ukuran</translation>
     </message>
@@ -121,7 +121,7 @@
         <translation>Bit field</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>Default</source>
         <translation>Bawaan</translation>
     </message>
@@ -131,7 +131,7 @@
         <translation>Deskripsi</translation>
     </message>
     <message>
-        <location line="+33"/>
+        <location line="+3"/>
         <source>%1 registers</source>
         <translation>%1 register</translation>
     </message>
@@ -151,7 +151,7 @@
         <translation>  •  %1 bermasalah</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="-3"/>
         <source>No registers yet.
 Open a project (Ctrl+O), import the AppSet sheet, or Add a register.</source>
         <translation>Belum ada register.
@@ -161,7 +161,7 @@ Buka proyek (Ctrl+O), impor sheet AppSet, atau Tambah register.</translation>
 <context>
     <name>AppSetWindow</name>
     <message>
-        <location filename="../qml/pages/appset/AppSetWindow.qml" line="+9"/>
+        <location filename="../qml/pages/appset/AppSetWindow.qml" line="+11"/>
         <source>Edit Register</source>
         <translation>Ubah Register</translation>
     </message>
@@ -171,7 +171,7 @@ Buka proyek (Ctrl+O), impor sheet AppSet, atau Tambah register.</translation>
         <translation>Tambah Register</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+65"/>
         <source>Address</source>
         <translation>Alamat</translation>
     </message>
@@ -240,20 +240,33 @@ Buka proyek (Ctrl+O), impor sheet AppSet, atau Tambah register.</translation>
         <source>Default</source>
         <translation>Bawaan</translation>
     </message>
+</context>
+<context>
+    <name>ArrangementWindow</name>
     <message>
-        <location line="+71"/>
-        <source>Save</source>
-        <translation>Simpan</translation>
+        <location filename="../qml/pages/scanarr/ArrangementWindow.qml" line="+9"/>
+        <source>Edit Scan Arrangement</source>
+        <translation>Ubah Scan Arrangement</translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>Add</source>
-        <translation>Tambah</translation>
+        <source>Add Scan Arrangement</source>
+        <translation>Tambah Scan Arrangement</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Cancel</source>
-        <translation>Batal</translation>
+        <location line="+19"/>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Scan Arrangement Name</source>
+        <translation>Nama Scan Arrangement</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Description</source>
+        <translation>Deskripsi</translation>
     </message>
 </context>
 <context>
@@ -265,9 +278,27 @@ Buka proyek (Ctrl+O), impor sheet AppSet, atau Tambah register.</translation>
     </message>
 </context>
 <context>
+    <name>EditWindow</name>
+    <message>
+        <location filename="../qml/components/EditWindow.qml" line="+17"/>
+        <source>Save</source>
+        <translation>Simpan</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Add</source>
+        <translation>Tambah</translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>Cancel</source>
+        <translation>Batal</translation>
+    </message>
+</context>
+<context>
     <name>Header</name>
     <message>
-        <location filename="../qml/layouts/Header.qml" line="+29"/>
+        <location filename="../qml/layouts/Header.qml" line="+36"/>
         <source>Show workspace names</source>
         <translation>Tampilkan nama ruang kerja</translation>
     </message>
@@ -277,7 +308,7 @@ Buka proyek (Ctrl+O), impor sheet AppSet, atau Tambah register.</translation>
         <translation>Sembunyikan nama ruang kerja</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+4"/>
         <source>Sense Tool</source>
         <translation>Sense Tool</translation>
     </message>
@@ -332,7 +363,7 @@ Ada perubahan yang belum disimpan</translation>
 <context>
     <name>HeaderList</name>
     <message>
-        <location filename="../qml/layouts/HeaderList.qml" line="+15"/>
+        <location filename="../qml/layouts/HeaderList.qml" line="+16"/>
         <source>Activity</source>
         <translation>Aktivitas</translation>
     </message>
@@ -345,94 +376,105 @@ Ada perubahan yang belum disimpan</translation>
 <context>
     <name>HwUtilPage</name>
     <message>
-        <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="+17"/>
-        <source>Sample Number must be a whole number of at least 2.</source>
-        <translation>Jumlah Sampel harus bilangan bulat minimal 2.</translation>
+        <location filename="../qml/pages/hwutil/HwUtilPage.qml" line="+22"/>
+        <location line="+22"/>
+        <source>Window coefficients</source>
+        <translation>Koefisien window</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>a0 must be between 0 and 1 (0.5 = Hann, 0.54 = Hamming).</source>
-        <translation>a0 harus antara 0 dan 1 (0.5 = Hann, 0.54 = Hamming).</translation>
+        <location line="-15"/>
+        <location line="+41"/>
+        <source>I Coef</source>
+        <translation>Koef. I</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>%1 must be a whole number of at least 1.</source>
-        <translation>%1 harus bilangan bulat minimal 1.</translation>
+        <location line="-41"/>
+        <location line="+41"/>
+        <source>Q Coef</source>
+        <translation>Koef. Q</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="-37"/>
         <source>Hardware Utility</source>
         <translation>Utilitas Perangkat Keras</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+4"/>
+        <location line="+15"/>
+        <location line="+10"/>
+        <location line="+16"/>
+        <source>YAML files (*.yaml *.yml)</source>
+        <translation>Berkas YAML (*.yaml *.yml)</translation>
+    </message>
+    <message>
+        <location line="+21"/>
         <source>Window Coefficient Generator</source>
         <translation>Pembuat Koefisien Window</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+1"/>
         <source>Demodulator Coefficient Generator</source>
         <translation>Pembuat Koefisien Demodulator</translation>
     </message>
     <message>
-        <location line="+20"/>
-        <location line="+114"/>
+        <location line="+13"/>
+        <location line="+32"/>
         <source>Import</source>
         <translation>Impor</translation>
     </message>
     <message>
-        <location line="-88"/>
-        <location line="+116"/>
+        <location line="-31"/>
+        <location line="+32"/>
         <source>Export</source>
         <translation>Ekspor</translation>
     </message>
     <message>
-        <location line="-88"/>
+        <location line="-25"/>
         <source>Enter the sample number and a0 below, then press Plot.
 Or Import a window coefficient file.</source>
         <translation>Isi jumlah sampel dan a0 di bawah, lalu tekan Plot.
 Atau Impor berkas koefisien window.</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+6"/>
         <source>Sample Number</source>
         <translation>Jumlah Sampel</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+7"/>
         <source>Window length</source>
         <translation>Panjang window</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location line="+108"/>
+        <location line="+3"/>
+        <location line="+26"/>
         <source>Plot</source>
         <translation>Plot</translation>
     </message>
     <message>
-        <location line="-34"/>
+        <location line="-10"/>
         <source>Enter step, sample, cycle and ADC frequency below, then press Plot.
 Or Import a demodulator coefficient file.</source>
         <translation>Isi step, sampel, siklus dan frekuensi ADC di bawah, lalu tekan Plot.
 Atau Impor berkas koefisien demodulator.</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+6"/>
         <source>Step</source>
         <translation>Step</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+1"/>
         <source>Sample</source>
         <translation>Sampel</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+1"/>
         <source>Cycle</source>
         <translation>Siklus</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+1"/>
         <source>ADC Freq</source>
         <translation>Frek. ADC</translation>
     </message>
@@ -440,7 +482,7 @@ Atau Impor berkas koefisien demodulator.</translation>
 <context>
     <name>PopUpMenu</name>
     <message>
-        <location filename="../qml/layouts/PopUpMenu.qml" line="+37"/>
+        <location filename="../qml/layouts/PopUpMenu.qml" line="+44"/>
         <source>Activity</source>
         <translation>Aktivitas</translation>
     </message>
@@ -480,7 +522,7 @@ Impor, simpan, perubahan, dan berkas yang dibuat akan muncul di sini.</translati
 <context>
     <name>PrjSetItem</name>
     <message>
-        <location filename="../qml/pages/prjset/PrjSetItem.qml" line="+150"/>
+        <location filename="../qml/pages/prjset/PrjSetItem.qml" line="+84"/>
         <source>Comment: </source>
         <translation>Komentar: </translation>
     </message>
@@ -488,7 +530,7 @@ Impor, simpan, perubahan, dan berkas yang dibuat akan muncul di sini.</translati
 <context>
     <name>PrjSetPage</name>
     <message>
-        <location filename="../qml/pages/prjset/PrjSetPage.qml" line="+48"/>
+        <location filename="../qml/pages/prjset/PrjSetPage.qml" line="+37"/>
         <source>Delete %1 item(s)?</source>
         <translation>Hapus %1 item?</translation>
     </message>
@@ -498,8 +540,8 @@ Impor, simpan, perubahan, dan berkas yang dibuat akan muncul di sini.</translati
         <translation>%1 item bermasalah (ditandai merah). Perbaiki dulu sebelum membuat header.</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <location line="+3"/>
+        <location line="+5"/>
+        <location line="+1"/>
         <source>Project Setting</source>
         <translation>Pengaturan Proyek</translation>
     </message>
@@ -510,22 +552,22 @@ Impor, simpan, perubahan, dan berkas yang dibuat akan muncul di sini.</translati
     </message>
     <message>
         <location line="+0"/>
-        <location line="+10"/>
+        <location line="+7"/>
         <source>YAML files (*.yaml *.yml)</source>
         <translation>Berkas YAML (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location line="-10"/>
+        <location line="-7"/>
         <source>prjcfg spreadsheet (*.xlsx)</source>
         <translation>Spreadsheet prjcfg (*.xlsx)</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+14"/>
         <source>C header (*.h)</source>
         <translation>Header C (*.h)</translation>
     </message>
     <message>
-        <location line="+60"/>
+        <location line="+37"/>
         <source>Import</source>
         <translation>Impor</translation>
     </message>
@@ -595,12 +637,12 @@ Impor, simpan, perubahan, dan berkas yang dibuat akan muncul di sini.</translati
         <translation>Hanya yang bermasalah</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+11"/>
         <source>Item</source>
         <translation>Item</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>Value</source>
         <translation>Nilai</translation>
     </message>
@@ -610,7 +652,7 @@ Impor, simpan, perubahan, dan berkas yang dibuat akan muncul di sini.</translati
         <translation>Deskripsi</translation>
     </message>
     <message>
-        <location line="+44"/>
+        <location line="+9"/>
         <source>Showing %1 of %2</source>
         <translation>Menampilkan %1 dari %2</translation>
     </message>
@@ -635,7 +677,7 @@ Impor, simpan, perubahan, dan berkas yang dibuat akan muncul di sini.</translati
         <translation> (%1 lainnya terdampak)</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="-8"/>
         <source>No items match the search.</source>
         <translation>Tidak ada item yang cocok.</translation>
     </message>
@@ -650,7 +692,7 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
 <context>
     <name>PrjSetWindow</name>
     <message>
-        <location filename="../qml/pages/prjset/PrjSetWindow.qml" line="+8"/>
+        <location filename="../qml/pages/prjset/PrjSetWindow.qml" line="+9"/>
         <source>Add Item</source>
         <translation>Tambah Item</translation>
     </message>
@@ -660,246 +702,67 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
         <translation>Ubah Item</translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+34"/>
         <source>Name</source>
         <translation>Nama</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+10"/>
         <source>An item with this name already exists</source>
         <translation>Item dengan nama ini sudah ada</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+4"/>
         <source>Value</source>
         <translation>Nilai</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+8"/>
         <source>Group</source>
         <translation>Grup</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+7"/>
         <source>Description</source>
         <translation>Deskripsi</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+6"/>
         <source>Comment (not written to prjset.h)</source>
         <translation>Komentar (tidak ditulis ke prjset.h)</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Save</source>
-        <translation>Simpan</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Add</source>
-        <translation>Tambahkan</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Cancel</source>
-        <translation>Batalkan</translation>
-    </message>
-</context>
-<context>
-    <name>ScanArrColumn</name>
-    <message>
-        <location filename="../qml/pages/scanarr/ArrangementColumn/ScanArrColumn.qml" line="+36"/>
-        <source>Delete %1 arrangement(s) and their steps?</source>
-        <translation>Hapus %1 arrangement beserta step-nya?</translation>
-    </message>
-    <message>
-        <location line="+33"/>
-        <source>Arrangements</source>
-        <translation>Arrangement</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Add</source>
-        <translation>Tambah</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Add an arrangement (Ctrl+N)</source>
-        <translation>Tambah arrangement (Ctrl+N)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Edit</source>
-        <translation>Ubah</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Edit ID, name, description (Enter, or double-click)</source>
-        <translation>Ubah ID, nama, deskripsi (Enter, atau klik ganda)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Delete</source>
-        <translation>Hapus</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Delete (Del)</source>
-        <translation>Hapus (Del)</translation>
-    </message>
-    <message>
-        <location line="+28"/>
-        <source>ID</source>
-        <translation>ID</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Name</source>
-        <translation>Nama</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Description</source>
-        <translation>Deskripsi</translation>
-    </message>
-    <message>
-        <location line="+29"/>
-        <source>%1 arrangements  •  %2 selected</source>
-        <translation>%1 arrangement  •  %2 dipilih</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>No arrangements yet. Add one, then click it to choose its scan steps.</source>
-        <translation>Belum ada arrangement. Tambahkan, lalu klik untuk memilih step scan-nya.</translation>
-    </message>
-</context>
-<context>
-    <name>ScanArrListColumn</name>
-    <message>
-        <location filename="../qml/pages/scanarr/ListColumn/ScanArrListColumn.qml" line="+39"/>
-        <source>Remove %1 step(s) from %2?</source>
-        <translation>Hapus %1 step dari %2?</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>Scan List</source>
-        <translation>Daftar Scan</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>%1 / 10 steps</source>
-        <translation>%1 / 10 step</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Add</source>
-        <translation>Tambah</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Insert steps after the selected one, or before AFE_END (Ctrl+N)</source>
-        <translation>Sisipkan step setelah yang dipilih, atau sebelum AFE_END (Ctrl+N)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Remove</source>
-        <translation>Hapus</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Remove the selected steps (Del)</source>
-        <translation>Hapus step terpilih (Del)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Move up</source>
-        <translation>Naikkan</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Move down</source>
-        <translation>Turunkan</translation>
-    </message>
-    <message>
-        <location line="+30"/>
-        <source>Scan step</source>
-        <translation>Step scan</translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>Click an arrangement to see and edit its scan steps.</source>
-        <translation>Klik sebuah arrangement untuk melihat dan mengubah step scan-nya.</translation>
-    </message>
-</context>
-<context>
-    <name>ScanArrListWindow</name>
-    <message>
-        <location filename="../qml/pages/scanarr/ListColumn/ScanArrListWindow.qml" line="+8"/>
-        <source>Add Scan Steps</source>
-        <translation>Tambah Step Scan</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Edit Scan Steps</source>
-        <translation>Ubah Step Scan</translation>
-    </message>
-    <message>
-        <location line="+39"/>
-        <source>Scan Items</source>
-        <translation>Item Scan</translation>
-    </message>
-    <message>
-        <location line="+52"/>
-        <source>%1 of %2 selected</source>
-        <translation>%1 dari %2 dipilih</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Save</source>
-        <translation>Simpan</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Add</source>
-        <translation>Tambah</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Cancel</source>
-        <translation>Batal</translation>
     </message>
 </context>
 <context>
     <name>ScanArrPage</name>
     <message>
-        <location filename="../qml/pages/scanarr/ScanArrPage.qml" line="+64"/>
+        <location filename="../qml/pages/scanarr/ScanArrPage.qml" line="+32"/>
         <source>Folder for afeScanArrg.c and afeScanArrg.h</source>
         <translation>Folder untuk afeScanArrg.c dan afeScanArrg.h</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <location line="+36"/>
+        <location line="-4"/>
+        <location line="+1"/>
         <source>Scan Arrangement</source>
         <translation>Scan Arrangement</translation>
     </message>
     <message>
-        <location line="-30"/>
+        <location line="+10"/>
         <source>Scan arrangement (*.yaml *.yml *.xlsx)</source>
         <translation>Scan arrangement (*.yaml *.yml *.xlsx)</translation>
     </message>
     <message>
         <location line="+0"/>
-        <location line="+19"/>
+        <location line="+13"/>
         <source>YAML files (*.yaml *.yml)</source>
         <translation>Berkas YAML (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location line="-19"/>
+        <location line="-13"/>
         <source>prjcfg spreadsheet (*.xlsx)</source>
         <translation>Spreadsheet prjcfg (*.xlsx)</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+6"/>
         <source>Imported. These arrangement rows have no name or scan steps yet and were skipped:
 
 </source>
@@ -908,7 +771,7 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
 </translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="-21"/>
         <source>Fix these problems first:
 
 </source>
@@ -917,7 +780,7 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
 </translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+111"/>
         <source>Import</source>
         <translation>Impor</translation>
     </message>
@@ -961,173 +824,208 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
         <source>Write the C files (Ctrl+G)</source>
         <translation>Tulis berkas C (Ctrl+G)</translation>
     </message>
-</context>
-<context>
-    <name>ScanArrWindow</name>
     <message>
-        <location filename="../qml/pages/scanarr/ArrangementColumn/ScanArrWindow.qml" line="+8"/>
-        <source>Add Scan Arrangement</source>
-        <translation>Tambah Scan Arrangement</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Edit Scan Arrangement</source>
-        <translation>Ubah Scan Arrangement</translation>
-    </message>
-    <message>
-        <location line="+35"/>
-        <source>ID</source>
-        <translation>ID</translation>
-    </message>
-    <message>
-        <location line="+25"/>
-        <source>Scan Arrangement Name</source>
-        <translation>Nama Scan Arrangement</translation>
-    </message>
-    <message>
-        <location line="+29"/>
-        <source>Description</source>
-        <translation>Deskripsi</translation>
-    </message>
-    <message>
-        <location line="+29"/>
-        <source>Save</source>
-        <translation>Simpan</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Add</source>
-        <translation>Tambah</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Cancel</source>
-        <translation>Batal</translation>
-    </message>
-</context>
-<context>
-    <name>ScanItemColumn</name>
-    <message>
-        <location filename="../qml/pages/scanarr/ItemColumn/ScanItemColumn.qml" line="+36"/>
-        <source>Delete %1 scan item(s)?</source>
-        <translation>Hapus %1 item scan?</translation>
-    </message>
-    <message>
-        <location line="+26"/>
+        <location line="+12"/>
         <source>Scan Items</source>
         <translation>Item Scan</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+2"/>
+        <location line="+28"/>
+        <source>Name</source>
+        <translation>Nama</translation>
+    </message>
+    <message>
+        <location line="-28"/>
+        <location line="+28"/>
+        <source>Description</source>
+        <translation>Deskripsi</translation>
+    </message>
+    <message>
+        <location line="-26"/>
+        <source>No scan items. The first one must be AFE_END (value 0).</source>
+        <translation>Belum ada item scan. Item pertama harus AFE_END (nilai 0).</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Delete %1 scan item(s)?</source>
+        <translation>Hapus %1 item scan?</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location line="+27"/>
+        <location line="+28"/>
         <source>Add</source>
         <translation>Tambah</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-55"/>
         <source>Add a scan item (Ctrl+N)</source>
         <translation>Tambah item scan (Ctrl+N)</translation>
     </message>
     <message>
         <location line="+1"/>
+        <location line="+27"/>
         <source>Edit</source>
         <translation>Ubah</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-27"/>
         <source>Edit (Enter, or double-click)</source>
         <translation>Ubah (Enter, atau klik ganda)</translation>
     </message>
     <message>
         <location line="+1"/>
+        <location line="+27"/>
         <source>Delete</source>
         <translation>Hapus</translation>
     </message>
     <message>
-        <location line="+0"/>
+        <location line="-27"/>
+        <location line="+27"/>
         <source>Delete (Del)</source>
         <translation>Hapus (Del)</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-26"/>
         <source>Move up (lowers its value)</source>
         <translation>Naikkan (nilainya berkurang)</translation>
     </message>
     <message>
         <location line="+1"/>
+        <location line="+54"/>
         <source>Move down</source>
         <translation>Turunkan</translation>
     </message>
     <message>
-        <location line="+29"/>
-        <source>Name</source>
-        <translation>Nama</translation>
+        <location line="-46"/>
+        <source>Arrangements</source>
+        <translation>Arrangement</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>No arrangements yet. Add one, then click it to choose its scan steps.</source>
+        <translation>Belum ada arrangement. Tambahkan, lalu klik untuk memilih step scan-nya.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Description</source>
-        <translation>Deskripsi</translation>
+        <source>%1 arrangements  •  %2 selected</source>
+        <translation>%1 arrangement  •  %2 dipilih</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <source>%1 items  •  %2 selected</source>
-        <translation>%1 item  •  %2 dipilih</translation>
+        <location line="+7"/>
+        <source>Delete %1 arrangement(s) and their steps?</source>
+        <translation>Hapus %1 arrangement beserta step-nya?</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>No scan items. The first one must be AFE_END (value 0).</source>
-        <translation>Belum ada item scan. Item pertama harus AFE_END (nilai 0).</translation>
+        <location line="+2"/>
+        <source>Add an arrangement (Ctrl+N)</source>
+        <translation>Tambah arrangement (Ctrl+N)</translation>
     </message>
-</context>
-<context>
-    <name>ScanWindow</name>
     <message>
-        <location filename="../qml/pages/scanarr/ItemColumn/ScanWindow.qml" line="+8"/>
-        <source>Add Scan Item</source>
-        <translation>Tambah Item Scan</translation>
+        <location line="+1"/>
+        <source>Edit ID, name, description (Enter, or double-click)</source>
+        <translation>Ubah ID, nama, deskripsi (Enter, atau klik ganda)</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Scan List</source>
+        <translation>Daftar Scan</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 / %2 steps</source>
+        <translation>%1 / %2 step</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Scan step</source>
+        <translation>Step scan</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Click an arrangement to see and edit its scan steps.</source>
+        <translation>Klik sebuah arrangement untuk melihat dan mengubah step scan-nya.</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 of %2 selected</source>
+        <translation>%1 dari %2 dipilih</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Remove %1 step(s) from %2?</source>
+        <translation>Hapus %1 step dari %2?</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Insert steps after the selected one, or before AFE_END (Ctrl+N)</source>
+        <translation>Sisipkan step setelah yang dipilih, atau sebelum AFE_END (Ctrl+N)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Remove</source>
+        <translation>Hapus</translation>
     </message>
     <message>
         <location line="+0"/>
+        <source>Remove the selected steps (Del)</source>
+        <translation>Hapus step terpilih (Del)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Move up</source>
+        <translation>Naikkan</translation>
+    </message>
+</context>
+<context>
+    <name>ScanItemWindow</name>
+    <message>
+        <location filename="../qml/pages/scanarr/ScanItemWindow.qml" line="+9"/>
         <source>Edit Scan Item</source>
         <translation>Ubah Item Scan</translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+0"/>
+        <source>Add Scan Item</source>
+        <translation>Tambah Item Scan</translation>
+    </message>
+    <message>
+        <location line="+18"/>
         <source>Scan Name</source>
         <translation>Nama Scan</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+7"/>
         <source>Description</source>
         <translation>Deskripsi</translation>
-    </message>
-    <message>
-        <location line="+29"/>
-        <source>Save</source>
-        <translation>Simpan</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Add</source>
-        <translation>Tambah</translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Cancel</source>
-        <translation>Batal</translation>
     </message>
 </context>
 <context>
     <name>SelectAllBox</name>
     <message>
-        <location filename="../qml/components/SelectAllBox.qml" line="+21"/>
+        <location filename="../qml/components/SelectAllBox.qml" line="+17"/>
         <source>Select all (Ctrl+A)</source>
         <translation>Pilih semua (Ctrl+A)</translation>
     </message>
 </context>
 <context>
+    <name>SelectableTable</name>
+    <message>
+        <location filename="../qml/components/SelectableTable.qml" line="+25"/>
+        <source>%1 items  •  %2 selected</source>
+        <translation>%1 item  •  %2 dipilih</translation>
+    </message>
+</context>
+<context>
     <name>SideBarList</name>
     <message>
-        <location filename="../qml/layouts/SideBarList.qml" line="+32"/>
+        <location filename="../qml/layouts/SideBarList.qml" line="+33"/>
         <source>Project Setting</source>
         <translation>Pengaturan Proyek</translation>
     </message>
@@ -1148,14 +1046,37 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
     </message>
 </context>
 <context>
+    <name>StepPickerWindow</name>
+    <message>
+        <location filename="../qml/pages/scanarr/StepPickerWindow.qml" line="+9"/>
+        <source>Add Scan Steps</source>
+        <translation>Tambah Step Scan</translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Scan Items</source>
+        <translation>Item Scan</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Name</source>
+        <translation>Nama</translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>%1 of %2 selected</source>
+        <translation>%1 dari %2 dipilih</translation>
+    </message>
+</context>
+<context>
     <name>UpdateWindow</name>
     <message>
-        <location filename="../qml/UpdateWindow.qml" line="+10"/>
+        <location filename="../qml/UpdateWindow.qml" line="+12"/>
         <source>New update available</source>
         <translation>Pembaruan baru tersedia</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+15"/>
         <source>App Update Required!</source>
         <translation>Dibutuhkan Pembaruan App!</translation>
     </message>
@@ -1183,25 +1104,25 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
 <context>
     <name>main</name>
     <message>
-        <location filename="../qml/main.qml" line="+103"/>
+        <location filename="../qml/main.qml" line="+41"/>
         <source>Imported. These ScanArrg rows had no name and were skipped:
 </source>
         <translation>Berhasil diimpor. Baris ScanArrg berikut tidak punya nama sehingga dilewati:
 </translation>
     </message>
     <message>
-        <location line="+34"/>
-        <location line="+65"/>
+        <location line="+23"/>
+        <location line="+66"/>
         <source>SenseTool</source>
         <translation>SenseTool</translation>
     </message>
     <message>
-        <location line="-64"/>
+        <location line="-65"/>
         <source>Untitled project</source>
         <translation>Proyek tanpa judul</translation>
     </message>
     <message>
-        <location line="+48"/>
+        <location line="+51"/>
         <source>Open project</source>
         <translation>Buka proyek</translation>
     </message>
@@ -1227,7 +1148,7 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
         <translation>Simpan proyek</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+11"/>
         <source>Unsaved changes</source>
         <translation>Perubahan belum disimpan</translation>
     </message>
@@ -1247,7 +1168,7 @@ Buka proyek (Ctrl+O), impor prjcfg.xlsx, atau Tambah item.</translation>
         <translation>Perubahan Anda akan hilang jika tidak disimpan.</translation>
     </message>
     <message>
-        <location line="+34"/>
+        <location line="+28"/>
         <source>% completed</source>
         <translation>% selesai</translation>
     </message>
